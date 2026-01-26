@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: enterprise-agentgateway-helm
+  namespace: argocd  # Assuming Argo CD is here; change if needed
+spec:
+  destination:
+    namespace: agentgateway-system  # Your desired namespace
+    server: https://kubernetes.default.svc  # In-cluster; change for remote
+  project: default  # Use your Argo CD project if customized
+  source:
+    chart: enterprise-agentgateway
+    helm:
+      skipCrds: false  # Redundant but safe
+      parameters:
+        - name: controller.image.pullPolicy
+          value: "Always"  # Example; customize e.g., to "IfNotPresent"
+        - name: licensing.secretName
+          value: "agent-gateway-license"  # References your secret
+        - name: licensing.create
+          value: "false"  # Disables default secret creation
+    repoURL: us-docker.pkg.dev/solo-public/enterprise-agentgateway/charts
+    targetRevision: 2.1.0  # Pin to version; update as needed
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true  # Auto-creates if missing
+      - ServerSideApply=true  # Better for large resources

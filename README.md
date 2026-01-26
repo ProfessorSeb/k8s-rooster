@@ -13,3 +13,7 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 
 
 kubectl label namespace argocd pod-security.kubernetes.io/enforce=privileged pod-security.kubernetes.io/audit=privileged pod-security.kubernetes.io/warn=privileged --overwrite
+
+
+
+kubectl create secret generic agent-gateway-license -n agentgateway-system --from-literal=license-key="$AGENTGATEWAY_LICENSE_KEY"
