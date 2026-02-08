@@ -1,0 +1,409 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    deprecated.daemonset.template.generation: '1'
+    longhorn.io/last-applied-tolerations: '[]'
+  labels:
+    longhorn.io/component: engine-image
+    longhorn.io/engine-image: ei-b0369a5d
+    longhorn.io/managed-by: longhorn-manager
+  name: engine-image-ei-b0369a5d
+  namespace: longhorn-system
+  ownerReferences:
+  - apiVersion: longhorn.io/v1beta2
+    blockOwnerDeletion: true
+    kind: EngineImage
+    name: ei-b0369a5d
+    uid: f62c5c05-9395-41f9-b0a2-d17b8708071b
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      longhorn.io/component: engine-image
+      longhorn.io/engine-image: ei-b0369a5d
+  template:
+    metadata:
+      labels:
+        longhorn.io/component: engine-image
+        longhorn.io/engine-image: ei-b0369a5d
+      name: engine-image-ei-b0369a5d
+      ownerReferences:
+      - apiVersion: longhorn.io/v1beta2
+        blockOwnerDeletion: true
+        kind: EngineImage
+        name: ei-b0369a5d
+        uid: f62c5c05-9395-41f9-b0a2-d17b8708071b
+    spec:
+      containers:
+      - args:
+        - -c
+        - diff /usr/local/bin/longhorn /data/longhorn > /dev/null 2>&1; if [ $? -ne
+          0 ]; then cp -p /usr/local/bin/longhorn /data/ && echo installed; fi &&
+          trap 'rm /data/longhorn* && echo cleaned up' EXIT && sleep infinity
+        command:
+        - /bin/bash
+        image: longhornio/longhorn-engine:v1.6.2
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - /data/longhorn version --client-only
+          failureThreshold: 3
+          initialDelaySeconds: 3
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 4
+        name: engine-image-ei-b0369a5d
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - ls /data/longhorn && /data/longhorn version --client-only
+          failureThreshold: 3
+          initialDelaySeconds: 3
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 4
+        resources: {}
+        securityContext:
+          privileged: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /data/
+          name: data
+      dnsPolicy: ClusterFirst
+      priorityClassName: longhorn-critical
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: longhorn-service-account
+      serviceAccountName: longhorn-service-account
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - hostPath:
+          path: /var/lib/longhorn/engine-binaries/longhornio-longhorn-engine-v1.6.2
+          type: ''
+        name: data
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 100%
+    type: RollingUpdate
+
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    deprecated.daemonset.template.generation: '1'
+    driver.longhorn.io/git-commit: dcd5164185d7130732f72bb2e978dfdc0338acd1
+    driver.longhorn.io/version: v1.6.2
+    longhorn.io/last-applied-tolerations: '[]'
+  labels:
+    longhorn.io/managed-by: longhorn-manager
+  name: longhorn-csi-plugin
+  namespace: longhorn-system
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: longhorn-csi-plugin
+  template:
+    metadata:
+      labels:
+        app: longhorn-csi-plugin
+    spec:
+      containers:
+      - args:
+        - --v=2
+        - --csi-address=$(ADDRESS)
+        - --kubelet-registration-path=/var/lib/kubelet/plugins/driver.longhorn.io/csi.sock
+        env:
+        - name: ADDRESS
+          value: /csi/csi.sock
+        image: longhornio/csi-node-driver-registrar:v2.9.2
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - rm -rf /registration/driver.longhorn.io /registration/driver.longhorn.io-reg.sock
+                /csi//*
+        name: node-driver-registrar
+        resources: {}
+        securityContext:
+          privileged: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /csi/
+          name: socket-dir
+        - mountPath: /registration
+          name: registration-dir
+      - args:
+        - --v=4
+        - --csi-address=/csi/csi.sock
+        image: longhornio/livenessprobe:v2.12.0
+        imagePullPolicy: IfNotPresent
+        name: longhorn-liveness-probe
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /csi/
+          name: socket-dir
+      - args:
+        - longhorn-manager
+        - -d
+        - csi
+        - --nodeid=$(NODE_ID)
+        - --endpoint=$(CSI_ENDPOINT)
+        - --drivername=driver.longhorn.io
+        - --manager-url=http://longhorn-backend:9500/v1
+        env:
+        - name: NODE_ID
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        - name: CSI_ENDPOINT
+          value: unix:///csi/csi.sock
+        image: longhornio/longhorn-manager:v1.6.2
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - rm -f /csi//*
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 9808
+            scheme: HTTP
+          initialDelaySeconds: 3
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 4
+        name: longhorn-csi-plugin
+        ports:
+        - containerPort: 9808
+          protocol: TCP
+        resources: {}
+        securityContext:
+          allowPrivilegeEscalation: true
+          capabilities:
+            add:
+            - SYS_ADMIN
+          privileged: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /csi/
+          name: socket-dir
+        - mountPath: /var/lib/kubelet/plugins/kubernetes.io/csi
+          mountPropagation: Bidirectional
+          name: kubernetes-csi-dir
+        - mountPath: /var/lib/kubelet/pods
+          mountPropagation: Bidirectional
+          name: pods-mount-dir
+        - mountPath: /dev
+          name: host-dev
+        - mountPath: /sys
+          name: host-sys
+        - mountPath: /host
+          mountPropagation: Bidirectional
+          name: host
+        - mountPath: /lib/modules
+          name: lib-modules
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      hostPID: true
+      priorityClassName: longhorn-critical
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: longhorn-service-account
+      serviceAccountName: longhorn-service-account
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - hostPath:
+          path: /var/lib/kubelet/plugins/kubernetes.io/csi
+          type: DirectoryOrCreate
+        name: kubernetes-csi-dir
+      - hostPath:
+          path: /var/lib/kubelet/plugins_registry
+          type: DirectoryOrCreate
+        name: registration-dir
+      - hostPath:
+          path: /var/lib/kubelet/plugins/driver.longhorn.io
+          type: DirectoryOrCreate
+        name: socket-dir
+      - hostPath:
+          path: /var/lib/kubelet/pods
+          type: DirectoryOrCreate
+        name: pods-mount-dir
+      - hostPath:
+          path: /dev
+          type: ''
+        name: host-dev
+      - hostPath:
+          path: /sys
+          type: ''
+        name: host-sys
+      - hostPath:
+          path: /
+          type: ''
+        name: host
+      - hostPath:
+          path: /lib/modules
+          type: ''
+        name: lib-modules
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    deprecated.daemonset.template.generation: '1'
+  labels:
+    app: longhorn-manager
+    app.kubernetes.io/instance: longhorn
+    app.kubernetes.io/name: longhorn
+    app.kubernetes.io/version: v1.6.2
+  name: longhorn-manager
+  namespace: longhorn-system
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: longhorn-manager
+  template:
+    metadata:
+      labels:
+        app: longhorn-manager
+        app.kubernetes.io/instance: longhorn
+        app.kubernetes.io/name: longhorn
+        app.kubernetes.io/version: v1.6.2
+    spec:
+      containers:
+      - command:
+        - longhorn-manager
+        - -d
+        - daemon
+        - --engine-image
+        - longhornio/longhorn-engine:v1.6.2
+        - --instance-manager-image
+        - longhornio/longhorn-instance-manager:v1.6.2
+        - --share-manager-image
+        - longhornio/longhorn-share-manager:v1.6.2
+        - --backing-image-manager-image
+        - longhornio/backing-image-manager:v1.6.2
+        - --support-bundle-manager-image
+        - longhornio/support-bundle-kit:v0.0.37
+        - --manager-image
+        - longhornio/longhorn-manager:v1.6.2
+        - --service-account
+        - longhorn-service-account
+        - --upgrade-version-check
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: spec.nodeName
+        image: longhornio/longhorn-manager:v1.6.2
+        imagePullPolicy: IfNotPresent
+        name: longhorn-manager
+        ports:
+        - containerPort: 9500
+          name: manager
+          protocol: TCP
+        - containerPort: 9501
+          name: conversion-wh
+          protocol: TCP
+        - containerPort: 9502
+          name: admission-wh
+          protocol: TCP
+        - containerPort: 9503
+          name: recov-backend
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /v1/healthz
+            port: 9501
+            scheme: HTTPS
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources: {}
+        securityContext:
+          privileged: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /host/dev/
+          name: dev
+        - mountPath: /host/proc/
+          name: proc
+        - mountPath: /var/lib/longhorn/
+          mountPropagation: Bidirectional
+          name: longhorn
+        - mountPath: /tls-files/
+          name: longhorn-grpc-tls
+      dnsPolicy: ClusterFirst
+      priorityClassName: longhorn-critical
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: longhorn-service-account
+      serviceAccountName: longhorn-service-account
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - hostPath:
+          path: /dev/
+          type: ''
+        name: dev
+      - hostPath:
+          path: /proc/
+          type: ''
+        name: proc
+      - hostPath:
+          path: /var/lib/longhorn/
+          type: ''
+        name: longhorn
+      - name: longhorn-grpc-tls
+        secret:
+          defaultMode: 420
+          optional: true
+          secretName: longhorn-grpc-tls
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 100%
+    type: RollingUpdate
