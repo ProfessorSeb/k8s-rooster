@@ -1,0 +1,198 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  labels:
+    app: longhorn-admission-webhook
+    app.kubernetes.io/instance: longhorn
+    app.kubernetes.io/name: longhorn
+    app.kubernetes.io/version: v1.6.2
+  name: longhorn-admission-webhook
+  namespace: longhorn-system
+spec:
+  clusterIP: 10.106.93.113
+  clusterIPs:
+  - 10.106.93.113
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: admission-webhook
+    port: 9502
+    protocol: TCP
+    targetPort: admission-wh
+  selector:
+    app: longhorn-manager
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  labels:
+    app: longhorn-manager
+    app.kubernetes.io/instance: longhorn
+    app.kubernetes.io/name: longhorn
+    app.kubernetes.io/version: v1.6.2
+  name: longhorn-backend
+  namespace: longhorn-system
+spec:
+  clusterIP: 10.100.231.195
+  clusterIPs:
+  - 10.100.231.195
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: manager
+    port: 9500
+    protocol: TCP
+    targetPort: manager
+  selector:
+    app: longhorn-manager
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  labels:
+    app: longhorn-conversion-webhook
+    app.kubernetes.io/instance: longhorn
+    app.kubernetes.io/name: longhorn
+    app.kubernetes.io/version: v1.6.2
+  name: longhorn-conversion-webhook
+  namespace: longhorn-system
+spec:
+  clusterIP: 10.111.212.228
+  clusterIPs:
+  - 10.111.212.228
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: conversion-webhook
+    port: 9501
+    protocol: TCP
+    targetPort: conversion-wh
+  selector:
+    app: longhorn-manager
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  labels:
+    app.kubernetes.io/instance: longhorn
+    app.kubernetes.io/name: longhorn
+    app.kubernetes.io/version: v1.6.2
+  name: longhorn-engine-manager
+  namespace: longhorn-system
+spec:
+  clusterIP: None
+  clusterIPs:
+  - None
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  selector:
+    longhorn.io/component: instance-manager
+    longhorn.io/instance-manager-type: engine
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  labels:
+    app: longhorn-ui
+    app.kubernetes.io/instance: longhorn
+    app.kubernetes.io/name: longhorn
+    app.kubernetes.io/version: v1.6.2
+  name: longhorn-frontend
+  namespace: longhorn-system
+spec:
+  clusterIP: 10.111.224.106
+  clusterIPs:
+  - 10.111.224.106
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  selector:
+    app: longhorn-ui
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  labels:
+    app: longhorn-recovery-backend
+    app.kubernetes.io/instance: longhorn
+    app.kubernetes.io/name: longhorn
+    app.kubernetes.io/version: v1.6.2
+  name: longhorn-recovery-backend
+  namespace: longhorn-system
+spec:
+  clusterIP: 10.105.92.237
+  clusterIPs:
+  - 10.105.92.237
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: recovery-backend
+    port: 9503
+    protocol: TCP
+    targetPort: recov-backend
+  selector:
+    app: longhorn-manager
+  sessionAffinity: None
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  labels:
+    app.kubernetes.io/instance: longhorn
+    app.kubernetes.io/name: longhorn
+    app.kubernetes.io/version: v1.6.2
+  name: longhorn-replica-manager
+  namespace: longhorn-system
+spec:
+  clusterIP: None
+  clusterIPs:
+  - None
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  selector:
+    longhorn.io/component: instance-manager
+    longhorn.io/instance-manager-type: replica
+  sessionAffinity: None
+  type: ClusterIP

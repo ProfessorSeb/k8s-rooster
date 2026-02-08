@@ -1,0 +1,57 @@
+# Sensitive data
+*.key
+*.pem
+*.p12
+secrets/
+*.secret
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backup files
+backups/
+*.backup
+
+# License files (should be managed separately)
+license.txt
+*.license
+
+# Local development
+.env
+.env.local
+
+# Build artifacts
+dist/
+build/
+
+# Logs
+*.log
+logs/
+
+# kubectl cache
+.kube/cache/
+
+# Helm
+charts/*.tgz
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Clean-up scripts outputs
+longhorn-current-config.yaml
+agentgateway-current-config.yaml
+extract-clean-configs.sh
