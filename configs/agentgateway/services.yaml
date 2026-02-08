@@ -196,73 +196,11 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app.kubernetes.io/instance: ollama-gateway
-    app.kubernetes.io/managed-by: kgateway
-    app.kubernetes.io/name: ollama-gateway
-    gateway.networking.k8s.io/gateway-class-name: enterprise-agentgateway
-    gateway.networking.k8s.io/gateway-name: ollama-gateway
-    kgateway: kube-gateway
-  name: ollama-gateway
-  namespace: agentgateway-system
-  ownerReferences:
-  - apiVersion: gateway.networking.k8s.io/v1
-    controller: true
-    kind: Gateway
-    name: ollama-gateway
-    uid: b9ab1e9d-b64d-44f4-b69f-46fb10fc0349
-spec:
-  allocateLoadBalancerNodePorts: true
-  clusterIP: 10.97.163.96
-  clusterIPs:
-  - 10.97.163.96
-  externalTrafficPolicy: Cluster
-  internalTrafficPolicy: Cluster
-  ipFamilies:
-  - IPv4
-  ipFamilyPolicy: SingleStack
-  ports:
-  - name: listener-8091
-    nodePort: 31933
-    port: 8091
-    protocol: TCP
-    targetPort: 8091
-  selector:
-    app.kubernetes.io/instance: ollama-gateway
-    app.kubernetes.io/name: ollama-gateway
-    gateway.networking.k8s.io/gateway-name: ollama-gateway
-  sessionAffinity: None
-  type: LoadBalancer
-
----
 apiVersion: v1
 kind: Service
 metadata:
   annotations: {}
   labels:
-    gateway: ollama-gateway
-  name: ollama-gateway-nodeport
-  namespace: agentgateway-system
-spec:
-  clusterIP: 10.101.111.156
-  clusterIPs:
-  - 10.101.111.156
-  externalTrafficPolicy: Cluster
-  internalTrafficPolicy: Cluster
-  ipFamilies:
-  - IPv4
-  ipFamilyPolicy: SingleStack
-  ports:
-  - name: http
-    nodePort: 30891
-    port: 8091
-    protocol: TCP
-    targetPort: 8091
-  selector:
-    gateway.networking.k8s.io/gateway-name: ollama-gateway
-  sessionAffinity: None
-  type: NodePort
-
----
 apiVersion: v1
 kind: Service
 metadata:
