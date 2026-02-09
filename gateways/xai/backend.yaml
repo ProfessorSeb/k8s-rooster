@@ -1,0 +1,19 @@
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayBackend
+metadata:
+  name: xai
+  namespace: agentgateway-system
+spec:
+  ai:
+    provider:
+      openai:
+        model: grok-4-1-fast-reasoning
+        host: api.x.ai
+        port: 443
+        path: "/v1/chat/completions"
+  policies:
+    auth:
+      secretRef:
+        name: xai-secret
+    tls:
+      sni: api.x.ai

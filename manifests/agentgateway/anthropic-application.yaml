@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: anthropic-gateway
+  namespace: argocd
+spec:
+  destination:
+    namespace: agentgateway-system
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: gateways/anthropic
+    repoURL: https://github.com/sebbycorp/k8s-rooster  # Update this to your actual repo URL
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
