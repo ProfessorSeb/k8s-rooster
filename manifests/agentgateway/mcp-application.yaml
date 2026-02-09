@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mcp-servers
+  namespace: argocd
+spec:
+  destination:
+    namespace: agentgateway-system
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    path: mcp
+    repoURL: https://github.com/ProfessorSeb/k8s-rooster
+    targetRevision: main
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
