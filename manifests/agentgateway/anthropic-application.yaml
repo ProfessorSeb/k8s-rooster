@@ -10,7 +10,7 @@ spec:
   project: default
   source:
     path: gateways/anthropic
-    repoURL: https://github.com/sebbycorp/k8s-rooster  # Update this to your actual repo URL
+    repoURL: https://github.com/ProfessorSeb/k8s-rooster
     targetRevision: HEAD
   syncPolicy:
     automated:
