@@ -1,0 +1,19 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: xai-gateway-proxy
+  namespace: agentgateway-system
+spec:
+  gatewayClassName: enterprise-agentgateway
+  infrastructure:
+    parametersRef:
+      name: tracing
+      group: enterpriseagentgateway.solo.io
+      kind: EnterpriseAgentgatewayParameters
+  listeners:
+    - protocol: HTTP
+      port: 8081
+      name: xai-providers
+      allowedRoutes:
+        namespaces:
+          from: All
