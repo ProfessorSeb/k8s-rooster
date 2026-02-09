@@ -7,7 +7,7 @@ metadata:
     route-type: xai-provider
 spec:
   parentRefs:
-    - name: xaigateway-proxy
+    - name: xai-gateway-proxy
       namespace: agentgateway-system
       sectionName: xai-providers
   rules:
