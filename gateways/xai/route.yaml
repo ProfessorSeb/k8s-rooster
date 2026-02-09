@@ -4,12 +4,12 @@ metadata:
   name: xai
   namespace: agentgateway-system
   labels:
-    route-type: llm-provider
+    route-type: xai-provider
 spec:
   parentRefs:
-    - name: agentgateway-proxy
+    - name: xaigateway-proxy
       namespace: agentgateway-system
-      sectionName: llm-providers
+      sectionName: xai-providers
   rules:
     - matches:
         - path:
