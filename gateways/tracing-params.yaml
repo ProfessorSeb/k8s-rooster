@@ -4,12 +4,9 @@ metadata:
   name: tracing
   namespace: agentgateway-system
 spec:
-  env:
-    - name: OTEL_EXPORTER_OTLP_ENDPOINT
-      value: "http://solo-enterprise-telemetry-collector:4317"
-    - name: OTEL_TRACES_EXPORTER
-      value: "otlp"
-    - name: OTEL_METRICS_EXPORTER
-      value: "otlp"
-    - name: OTEL_SERVICE_NAME
-      value: "agentgateway-proxy"
+  rawConfig:
+    config:
+      tracing:
+        otlpEndpoint: http://solo-enterprise-telemetry-collector.kagent.svc.cluster.local:4317
+        otlpProtocol: grpc
+        randomSampling: true
