@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - gateway.yaml
+  - tracing-params.yaml
   - openai/secret.yaml
   - openai/backend.yaml
   - openai/route.yaml
