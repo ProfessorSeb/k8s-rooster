@@ -7,6 +7,6 @@ spec:
   rawConfig:
     config:
       tracing:
-        otlpEndpoint: http://solo-enterprise-telemetry-collector.kagent.svc.cluster.local:4317
+        otlpEndpoint: grpc://solo-enterprise-telemetry-collector.kagent.svc.cluster.local:4317
         otlpProtocol: grpc
         randomSampling: true
