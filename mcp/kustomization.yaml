@@ -8,7 +8,7 @@ resources:
   - backend/mcp-backend.yaml
   - routes/mcp-route.yaml
   - github/gh-gateway.yaml
-  # - github/backend/github-mcp-backend.yaml
+  - github/backend/github-mcp-backend.yaml
   # - github/routes/github-mcp-route.yaml
   # - github/routes/github-mcp-policy.yaml
 
