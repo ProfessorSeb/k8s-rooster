@@ -4,13 +4,10 @@ kind: Kustomization
 resources:
   - gateway.yaml
   - tracing-params.yaml
-  - openai/secret.yaml
   - openai/backend.yaml
   - openai/route.yaml
-  - anthropic/secret.yaml
   - anthropic/backend.yaml
   - anthropic/route.yaml
-  - xai/secret.yaml
   - xai/backend.yaml
   - xai/route.yaml
 
