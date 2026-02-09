@@ -1,0 +1,27 @@
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: github-mcp-policy
+  namespace: agentgateway-system
+spec:
+  targetRefs:
+  - kind: HTTPRoute
+    name: mcp-github
+  backend:
+    http:
+      cors:
+        allowHeaders:
+        - "*"
+        allowMethods:
+        - "*"
+        allowOrigins:
+        - "http://localhost:8091"
+        - "http://127.0.0.1:8091"
+        - "*"
+      requestHeaderModifier:
+        set:
+        - name: Authorization
+          valueFrom:
+            secretKeyRef:
+              name: ph-secret
+              key: Authorization

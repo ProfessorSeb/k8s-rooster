@@ -1,28 +1,36 @@
 # MCP (Model Context Protocol) Servers
 
-Enterprise AgentGateway configuration for MCP servers with dynamic routing.
+Enterprise AgentGateway configuration for MCP servers with dynamic routing and HTTPS connections.
 
 ## Overview
 
-This deployment sets up an MCP gateway that can dynamically route to MCP servers using label selectors. The setup includes:
+This deployment sets up multiple MCP gateways for different MCP server types:
 
+### Local MCP Server
 - **MCP Gateway**: Listens on port 8090 for MCP traffic
 - **MCP Server**: `mcp-server-everything` providing various utility tools  
 - **Dynamic Routing**: Uses label selectors to automatically discover MCP servers
 - **Protocol Support**: Streamable HTTP for MCP communication
 
+### GitHub MCP Server (HTTPS)
+- **GitHub MCP Gateway**: Listens on port 8091 for GitHub MCP traffic
+- **GitHub MCP Server**: Remote connection to `api.githubcopilot.com`
+- **Static Routing**: Direct HTTPS connection to GitHub's MCP server
+- **Authentication**: Uses GitHub Personal Access Token via `ph-secret`
+- **CORS Support**: Configured for browser-based MCP Inspector access
+
 ## Architecture
 
+### Local MCP Server
 ```
-Client Request
-      ↓
-MCP Gateway (port 8090)
-      ↓
-HTTPRoute (/mcp path)
-      ↓  
-AgentgatewayBackend (label selector)
-      ↓
-MCP Server Everything (port 3001)
+AI Client → MCP Gateway (8090) → HTTPRoute (/mcp) → AgentgatewayBackend → MCP Server (3001)
+```
+
+### GitHub MCP Server  
+```
+AI Client → GitHub MCP Gateway (8091) → HTTPRoute (/mcp-github) → AgentgatewayBackend → api.githubcopilot.com:443 (HTTPS)
+                                     ↓
+                              AgentgatewayPolicy (CORS + Auth Header from ph-secret)
 ```
 
 ## Components
@@ -73,12 +81,18 @@ kubectl apply -f mcp/routes/
 
 ## Usage
 
-### Get Gateway Address
+### Get Gateway Addresses
 ```bash
+# Local MCP Server
 kubectl get svc mcp-gateway-proxy -n agentgateway-system
+
+# GitHub MCP Server  
+kubectl get svc gh-mcp-gateway-proxy -n agentgateway-system
 ```
 
 ### Test with MCP Inspector
+
+**Local MCP Server:**
 ```bash
 # Install MCP Inspector tool
 npx @modelcontextprotocol/inspector#0.18.0
@@ -87,12 +101,22 @@ npx @modelcontextprotocol/inspector#0.18.0
 # Transport Type: Streamable HTTP
 ```
 
+**GitHub MCP Server:**
+```bash
+# Connect to: http://GATEWAY-IP:8091/mcp-github  
+# Transport Type: Streamable HTTP
+# Provides GitHub repository, issues, PRs access
+```
+
 ### Local Testing
 ```bash
-# Port forward for local testing
+# Port forward for local MCP testing
 kubectl port-forward svc/mcp-gateway-proxy -n agentgateway-system 8090:8090
-
 # Connect to: http://localhost:8090/mcp
+
+# Port forward for GitHub MCP testing
+kubectl port-forward svc/gh-mcp-gateway-proxy -n agentgateway-system 8091:8091  
+# Connect to: http://localhost:8091/mcp-github
 ```
 
 ## Available Tools
