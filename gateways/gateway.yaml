@@ -5,6 +5,11 @@ metadata:
   namespace: agentgateway-system
 spec:
   gatewayClassName: enterprise-agentgateway
+  infrastructure:
+    parametersRef:
+      name: tracing
+      group: enterpriseagentgateway.solo.io
+      kind: EnterpriseAgentgatewayParameters
   listeners:
     - protocol: HTTP
       port: 8080
