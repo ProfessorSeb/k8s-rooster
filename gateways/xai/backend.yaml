@@ -8,9 +8,9 @@ spec:
     provider:
       openai:
         model: grok-4-1-fast-reasoning
-        host: api.x.ai
-        port: 443
-        path: "/v1/chat/completions"
+    host: api.x.ai
+    port: 443
+    path: "/v1/chat/completions"
   policies:
     auth:
       secretRef:
