@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector-config
+  namespace: agentgateway-system
+data:
+  config.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+    exporters:
+      otlphttp/solo:
+        endpoint: grpc://solo-enterprise-telemetry-collector.agentgateway-system.svc.cluster.local:4317
+      otlphttp/langfuse:
+        endpoint: http://172.16.10.173:3000/api/public/otel
+        headers:
+          Authorization: "Basic cGstbGYtNmEyODVjZjUtMjc4Ny00Y2Y3LTgyM2ItNTRmZWY5YmIxYjYwOnNrLWxmLTE5NDI2ZWRlLTMyYWItNGFlMS05YTM0LTY0MjkwMDA5MDE4ZA=="
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          exporters: [otlphttp/solo, otlphttp/langfuse]

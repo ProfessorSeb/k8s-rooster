@@ -5,6 +5,7 @@ resources:
   - gateway.yaml
   - xaigateway.yaml
   - tracing-params.yaml
+  - otel-collector/
   - openai/backend.yaml
   - openai/route.yaml
   - anthropic/backend.yaml
