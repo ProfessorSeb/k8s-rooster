@@ -1,0 +1,9 @@
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayBackend
+metadata:
+  name: excalidraw-mcp
+  namespace: agentgateway-system
+spec:
+  static:
+    host: 172.16.10.165
+    port: 5000
