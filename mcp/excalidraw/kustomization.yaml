@@ -6,8 +6,3 @@ resources:
   - service.yaml
   - backend.yaml
   - route.yaml
-
-labels:
-  - pairs:
-      app.kubernetes.io/name: excalidraw-mcp
-      app.kubernetes.io/component: agentgateway-mcp
