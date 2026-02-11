@@ -4,7 +4,6 @@ kind: Kustomization
 resources:
   - gateway.yaml
   - xaigateway.yaml
-  - excalidraw-gateway.yaml
   - tracing-params.yaml
   - openai/backend.yaml
   - openai/route.yaml
