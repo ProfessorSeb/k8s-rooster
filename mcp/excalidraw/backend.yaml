@@ -5,5 +5,5 @@ metadata:
   namespace: agentgateway-system
 spec:
   static:
-    host: 172.16.10.165
-    port: 5000
+    host: excalidraw-mcp.agentgateway-system.svc.cluster.local
+    port: 3000

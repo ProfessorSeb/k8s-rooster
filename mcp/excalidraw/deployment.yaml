@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: excalidraw-mcp
+  namespace: agentgateway-system
+  labels:
+    app: excalidraw-mcp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: excalidraw-mcp
+  template:
+    metadata:
+      labels:
+        app: excalidraw-mcp
+    spec:
+      containers:
+      - name: excalidraw-mcp
+        image: node:20-alpine
+        workingDir: /app
+        command: ["sh", "-c"]
+        args:
+          - |
+            git clone https://github.com/excalidraw/excalidraw-mcp.git /app
+            cd /app
+            npm install
+            npm run build
+            node dist/index.js
+        ports:
+        - containerPort: 3000
+        env:
+        - name: PORT
+          value: "3000"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
