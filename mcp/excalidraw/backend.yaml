@@ -6,4 +6,4 @@ metadata:
 spec:
   static:
     host: excalidraw-mcp.agentgateway-system.svc.cluster.local
-    port: 3000
+    port: 3001
