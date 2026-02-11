@@ -3,11 +3,13 @@ kind: HTTPRoute
 metadata:
   name: excalidraw-mcp
   namespace: agentgateway-system
+  labels:
+    example: exc-mcp-route
 spec:
   parentRefs:
-  - name: agentgateway-proxy
+  - name: exc-agentgateway-proxy
     namespace: agentgateway-system
-    sectionName: mcp
+    sectionName: exc-mcp-gateway
   rules:
   - matches:
     - path:

@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: agentgateway-proxy
+  name: exc-agentgateway-proxy
   namespace: agentgateway-system
 spec:
   gatewayClassName: enterprise-agentgateway
@@ -12,8 +12,8 @@ spec:
       kind: EnterpriseAgentgatewayParameters
   listeners:
     - protocol: HTTP
-      port: 8080
-      name: llm-providers
+      port: 8086
+      name: exc-mcp-gateway
       allowedRoutes:
         namespaces:
           from: All
