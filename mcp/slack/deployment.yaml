@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: slack-mcp
+  namespace: agentgateway-system
+  labels:
+    app: slack-mcp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: slack-mcp
+  template:
+    metadata:
+      labels:
+        app: slack-mcp
+    spec:
+      containers:
+      - name: slack-mcp
+        image: zencoderai/slack-mcp:latest
+        command: ["node"]
+        args:
+          - "dist/index.js"
+          - "--transport"
+          - "sse"
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - secretRef:
+            name: slack-credentials

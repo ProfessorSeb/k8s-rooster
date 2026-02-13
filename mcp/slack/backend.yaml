@@ -7,6 +7,7 @@ spec:
   mcp:
     targets:
     - name: slack-mcp
-      static:
-        host: slack-mcp.kagent.svc.cluster.local
-        port: 3000
+      selector:
+        services:
+          matchLabels:
+            app: slack-mcp
