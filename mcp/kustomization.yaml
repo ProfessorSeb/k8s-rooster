@@ -11,6 +11,7 @@ resources:
   - github/backend/github-mcp-backend.yaml
   # - github/routes/github-mcp-route.yaml
   # - github/routes/github-mcp-policy.yaml
+  - slack/gateway.yaml
   - slack/deployment.yaml
   - slack/service.yaml
   - slack/backend.yaml
