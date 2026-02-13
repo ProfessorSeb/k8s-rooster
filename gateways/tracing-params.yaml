@@ -10,3 +10,11 @@ spec:
         otlpEndpoint: grpc://solo-enterprise-telemetry-collector.agentgateway-system.svc.cluster.local:4317
         otlpProtocol: grpc
         randomSampling: true
+        fields:
+          add:
+            gen_ai.operation.name: '"chat"'
+            gen_ai.system: "llm.provider"
+            gen_ai.request.model: "llm.requestModel"
+            gen_ai.response.model: "llm.responseModel"
+            gen_ai.usage.completion_tokens: "llm.outputTokens"
+            gen_ai.usage.prompt_tokens: "llm.inputTokens"
