@@ -1,0 +1,19 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: model-priority-gateway-proxy
+  namespace: agentgateway-system
+spec:
+  gatewayClassName: enterprise-agentgateway
+  infrastructure:
+    parametersRef:
+      name: tracing
+      group: enterpriseagentgateway.solo.io
+      kind: EnterpriseAgentgatewayParameters
+  listeners:
+    - protocol: HTTP
+      port: 8085
+      name: model-priority
+      allowedRoutes:
+        namespaces:
+          from: All

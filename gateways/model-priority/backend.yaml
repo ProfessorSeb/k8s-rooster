@@ -1,0 +1,36 @@
+# OpenAI model failover with priority groups
+# Priority 1 (highest): gpt-4.1
+# Priority 2 (fallback): gpt-5.1
+# Priority 3 (lowest):   gpt-3.5-turbo
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayBackend
+metadata:
+  name: model-priority
+  namespace: agentgateway-system
+spec:
+  ai:
+    groups:
+    - providers:
+      - name: openai-gpt-41
+        openai:
+          model: gpt-4.1
+        policies:
+          auth:
+            secretRef:
+              name: openai-secret
+    - providers:
+      - name: openai-gpt-51
+        openai:
+          model: gpt-5.1
+        policies:
+          auth:
+            secretRef:
+              name: openai-secret
+    - providers:
+      - name: openai-gpt-35-turbo
+        openai:
+          model: gpt-3.5-turbo
+        policies:
+          auth:
+            secretRef:
+              name: openai-secret
