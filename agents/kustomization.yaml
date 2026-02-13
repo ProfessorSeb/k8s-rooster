@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - kagent-slack-bot-deployment.yaml
-  - slack-mcp.yaml
+  #- slack-mcp.yaml
   - slackbot-k8s-agent.yaml
 
 commonLabels:
