@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kagent-slack-bot
+  namespace: kagent
+  labels:
+    app: kagent-slack-bot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kagent-slack-bot
+  template:
+    metadata:
+      labels:
+        app: kagent-slack-bot
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: bot
+        image: sebbycorp/kagent-slack-bot:latest
+        imagePullPolicy: Always
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
+        env:
+        - name: SLACK_BOT_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: slack-credentials
+              key: SLACK_BOT_TOKEN
+        - name: SLACK_APP_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: slack-credentials
+              key: SLACK_APP_TOKEN
+        - name: KAGENT_BASE_URL
+          value: "http://kagent-controller.kagent.svc.cluster.local:8083"
+        - name: KAGENT_NAMESPACE
+          value: "kagent"
+        - name: KAGENT_AGENT_NAME
+          value: "slackbot-k8s-agent"
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: python-cache
+          mountPath: /home/kagent/.cache
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          exec:
+            command:
+            - python
+            - -c
+            - "import sys; sys.exit(0)"
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+            - python
+            - -c
+            - "import sys; sys.exit(0)"
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      - name: python-cache
+        emptyDir: {}
+      restartPolicy: Always
+      automountServiceAccountToken: false
