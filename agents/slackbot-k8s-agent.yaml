@@ -7,7 +7,7 @@ spec:
   description: Slackbot Kubernetes Agent
   type: Declarative
   declarative:
-    modelConfig: default-model-config
+    modelConfig: claude-model-config
     systemMessage: |-
       You're an expert Kubernetes agent that uses tools to answer users questions and help them with their Kubernetes clusters.
 
