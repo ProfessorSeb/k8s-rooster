@@ -1,5 +1,5 @@
 # Demo Policy: Safe Operations Only
-# Allows reads, comments, reviews but blocks destructive operations
+# Allows everything except destructive operations
 # (create repos, delete files, merge PRs, push code)
 # Blocks 9 of 40 tools
 apiVersion: agentgateway.dev/v1alpha1
@@ -20,11 +20,11 @@ spec:
   backend:
     mcp:
       authorization:
-        action: Deny
+        action: Allow
         policy:
           matchExpressions:
           - >-
-            tool.name == 'create_repository' ||
+            !(tool.name == 'create_repository' ||
             tool.name == 'create_or_update_file' ||
             tool.name == 'create_pull_request' ||
             tool.name == 'delete_file' ||
@@ -32,4 +32,4 @@ spec:
             tool.name == 'merge_pull_request' ||
             tool.name == 'push_files' ||
             tool.name == 'update_pull_request' ||
-            tool.name == 'update_pull_request_branch'
+            tool.name == 'update_pull_request_branch')
