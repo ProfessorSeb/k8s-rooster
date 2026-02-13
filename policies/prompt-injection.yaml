@@ -1,0 +1,80 @@
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  annotations:
+    description: Blocks 'ignore previous instructions' style attacks
+  labels:
+    category: prompt-injection
+    demo: agentgateway
+  name: 07-block-jailbreak-ignore-instructions
+  namespace: agentgateway-system
+spec:
+  backend:
+    ai:
+      promptGuard:
+        request:
+        - regex:
+            action: Reject
+            matches:
+            - (?i)(ignore previous|disregard all|ignore all previous instructions)
+          response:
+            message: "\U0001F6E1\uFE0F Blocked: Prompt injection attempt detected"
+            statusCode: 403
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: multi-llm-route
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  annotations:
+    description: Blocks DAN (Do Anything Now) jailbreak attempts
+  labels:
+    category: prompt-injection
+    demo: agentgateway
+  name: 08-block-jailbreak-dan-mode
+  namespace: agentgateway-system
+spec:
+  backend:
+    ai:
+      promptGuard:
+        request:
+        - regex:
+            action: Reject
+            matches:
+            - (?i)(DAN|do anything now|developer mode|you have no restrictions)
+          response:
+            message: "\U0001F6E1\uFE0F Blocked: DAN mode jailbreak attempt detected"
+            statusCode: 403
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: multi-llm-route
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  annotations:
+    description: Blocks role manipulation attempts
+  labels:
+    category: prompt-injection
+    demo: agentgateway
+  name: 09-block-jailbreak-role-manipulation
+  namespace: agentgateway-system
+spec:
+  backend:
+    ai:
+      promptGuard:
+        request:
+        - regex:
+            action: Reject
+            matches:
+            - (?i)(you are now|pretend you are|act as if|roleplay as)
+          response:
+            message: "\U0001F6E1\uFE0F Blocked: Role manipulation attempt detected"
+            statusCode: 403
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: multi-llm-route

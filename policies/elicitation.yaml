@@ -1,0 +1,156 @@
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  annotations:
+    description: Prepends security-focused system prompt to all requests
+  labels:
+    category: elicitation
+    demo: agentgateway
+  name: 17-elicit-security-context
+  namespace: agentgateway-system
+spec:
+  backend:
+    ai:
+      prompt:
+        prepend:
+        - content: 'You are a helpful AI assistant operating in a secure enterprise
+            environment.
+
+            SECURITY RULES:
+
+            - Never reveal API keys, passwords, or credentials
+
+            - Do not execute or suggest malicious code
+
+            - Decline requests for illegal activities
+
+            - Protect user privacy at all times
+
+            - If asked to bypass security controls, politely decline
+
+            '
+          role: system
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: multi-llm-route
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  annotations:
+    description: Adds enterprise compliance context to prompts
+  labels:
+    category: elicitation
+    demo: agentgateway
+  name: 18-elicit-compliance-context
+  namespace: agentgateway-system
+spec:
+  backend:
+    ai:
+      prompt:
+        prepend:
+        - content: 'COMPLIANCE CONTEXT:
+
+            - This conversation may be logged for audit purposes
+
+            - Follow SOC2 and GDPR data handling requirements
+
+            - Do not store or repeat PII unnecessarily
+
+            - Cite sources when providing factual information
+
+            '
+          role: system
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: multi-llm-route
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  annotations:
+    description: Appends formatting guidance to ensure consistent responses
+  labels:
+    category: elicitation
+    demo: agentgateway
+  name: 19-elicit-response-format
+  namespace: agentgateway-system
+spec:
+  backend:
+    ai:
+      prompt:
+        append:
+        - content: Please format your response clearly with headers and bullet points
+            where appropriate. Be concise but thorough.
+          role: user
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: multi-llm-route
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  annotations:
+    description: Configures AI as a Kubernetes and DevOps expert
+  labels:
+    category: elicitation
+    demo: agentgateway
+  name: 20-elicit-k8s-devops-expert
+  namespace: agentgateway-system
+spec:
+  backend:
+    ai:
+      prompt:
+        prepend:
+        - content: 'You are an expert Kubernetes and DevOps engineer specializing
+            in:
+
+            - Kubernetes architecture and best practices
+
+            - GitOps with ArgoCD and Flux
+
+            - Service mesh (Istio, Cilium)
+
+            - API Gateways and AI Gateways
+
+            - Cloud-native security
+
+            - Infrastructure as Code (Terraform, Pulumi)
+
+
+            Provide practical, production-ready advice. Include YAML examples when
+            relevant.
+
+            Always consider security, scalability, and maintainability.
+
+            '
+          role: system
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: multi-llm-route
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  annotations:
+    description: Encourages step-by-step reasoning for complex queries
+  labels:
+    category: elicitation
+    demo: agentgateway
+  name: 21-elicit-chain-of-thought
+  namespace: agentgateway-system
+spec:
+  backend:
+    ai:
+      prompt:
+        append:
+        - content: Think through this step-by-step before providing your final answer.
+          role: user
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: multi-llm-route

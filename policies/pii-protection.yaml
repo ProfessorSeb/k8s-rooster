@@ -1,0 +1,107 @@
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  annotations:
+    description: Blocks Social Security Numbers in prompts
+  labels:
+    category: pii-protection
+    demo: agentgateway
+  name: 03-block-ssn-numbers
+  namespace: agentgateway-system
+spec:
+  backend:
+    ai:
+      promptGuard:
+        request:
+        - regex:
+            action: Reject
+            builtins:
+            - Ssn
+          response:
+            message: "\U0001F6AB Blocked: Social Security Number detected"
+            statusCode: 403
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: multi-llm-route
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  annotations:
+    description: Blocks credit card numbers in prompts
+  labels:
+    category: pii-protection
+    demo: agentgateway
+  name: 04-block-credit-cards
+  namespace: agentgateway-system
+spec:
+  backend:
+    ai:
+      promptGuard:
+        request:
+        - regex:
+            action: Reject
+            builtins:
+            - CreditCard
+          response:
+            message: "\U0001F6AB Blocked: Credit card number detected"
+            statusCode: 403
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: multi-llm-route
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  annotations:
+    description: Blocks phone numbers in prompts
+  labels:
+    category: pii-protection
+    demo: agentgateway
+  name: 05-block-phone-numbers
+  namespace: agentgateway-system
+spec:
+  backend:
+    ai:
+      promptGuard:
+        request:
+        - regex:
+            action: Reject
+            builtins:
+            - PhoneNumber
+          response:
+            message: "\U0001F6AB Blocked: Phone number detected"
+            statusCode: 403
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: multi-llm-route
+---
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  annotations:
+    description: Blocks Canadian Social Insurance Numbers in prompts
+  labels:
+    category: pii-protection
+    demo: agentgateway
+  name: 06-block-canadian-sin
+  namespace: agentgateway-system
+spec:
+  backend:
+    ai:
+      promptGuard:
+        request:
+        - regex:
+            action: Reject
+            builtins:
+            - CaSin
+          response:
+            message: "\U0001F6AB Blocked: Canadian SIN detected"
+            statusCode: 403
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: multi-llm-route
