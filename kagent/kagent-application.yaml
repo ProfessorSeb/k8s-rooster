@@ -43,7 +43,7 @@ spec:
           kgateway-agent:
             enabled: true
           observability-agent:
-            enabled: true
+            enabled: false
           helm-agent:
             enabled: true
   syncPolicy:
