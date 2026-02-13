@@ -1,0 +1,48 @@
+# Demo Policy: Read-Only GitHub Access
+# Blocks all write/modify operations — agents can only read and search
+# Enable this to show fine-grained MCP tool authorization in AgentGateway
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: github-mcp-read-only
+  namespace: agentgateway-system
+  labels:
+    demo: "true"
+    policy-type: read-only
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: mcp-github
+  backend:
+    mcp:
+      toolAuth:
+        defaultAction: Deny
+        rules:
+        # Allow all read/search/list operations
+        - tools:
+          - "get_*"
+          - "list_*"
+          - "search_*"
+          - "issue_read"
+          - "pull_request_read"
+          action: Allow
+        # Explicitly block all write operations with custom messages
+        - tools:
+          - "create_*"
+          - "delete_*"
+          - "update_*"
+          - "merge_*"
+          - "push_*"
+          - "fork_*"
+          - "assign_*"
+          - "request_*"
+          - "issue_write"
+          - "sub_issue_write"
+          - "pull_request_review_write"
+          - "add_comment_to_pending_review"
+          - "add_issue_comment"
+          - "create_or_update_file"
+          action: Deny
+          response:
+            message: "🚫 Write operation blocked by read-only policy. This agent only has read access to GitHub."
