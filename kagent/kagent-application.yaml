@@ -17,9 +17,8 @@ spec:
         providers:
           default: openAI
           openAI:
-            apiKeySecretRef:
-              name: kagent-openai
-              key: OPENAI_API_KEY
+            apiKeySecretRef: kagent-openai
+            apiKeySecretKey: OPENAI_API_KEY
         otel:
           tracing:
             enabled: true
