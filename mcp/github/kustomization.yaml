@@ -4,8 +4,8 @@ kind: Kustomization
 resources:
   - gh-gateway.yaml
   - backend/github-mcp-backend.yaml
-  - routes/github-mcp-route.yaml
-  - routes/github-mcp-policy.yaml
+  # - routes/github-mcp-route.yaml
+  # - routes/github-mcp-policy.yaml
 
 commonLabels:
   app.kubernetes.io/name: github-mcp
