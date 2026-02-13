@@ -120,6 +120,16 @@ spec:
         - text
         tags: ["team-lead", "orchestration", "github", "kubernetes", "slack"]
     tools:
+    # Sub-agents
+    - type: Agent
+      agent:
+        name: github-issues-agent
+    - type: Agent
+      agent:
+        name: github-pr-agent
+    - type: Agent
+      agent:
+        name: k8s-agent
     # Slack tools via AgentGateway
     - type: McpServer
       mcpServer:
