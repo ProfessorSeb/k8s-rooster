@@ -15,13 +15,15 @@ spec:
     helm:
       valuesObject:
         imagePullSecrets: []
-        cluster: kind-kagent-ent-fake-idp
+        cluster: rooster.maniak.io
         global:
           imagePullPolicy: IfNotPresent
         products:
           kagent:
             enabled: true
           agentregistry:
+            enabled: true
+          agentgateway:
             enabled: true
         service:
           type: LoadBalancer
