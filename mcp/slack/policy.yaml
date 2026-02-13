@@ -1,0 +1,13 @@
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: slack-mcp-policy
+  namespace: agentgateway-system
+spec:
+  targetRefs:
+  - kind: HTTPRoute
+    name: mcp-slack
+  backend:
+    mcp:
+      toolAuth:
+        defaultAction: Allow

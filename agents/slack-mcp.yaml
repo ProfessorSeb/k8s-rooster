@@ -11,7 +11,7 @@ spec:
     args:
     - "dist/index.js"
     - "--transport"
-    - "stdio"
+    - "sse"
     secretRefs:
     - name: slack-credentials
-  transportType: "stdio"
+  transportType: "sse"

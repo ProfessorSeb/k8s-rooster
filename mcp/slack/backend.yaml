@@ -1,0 +1,12 @@
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayBackend
+metadata:
+  name: slack-mcp-backend
+  namespace: agentgateway-system
+spec:
+  mcp:
+    targets:
+    - name: slack-mcp
+      static:
+        host: slack-mcp.kagent.svc.cluster.local
+        port: 3000

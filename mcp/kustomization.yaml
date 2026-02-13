@@ -11,6 +11,9 @@ resources:
   - github/backend/github-mcp-backend.yaml
   # - github/routes/github-mcp-route.yaml
   # - github/routes/github-mcp-policy.yaml
+  - slack/backend.yaml
+  - slack/route.yaml
+  - slack/policy.yaml
 
 commonLabels:
   app.kubernetes.io/name: mcp-servers
