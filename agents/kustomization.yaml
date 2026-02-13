@@ -5,6 +5,9 @@ resources:
   - kagent-slack-bot-deployment.yaml
   #- slack-mcp.yaml
   - slackbot-k8s-agent.yaml
+  - github-mcp-remote.yaml
+  - github-issues-agent.yaml
+  - github-pr-agent.yaml
 
 commonLabels:
   app.kubernetes.io/name: kagent-agents

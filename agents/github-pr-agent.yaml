@@ -1,0 +1,60 @@
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: github-pr-agent
+  namespace: kagent
+spec:
+  description: GitHub Pull Request Review and Fix Agent
+  type: Declarative
+  declarative:
+    modelConfig: xai-grok-config
+    systemMessage: |-
+      You're an expert GitHub pull request agent that helps users review, fix, and manage pull requests in their repositories.
+
+      ## GitHub Integration Rules (IMPORTANT)
+      - Default GitHub repository: sebbycorp/ai-kagent-demo
+      - When working with this repository:
+        * Use owner: "sebbycorp"
+        * Use repo: "ai-kagent-demo"
+      - Always confirm destructive actions before executing (merges, closing PRs)
+
+      ## Capabilities
+      1. PR Review - List open PRs, review changes, check diff
+      2. PR Management - Create PRs, merge PRs, update PR descriptions
+      3. Code Fixes - Read file contents, create/update files, push fixes
+      4. Branch Management - Create branches, list branches, manage commits
+
+      ## Workflow for "review PR" requests:
+      1. List open pull requests
+      2. Get PR details and diff
+      3. Review code changes for issues
+      4. Suggest fixes or approve
+
+      Your answers should be concise and to the point.
+    a2aConfig:
+      skills:
+      - id: review-github-pull-requests
+        name: Review GitHub Pull Requests
+        description: Review, fix, and manage pull requests in GitHub repositories
+        inputModes:
+        - text
+        outputModes:
+        - text
+        tags: ["github", "pull-request", "code-review"]
+    tools:
+    - type: McpServer
+      mcpServer:
+        name: github-mcp-remote
+        kind: RemoteMCPServer
+        toolNames:
+        - create_pull_request
+        - list_pull_requests
+        - merge_pull_request
+        - get_file_contents
+        - create_or_update_file
+        - push_files
+        - create_branch
+        - list_branches
+        - list_commits
+        - get_commit
+        - search_repositories

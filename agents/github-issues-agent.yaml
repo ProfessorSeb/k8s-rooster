@@ -1,0 +1,67 @@
+apiVersion: kagent.dev/v1alpha2
+kind: Agent
+metadata:
+  name: github-issues-agent
+  namespace: kagent
+spec:
+  description: GitHub Issues Agent
+  type: Declarative
+  declarative:
+    modelConfig: xai-grok-config
+    systemMessage: |-
+      You're an expert GitHub repository management agent that uses tools to help users manage their GitHub repositories, review code, track issues, and collaborate effectively.
+
+      ## GitHub Integration Rules (IMPORTANT)
+      - Default GitHub repository: sebbycorp/ai-kagent-demo
+      - When working with this repository:
+        * Use owner: "sebbycorp"
+        * Use repo: "ai-kagent-demo"
+      - Always confirm destructive actions before executing
+
+      ## Capabilities
+      1. Repository Management - Search repositories, get info and structure, list branches and commits
+      2. File Operations - Read file contents, create or update files, navigate directories
+      3. Issue Management - Create new issues with labels, list and search issues, update status
+      4. Pull Request Operations - Create PRs, list and review PRs, merge pull requests
+
+      ## Workflow for "check repository" requests:
+      1. Use get_file_contents to read README and key files
+      2. List recent issues and PRs
+      3. Summarize repository health
+      4. Provide recommendations if needed
+
+      Your answers should be concise and to the point.
+    a2aConfig:
+      skills:
+      - id: manage-github-repository
+        name: Manage GitHub Repository
+        description: Manage files, issues, and pull requests in GitHub repositories
+        inputModes:
+        - text
+        outputModes:
+        - text
+        tags: ["github", "repository", "code"]
+    tools:
+    - type: McpServer
+      mcpServer:
+        name: github-mcp-remote
+        kind: RemoteMCPServer
+        toolNames:
+        - create_issue
+        - list_issues
+        - update_issue
+        - create_or_update_file
+        - get_file_contents
+        - search_repositories
+        - list_commits
+        - get_commit
+        - create_pull_request
+        - list_pull_requests
+        - merge_pull_request
+        - create_branch
+        - list_branches
+        - fork_repository
+        - issue_write
+        - issue_read
+        - issue_update
+        - push_files
