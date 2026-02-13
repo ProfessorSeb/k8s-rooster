@@ -28,3 +28,6 @@ spec:
         envFrom:
         - secretRef:
             name: slack-credentials
+        env:
+        - name: AUTH_TOKEN
+          value: "agentgateway-internal"

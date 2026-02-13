@@ -15,6 +15,12 @@ spec:
         - path:
             type: PathPrefix
             value: /mcp/slack
+      filters:
+        - type: RequestHeaderModifier
+          requestHeaderModifier:
+            set:
+              - name: Authorization
+                value: "Bearer agentgateway-internal"
       backendRefs:
       - name: slack-mcp-backend
         group: agentgateway.dev
