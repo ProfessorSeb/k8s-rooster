@@ -31,6 +31,22 @@ spec:
           enabled: true
         kmcp:
           enabled: true
+        kagent-tools:
+          enabled: true
+          agents:
+            k8s-agent:
+              enabled: true
+            kgateway-agent:
+              enabled: true
+            observability-agent:
+              enabled: true
+            helm-agent:
+              enabled: true
+          tools:
+            grafana-mcp:
+              enabled: true
+            querydoc:
+              enabled: true
   syncPolicy:
     automated:
       prune: true
