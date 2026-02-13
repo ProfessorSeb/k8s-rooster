@@ -4,6 +4,8 @@ metadata:
   name: llm-agentgateway
   namespace: kagent
 spec:
+  apiKeySecret: kagent-openai
+  apiKeySecretKey: OPENAI_API_KEY
   provider: OpenAI
   model: gpt-4o-mini-2024-07-18
   openAI:
