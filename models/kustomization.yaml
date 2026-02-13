@@ -5,6 +5,7 @@ resources:
   - xai-grok-config.yaml
   - claude-model-config.yaml
   - llm-agentgateway.yaml
+  - gemini-model-config.yaml
 
 commonLabels:
   app.kubernetes.io/name: kagent-models

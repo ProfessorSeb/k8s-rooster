@@ -1,0 +1,11 @@
+apiVersion: kagent.dev/v1alpha2
+kind: ModelConfig
+metadata:
+  name: gemini-model-config
+  namespace: kagent
+spec:
+  apiKeySecret: kagent-gemini
+  apiKeySecretKey: GOOGLE_API_KEY
+  model: gemini-pro
+  provider: Gemini
+  gemini: {}
