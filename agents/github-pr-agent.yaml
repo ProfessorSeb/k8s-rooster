@@ -12,7 +12,7 @@ spec:
       You're an expert GitHub pull request agent that helps users review, fix, and manage pull requests in their repositories.
 
       ## GitHub Integration Rules (IMPORTANT)
-      - Default GitHub repository: sebbycorp/ai-kagent-demo
+      - Default GitHub repository: ProfessorSeb/ai-kagent-demo
       - When working with this repository:
         * Use owner: "sebbycorp"
         * Use repo: "ai-kagent-demo"

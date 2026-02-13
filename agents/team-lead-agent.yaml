@@ -29,7 +29,7 @@ spec:
       - Lists and searches issues
       - Reads file contents from repositories
       - Manages labels and comments
-      - Default repo: sebbycorp/ai-kagent-demo
+      - Default repo: ProfessorSeb/ai-kagent-demo
 
       Documentation Standards:
       - Bug reports include: environment, steps to reproduce, evidence, root cause, proposed solution
@@ -42,7 +42,7 @@ spec:
       - Reviews code for bugs, security, performance, and best practices
       - Fixes issues in existing PRs
       - Manages PR lifecycle (update, merge, close)
-      - Default repo: sebbycorp/ai-kagent-demo
+      - Default repo: ProfessorSeb/ai-kagent-demo
 
       Documentation Standards:
       - PR titles follow format: [type]: Brief description
