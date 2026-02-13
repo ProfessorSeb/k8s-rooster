@@ -9,4 +9,4 @@ spec:
   provider: OpenAI
   model: gpt-4o-mini-2024-07-18
   openAI:
-    baseUrl: "http://172.16.10.168:30689/compatibility/v1"
+    baseUrl: "http://172.16.10.168:31572/openai"
