@@ -1,0 +1,39 @@
+# Request-based rate limit: 10 requests per minute
+apiVersion: ratelimit.solo.io/v1alpha1
+kind: RateLimitConfig
+metadata:
+  name: xai-request-rate-limit
+  namespace: agentgateway-system
+spec:
+  raw:
+    descriptors:
+    - key: generic_key
+      value: counter
+      rateLimit:
+        requestsPerUnit: 10
+        unit: MINUTE
+    rateLimits:
+    - actions:
+      - genericKey:
+          descriptorValue: counter
+      type: REQUEST
+---
+# Token-based rate limit: 5000 tokens per minute per user
+apiVersion: ratelimit.solo.io/v1alpha1
+kind: RateLimitConfig
+metadata:
+  name: xai-token-rate-limit
+  namespace: agentgateway-system
+spec:
+  raw:
+    descriptors:
+    - key: X-User-ID
+      rateLimit:
+        requestsPerUnit: 5000
+        unit: MINUTE
+    rateLimits:
+    - actions:
+      - requestHeaders:
+          descriptorKey: "X-User-ID"
+          headerName: "X-User-ID"
+      type: TOKEN

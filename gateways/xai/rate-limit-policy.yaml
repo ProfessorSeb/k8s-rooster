@@ -1,0 +1,33 @@
+# Apply request-based rate limit to xAI HTTPRoute
+apiVersion: enterpriseagentgateway.solo.io/v1alpha1
+kind: EnterpriseAgentgatewayPolicy
+metadata:
+  name: xai-request-rate-limit
+  namespace: agentgateway-system
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: xai
+  traffic:
+    entRateLimit:
+      global:
+        rateLimitConfigRefs:
+        - name: xai-request-rate-limit
+---
+# Apply token-based rate limit to xAI HTTPRoute
+apiVersion: enterpriseagentgateway.solo.io/v1alpha1
+kind: EnterpriseAgentgatewayPolicy
+metadata:
+  name: xai-token-rate-limit
+  namespace: agentgateway-system
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: xai
+  traffic:
+    entRateLimit:
+      global:
+        rateLimitConfigRefs:
+        - name: xai-token-rate-limit
