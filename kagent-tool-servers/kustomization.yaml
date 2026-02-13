@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - slack-mcp-remote.yaml
+
+commonLabels:
+  app.kubernetes.io/name: kagent-tool-servers
+  app.kubernetes.io/component: remote-mcp
+
+namespace: kagent

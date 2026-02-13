@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kagent-tool-servers
+  namespace: argocd
+spec:
+  destination:
+    namespace: kagent
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    repoURL: https://github.com/ProfessorSeb/k8s-rooster.git
+    targetRevision: main
+    path: kagent-tool-servers
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
