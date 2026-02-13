@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - kagent-crds-application.yaml
+  - kagent-mgmt-application.yaml
+  - kagent-application.yaml
+
+commonLabels:
+  app.kubernetes.io/name: kagent
+  app.kubernetes.io/component: kagent-enterprise
+
+namespace: argocd
