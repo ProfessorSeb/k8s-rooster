@@ -37,8 +37,8 @@ spec:
       kind: ConfigMap
       name: solo-enterprise-telemetry-collector-config
       namespace: kagent
-      jsonPointers:
-        - /data/relay
+      jqPathExpressions:
+        - .data.relay
   syncPolicy:
     automated:
       prune: true
