@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kagent
+  namespace: argocd
+spec:
+  destination:
+    namespace: kagent
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: kagent-enterprise
+    repoURL: us-docker.pkg.dev/solo-public/kagent-enterprise-helm/charts
+    targetRevision: 0.3.4
+    helm:
+      valuesObject:
+        providers:
+          default: openAI
+          openAI:
+            apiKeySecretRef:
+              name: kagent-openai
+              key: OPENAI_API_KEY
+        otel:
+          tracing:
+            enabled: true
+            exporter:
+              otlp:
+                endpoint: solo-enterprise-ui.kagent.svc.cluster.local:4317
+                insecure: true
+        controller:
+          enabled: true
+        kmcp:
+          enabled: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
