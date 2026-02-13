@@ -22,7 +22,7 @@ spec:
         args:
           - "dist/index.js"
           - "--transport"
-          - "sse"
+          - "http"
         ports:
         - containerPort: 3000
         envFrom:
