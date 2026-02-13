@@ -1,6 +1,7 @@
 # Demo Policy: Safe Operations Only
-# Allows reads + comments/reviews but blocks destructive operations
+# Allows reads, comments, reviews but blocks destructive operations
 # (create repos, delete files, merge PRs, push code)
+# Blocks 9 of 40 tools
 apiVersion: agentgateway.dev/v1alpha1
 kind: AgentgatewayPolicy
 metadata:
@@ -9,46 +10,26 @@ metadata:
   labels:
     demo: "true"
     policy-type: safe-ops
+  annotations:
+    description: "Blocks destructive GitHub operations (create repo, delete, merge, push, fork)"
 spec:
   targetRefs:
-  - group: gateway.networking.k8s.io
-    kind: HTTPRoute
-    name: mcp-github
+  - group: agentgateway.dev
+    kind: AgentgatewayBackend
+    name: github-mcp-backend
   backend:
     mcp:
-      toolAuth:
-        defaultAction: Deny
-        rules:
-        # Allow all read/search/list operations
-        - tools:
-          - "get_*"
-          - "list_*"
-          - "search_*"
-          - "issue_read"
-          - "pull_request_read"
-          action: Allow
-        # Allow safe interactions (comments, reviews, issue management)
-        - tools:
-          - "add_issue_comment"
-          - "add_comment_to_pending_review"
-          - "pull_request_review_write"
-          - "issue_write"
-          - "sub_issue_write"
-          - "assign_copilot_to_issue"
-          - "request_copilot_review"
-          - "create_branch"
-          action: Allow
-        # Block destructive operations
-        - tools:
-          - "create_repository"
-          - "create_or_update_file"
-          - "create_pull_request"
-          - "delete_file"
-          - "fork_repository"
-          - "merge_pull_request"
-          - "push_files"
-          - "update_pull_request"
-          - "update_pull_request_branch"
-          action: Deny
-          response:
-            message: "🚫 Destructive operation blocked. This agent cannot create repos, push code, merge PRs, or delete files. Requires elevated access."
+      authorization:
+        action: Deny
+        policy:
+          matchExpressions:
+          - >-
+            tool.name == 'create_repository' ||
+            tool.name == 'create_or_update_file' ||
+            tool.name == 'create_pull_request' ||
+            tool.name == 'delete_file' ||
+            tool.name == 'fork_repository' ||
+            tool.name == 'merge_pull_request' ||
+            tool.name == 'push_files' ||
+            tool.name == 'update_pull_request' ||
+            tool.name == 'update_pull_request_branch'
