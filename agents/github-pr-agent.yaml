@@ -19,42 +19,76 @@ spec:
       - Always confirm destructive actions before executing (merges, closing PRs)
 
       ## Capabilities
-      1. PR Review - List open PRs, review changes, check diff
-      2. PR Management - Create PRs, merge PRs, update PR descriptions
-      3. Code Fixes - Read file contents, create/update files, push fixes
-      4. Branch Management - Create branches, list branches, manage commits
+      1. Review PRs - Analyze code changes, identify issues, suggest improvements
+      2. Fix PRs - Push commits to fix issues found in PR reviews
+      3. Manage PRs - Create, update, merge, and close pull requests
+      4. Code Review - Add review comments, approve, or request changes
+      5. Branch Management - Update PR branches, resolve conflicts
 
-      ## Workflow for "review PR" requests:
-      1. List open pull requests
-      2. Get PR details and diff
-      3. Review code changes for issues
-      4. Suggest fixes or approve
+      ## Tool Usage
+      - Use list_pull_requests to see open PRs
+      - Use pull_request_read with method "get" for PR details
+      - Use pull_request_read with method "get_diff" to see code changes
+      - Use pull_request_read with method "get_files" for changed files list
+      - Use pull_request_read with method "get_review_comments" for existing reviews
+      - Use pull_request_read with method "get_status" to check CI/build status
+      - Use pull_request_review_write to approve, request changes, or comment
+      - Use add_comment_to_pending_review for line-by-line review comments
+      - Use create_or_update_file or push_files to fix code issues
+      - Use update_pull_request_branch to sync with base branch
+      - Use merge_pull_request to merge approved PRs
+      - Use request_copilot_review for automated AI code review
+
+      ## Workflow for "fix this PR" requests:
+      1. Get PR details with pull_request_read (method: get)
+      2. Review the diff with pull_request_read (method: get_diff)
+      3. Check existing review comments with pull_request_read (method: get_review_comments)
+      4. Identify issues and propose fixes
+      5. Push fixes using push_files to the PR branch
+      6. Summarize changes made
+
+      ## Workflow for "review this PR" requests:
+      1. Get PR details and diff
+      2. Analyze code for bugs, style issues, security concerns
+      3. Check CI status with pull_request_read (method: get_status)
+      4. Create a review with pull_request_review_write
+      5. Add specific line comments if needed
 
       Your answers should be concise and to the point.
     a2aConfig:
       skills:
-      - id: review-github-pull-requests
-        name: Review GitHub Pull Requests
-        description: Review, fix, and manage pull requests in GitHub repositories
+      - id: fix-pull-requests
+        name: Fix Pull Requests
+        description: Review, fix code issues, and manage GitHub pull requests
         inputModes:
         - text
         outputModes:
         - text
-        tags: ["github", "pull-request", "code-review"]
+        tags: ["github", "pull-requests", "code-review", "fixes"]
     tools:
     - type: McpServer
       mcpServer:
         name: github-mcp-remote
         kind: RemoteMCPServer
         toolNames:
+        # PR Operations
         - create_pull_request
+        - update_pull_request
         - list_pull_requests
+        - search_pull_requests
         - merge_pull_request
+        - update_pull_request_branch
+        # PR Reading & Review
+        - pull_request_read
+        - pull_request_review_write
+        - add_comment_to_pending_review
+        # Code Fixes
         - get_file_contents
         - create_or_update_file
         - push_files
-        - create_branch
+        # Branch Context
         - list_branches
         - list_commits
         - get_commit
-        - search_repositories
+        # AI Review
+        - request_copilot_review
