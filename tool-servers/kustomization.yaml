@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - slack-mcp-remote.yaml
+  - github-mcp-remote.yaml
 
 commonLabels:
   app.kubernetes.io/name: kagent-tool-servers

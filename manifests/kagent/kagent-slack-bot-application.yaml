@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kagent-tool-servers
+  name: kagent-slack-bot
   namespace: argocd
 spec:
   destination:
@@ -11,7 +11,7 @@ spec:
   source:
     repoURL: https://github.com/ProfessorSeb/k8s-rooster.git
     targetRevision: main
-    path: tool-servers
+    path: slack-bot
   syncPolicy:
     automated:
       prune: true

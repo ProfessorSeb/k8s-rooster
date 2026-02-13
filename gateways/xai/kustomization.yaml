@@ -2,13 +2,14 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - shared/
-  - anthropic/
-  - openai/
-  - xai/
+  - backend.yaml
+  - route.yaml
+  - xaigateway.yaml
+  - rate-limit-config.yaml
+  - rate-limit-policy.yaml
 
 commonLabels:
-  app.kubernetes.io/name: llm-gateways
+  app.kubernetes.io/name: xai-gateway
   app.kubernetes.io/component: agentgateway
 
 namespace: agentgateway-system

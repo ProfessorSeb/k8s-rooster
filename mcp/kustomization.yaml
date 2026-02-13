@@ -2,20 +2,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - gateway.yaml
-  - mcp-server-everything/deployment.yaml
-  - mcp-server-everything/service.yaml
-  - backend/mcp-backend.yaml
-  - routes/mcp-route.yaml
-  - github/gh-gateway.yaml
-  - github/backend/github-mcp-backend.yaml
-  # - github/routes/github-mcp-route.yaml
-  # - github/routes/github-mcp-policy.yaml
-  - slack/gateway.yaml
-  - slack/deployment.yaml
-  - slack/service.yaml
-  - slack/backend.yaml
-  - slack/route.yaml
+  - shared/
+  - everything/
+  - github/
+  - slack/
+  - excalidraw/
 
 commonLabels:
   app.kubernetes.io/name: mcp-servers
