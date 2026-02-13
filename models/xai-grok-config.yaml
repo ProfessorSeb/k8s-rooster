@@ -1,0 +1,12 @@
+apiVersion: kagent.dev/v1alpha2
+kind: ModelConfig
+metadata:
+  name: xai-grok-config
+  namespace: kagent
+spec:
+  apiKeySecret: kagent-xai-provider
+  apiKeySecretKey: PROVIDER_API_KEY
+  model: grok-4-1-fast-reasoning
+  provider: OpenAI
+  openAI:
+    baseUrl: "https://api.x.ai/v1"
