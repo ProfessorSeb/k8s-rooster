@@ -6,7 +6,7 @@ metadata:
 spec:
   description: "Slack MCP tools via AgentGateway (mcp-slack-gateway-proxy)"
   protocol: STREAMABLE_HTTP
-  url: http://mcp-slack-gateway-proxy.agentgateway-system.svc.cluster.local:8079/mcp/slack
+  url: http://172.16.10.168:31481/mcp/slack
   timeout: 30s
   sseReadTimeout: 5m0s
   terminateOnClose: true
