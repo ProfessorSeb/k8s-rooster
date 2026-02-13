@@ -16,7 +16,6 @@ resources:
   - slack/service.yaml
   - slack/backend.yaml
   - slack/route.yaml
-  - slack/policy.yaml
 
 commonLabels:
   app.kubernetes.io/name: mcp-servers
