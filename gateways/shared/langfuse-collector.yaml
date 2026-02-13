@@ -1,0 +1,103 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: langfuse-otel-collector-config
+  namespace: agentgateway-system
+data:
+  config.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+    exporters:
+      # Forward to Langfuse
+      otlphttp/langfuse:
+        endpoint: http://172.16.10.173:3000/api/public/otel
+        headers:
+          Authorization: "Basic cGstbGYtNmEyODVjZjUtMjc4Ny00Y2Y3LTgyM2ItNTRmZWY5YmIxYjYwOnNrLWxmLTE5NDI2ZWRlLTMyYWItNGFlMS05YTM0LTY0MjkwMDA5MDE4ZA=="
+        retry_on_failure:
+          enabled: true
+          initial_interval: 5s
+          max_interval: 30s
+          max_elapsed_time: 300s
+      # Forward to kagent telemetry collector (preserves Solo UI traces)
+      otlp/kagent:
+        endpoint: solo-enterprise-telemetry-collector.kagent.svc.cluster.local:4317
+        tls:
+          insecure: true
+        retry_on_failure:
+          enabled: true
+          initial_interval: 5s
+          max_interval: 30s
+          max_elapsed_time: 300s
+    processors:
+      batch:
+        send_batch_size: 1000
+        timeout: 5s
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [otlphttp/langfuse, otlp/kagent]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: langfuse-otel-collector
+  namespace: agentgateway-system
+  labels:
+    app: langfuse-otel-collector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: langfuse-otel-collector
+  template:
+    metadata:
+      labels:
+        app: langfuse-otel-collector
+    spec:
+      containers:
+        - name: otel-collector
+          image: docker.io/otel/opentelemetry-collector-contrib:0.132.1
+          args: ["--config=/conf/config.yaml"]
+          ports:
+            - containerPort: 4317
+              name: otlp-grpc
+            - containerPort: 4318
+              name: otlp-http
+          volumeMounts:
+            - name: config
+              mountPath: /conf
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+      volumes:
+        - name: config
+          configMap:
+            name: langfuse-otel-collector-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: langfuse-otel-collector
+  namespace: agentgateway-system
+spec:
+  selector:
+    app: langfuse-otel-collector
+  ports:
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
