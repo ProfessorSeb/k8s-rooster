@@ -1,4 +1,7 @@
-# Kubernetes Environment - Rooster
+# Kubernetes Environment - Rooster 🐓
+
+> *"Talk to me, Goose."*
+> *"Goose is dead. I'm Rooster now. And I brought Kubernetes."*
 
 This repository contains Kubernetes configurations for the `maniak-rooster` Talos-based cluster, managed entirely via ArgoCD. It covers Longhorn storage, Solo AgentGateway (AI gateway), kagent Enterprise (AI agent platform), MCP tool servers, and supporting infrastructure.
 
@@ -39,6 +42,10 @@ k8s-rooster/
 │   ├── kagent-application.yaml
 │   └── kustomization.yaml
 ├── agents/                       # kagent Agent CRs, MCPServer CRs, Slack bot
+│   ├── team-lead-agent.yaml      # Orchestrator: github-issues, github-pr, k8s + Slack MCP
+│   ├── github-issues-agent.yaml  # GitHub issue management (ProfessorSeb/ai-kagent-demo)
+│   ├── github-pr-agent.yaml      # GitHub PR management (ProfessorSeb/ai-kagent-demo)
+│   ├── github-mcp-remote.yaml    # RemoteMCPServer for GitHub MCP via AgentGateway
 │   ├── slackbot-k8s-agent.yaml
 │   ├── kagent-slack-bot-deployment.yaml
 │   ├── slack-mcp.yaml            # MCPServer CR (stdio transport, kagent-managed)
@@ -156,6 +163,9 @@ All applications use **auto-sync**, **selfHeal**, **prune**, and **ServerSideApp
 
 | Agent | Description | Tools |
 |---|---|---|
+| `team-lead-agent` | Orchestrates dev workflow across GitHub, K8s, and Slack | github-issues-agent, github-pr-agent, k8s-agent, Slack MCP |
+| `github-issues-agent` | Issue tracking and repo management | GitHub MCP (default repo: ProfessorSeb/ai-kagent-demo) |
+| `github-pr-agent` | PR creation, review, and fixes | GitHub MCP (default repo: ProfessorSeb/ai-kagent-demo) |
 | `k8s-agent` | Kubernetes operations | kagent built-in k8s tools |
 | `kgateway-agent` | kGateway/AgentGateway management | kagent built-in tools |
 | `helm-agent` | Helm chart operations | kagent built-in tools |
