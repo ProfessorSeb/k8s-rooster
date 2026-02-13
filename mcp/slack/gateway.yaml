@@ -12,7 +12,7 @@ spec:
       kind: EnterpriseAgentgatewayParameters
   listeners:
     - protocol: HTTP
-      port: 8092
+      port: 8079
       name: slack-mcp-gateway
       allowedRoutes:
         namespaces:
