@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kagent-mgmt
+  namespace: argocd
+spec:
+  destination:
+    namespace: kagent
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: management
+    repoURL: us-docker.pkg.dev/solo-public/solo-enterprise-helm/charts
+    targetRevision: 0.3.4
+    helm:
+      valuesObject:
+        imagePullSecrets: []
+        cluster: kind-kagent-ent-fake-idp
+        global:
+          imagePullPolicy: IfNotPresent
+        products:
+          kagent:
+            enabled: true
+          agentregistry:
+            enabled: true
+        service:
+          type: LoadBalancer
+          clusterIP: ""
+        clickhouse:
+          enabled: true
+        tracing:
+          verbose: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
