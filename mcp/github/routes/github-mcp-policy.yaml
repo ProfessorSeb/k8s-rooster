@@ -8,20 +8,6 @@ spec:
   - kind: HTTPRoute
     name: mcp-github
   backend:
-    http:
-      cors:
-        allowHeaders:
-        - "*"
-        allowMethods:
-        - "*"
-        allowOrigins:
-        - "http://localhost:8091"
-        - "http://127.0.0.1:8091"
-        - "*"
-      requestHeaderModifier:
-        set:
-        - name: Authorization
-          valueFrom:
-            secretKeyRef:
-              name: ph-secret
-              key: Authorization
+    mcp:
+      toolAuth:
+        defaultAction: Allow
