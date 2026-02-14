@@ -1,26 +1,27 @@
 ###############################################################################
-# MCP Tool Authorization — Scope-Based Access Control
+# MCP Tool Authorization — Scope-Based Access Control (CEL)
 # Controls which MCP tools each user can invoke based on Okta JWT scopes.
-# 
+#
+# Uses CEL expressions to evaluate JWT claims at the MCP backend level.
+# tools/list responses are FILTERED (unauthorized tools hidden).
+# tools/call requests are REJECTED if unauthorized.
+#
 # Scopes:
 #   mcp:read  — list, get, search operations only
 #   mcp:write — read + post, create, reply, add operations
-#   mcp:admin — full access including delete and admin operations
-#
-# Default action: DENY — if no rule matches, the tool call is blocked.
+#   mcp:admin — full access (except destructive ops)
 ###############################################################################
 apiVersion: agentgateway.dev/v1alpha1
 kind: AgentgatewayPolicy
 metadata:
-  name: mcp-tool-rbac
+  name: mcp-tool-rbac-read
   namespace: agentgateway-system
   labels:
     category: authorization
     demo: agentgateway
   annotations:
     description: >-
-      Scope-based MCP tool access control. Users with mcp:read can only
-      list/get/search. mcp:write adds create/post. mcp:admin gets everything.
+      Allow read-only MCP tool access for users with mcp:read scope.
 spec:
   targetRefs:
   - kind: HTTPRoute
@@ -29,45 +30,84 @@ spec:
     name: mcp-github
   backend:
     mcp:
-      toolAuth:
-        defaultAction: Deny
-        rules:
-        #----------------------------------------------------------------------
-        # mcp:read — Read-only operations
-        #----------------------------------------------------------------------
-        - tools:
-          - "slack_list_channels"
-          - "slack_get_channel_history"
-          - "slack_get_thread_replies"
-          - "slack_search_messages"
-          - "get_repository"
-          - "list_repositories"
-          - "search_issues"
-          - "get_issue"
-          - "list_pull_requests"
-          - "get_pull_request"
-          - "get_file_contents"
-          - "search_code"
-          action: Allow
-
-        #----------------------------------------------------------------------
-        # mcp:write — Read + Write operations
-        #----------------------------------------------------------------------
-        - tools:
-          - "slack_post_message"
-          - "slack_reply_to_thread"
-          - "slack_add_reaction"
-          - "create_issue"
-          - "create_pull_request"
-          - "create_or_update_file"
-          action: Allow
-
-        #----------------------------------------------------------------------
-        # Block dangerous operations — always denied, even for admin
-        #----------------------------------------------------------------------
-        - tools:
-          - "delete_repository"
-          - "delete_branch"
-          action: Deny
-          response:
-            message: "🚫 Destructive operations blocked — requires human approval"
+      authorization:
+        action: Allow
+        policy:
+          matchExpressions:
+          - >-
+            claims.scp.exists(s, s == 'mcp:read') && (
+              tool.name.startsWith('list_') ||
+              tool.name.startsWith('get_') ||
+              tool.name.startsWith('search_') ||
+              tool.name == 'slack_list_channels' ||
+              tool.name == 'slack_get_channel_history' ||
+              tool.name == 'slack_get_thread_replies' ||
+              tool.name == 'slack_search_messages'
+            )
+---
+###############################################################################
+# mcp:write — Allow write operations for users with mcp:write scope
+###############################################################################
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: mcp-tool-rbac-write
+  namespace: agentgateway-system
+  labels:
+    category: authorization
+    demo: agentgateway
+  annotations:
+    description: >-
+      Allow write MCP tool access for users with mcp:write scope.
+spec:
+  targetRefs:
+  - kind: HTTPRoute
+    name: mcp-slack
+  - kind: HTTPRoute
+    name: mcp-github
+  backend:
+    mcp:
+      authorization:
+        action: Allow
+        policy:
+          matchExpressions:
+          - >-
+            claims.scp.exists(s, s == 'mcp:write') && (
+              tool.name == 'slack_post_message' ||
+              tool.name == 'slack_reply_to_thread' ||
+              tool.name == 'slack_add_reaction' ||
+              tool.name.startsWith('create_') ||
+              tool.name == 'create_or_update_file'
+            )
+---
+###############################################################################
+# Block destructive operations — ALWAYS denied, regardless of scope
+###############################################################################
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: mcp-tool-block-destructive
+  namespace: agentgateway-system
+  labels:
+    category: authorization
+    demo: agentgateway
+  annotations:
+    description: >-
+      Block destructive MCP operations. Even mcp:admin cannot delete
+      repositories or branches. Requires human approval.
+spec:
+  targetRefs:
+  - kind: HTTPRoute
+    name: mcp-slack
+  - kind: HTTPRoute
+    name: mcp-github
+  backend:
+    mcp:
+      authorization:
+        action: Deny
+        policy:
+          matchExpressions:
+          - >-
+            tool.name.contains('delete') ||
+            tool.name.contains('destroy') ||
+            tool.name.contains('merge_pull_request')

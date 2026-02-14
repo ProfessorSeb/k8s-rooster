@@ -11,12 +11,11 @@ resources:
   # Prompt Enrichment / Elicitation (5 policies)
   - elicitation.yaml
 
-  # MCP Authentication — Okta JWT validation on MCP routes
+  # MCP Authentication — Okta JWKS service + JWT validation
+  - okta-jwks-service.yaml
   - mcp-jwt-auth.yaml
-  # MCP Authorization — Scope-based tool access (read/write/admin)
+  # MCP Authorization — Scope-based tool access (read/write + block destructive)
   - mcp-tool-rbac.yaml
-  # MCP Rate Limiting — Per-user tool call limits
-  - mcp-rate-limit.yaml
 
   # MCP Tool Auth (legacy, disabled)
   # - github-mcp-read-only-policy.yaml
