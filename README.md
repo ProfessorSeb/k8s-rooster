@@ -14,7 +14,7 @@ k8s-rooster/
 │   ├── kagent/                   # kagent ArgoCD applications (agents, tool servers, slack bot)
 │   └── longhorn/                 # Longhorn deployment
 ├── gateways/                     # LLM gateway resources
-│   ├── shared/                   # Shared gateway, tracing params, otel-collector
+│   ├── shared/                   # Shared gateway, tracing params, otel-collector, Langfuse fan-out collector
 │   ├── anthropic/                # Anthropic backend + route
 │   ├── openai/                   # OpenAI backend + route
 │   ├── xai/                      # xAI backend + route + gateway + rate limiting
@@ -54,7 +54,10 @@ k8s-rooster/
 │   └── kustomization.yaml
 ├── models/                       # Model configs (kagent ModelConfig CRs)
 ├── archive/                      # Stale raw resource dumps (not referenced by ArgoCD)
-├── docs/                         # Reference examples and deployment guide
+├── scripts/                      # Utility scripts
+│   └── verify-langfuse.sh        # Verify Langfuse dual-export pipeline
+├── docs/                         # Reference examples and guides
+│   └── langfuse-integration.md   # Langfuse setup tutorial + architecture
 └── README.md
 ```
 
@@ -74,7 +77,7 @@ k8s-rooster/
 - **AgentGateway** (Solo Enterprise) — AI gateway for LLM traffic, MCP tool proxying, A2A, security policies
 - **kagent Enterprise** (Solo/CNCF) — Kubernetes-native AI agent platform with MCP tool integration
 - **Consolidated Management UI** — Single `solo-enterprise-ui` in kagent namespace serves both kagent and AgentGateway products
-- **Telemetry** — `solo-enterprise-telemetry-collector` + ClickHouse in kagent namespace, all tracing routes to `kagent.svc.cluster.local:4317`
+- **Telemetry** — Dual-export trace pipeline: AgentGateway → Langfuse OTel Collector (fan-out) → Langfuse + ClickHouse (Solo UI)
 
 ### MCP Tool Flow (AgentGateway)
 
@@ -133,10 +136,51 @@ kubectl get agentgatewaypolicies -n agentgateway-system
 kubectl annotate app <app-name> -n argocd argocd.argoproj.io/refresh=hard --overwrite
 ```
 
+## Tracing & Observability
+
+### Architecture
+
+```
+AgentGateway Proxies ──▶ Langfuse OTel Collector (fan-out) ──┬──▶ Langfuse (OTLP HTTP)
+                         agentgateway-system:4317             └──▶ Solo Telemetry Collector → ClickHouse (Solo UI)
+                                                                   kagent:4317
+```
+
+All LLM traces from AgentGateway are dual-exported to both **Langfuse** and the **Solo Enterprise UI** (ClickHouse). A lightweight OTel Collector in `agentgateway-system` acts as a fan-out, forwarding traces to both destinations.
+
+### Components
+
+| Component | Namespace | Purpose |
+|---|---|---|
+| `langfuse-otel-collector` | agentgateway-system | Fan-out: receives traces from proxies, exports to Langfuse + kagent |
+| `solo-enterprise-telemetry-collector` | kagent | Receives traces from fan-out, stores in ClickHouse |
+| `kagent-mgmt-clickhouse` | kagent | Trace storage for Solo Enterprise UI |
+| Langfuse (external) | Docker on host | LLM observability UI (`http://172.16.10.173:3000`) |
+
+### Configuration
+
+- **Tracing endpoint:** `gateways/shared/tracing-params.yaml` → points to fan-out collector
+- **Fan-out collector:** `gateways/shared/langfuse-collector.yaml` → ConfigMap + Deployment + Service
+- **Full tutorial:** [`docs/langfuse-integration.md`](docs/langfuse-integration.md)
+- **Verification script:** [`scripts/verify-langfuse.sh`](scripts/verify-langfuse.sh)
+
+### Trace Fields in Langfuse
+
+| Field | Example |
+|---|---|
+| Trace name | `POST /openai/*` |
+| Input | User prompt messages |
+| Output | Model response |
+| Gateway | `agentgateway-system/agentgateway-proxy` |
+| Route | `agentgateway-system/openai` |
+| Endpoint | `api.openai.com:443` |
+| Model | `gpt-4o-mini-2024-07-18` |
+| Token usage | Prompt, completion, total |
+
 ## Key Decisions
 
 - **Consolidated management UI** in kagent namespace — single deployment serves both kagent and AgentGateway products
-- **All tracing routes to kagent namespace** — single telemetry collector for both products
+- **Dual trace export via fan-out collector** — separate OTel Collector avoids fighting ArgoCD's Helm-managed ConfigMap while sending traces to both Langfuse and ClickHouse
 - **MCP policies disabled during development** — re-enable via `policies/kustomization.yaml`
 - **AgentGateway for MCP routing** — MCP servers deployed as standard Deployments with HTTP transport, fronted by AgentGateway for security/observability
 - **kagent uses RemoteMCPServer** to consume AgentGateway-fronted MCP tools — gets tracing and policy enforcement for free
