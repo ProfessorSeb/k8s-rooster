@@ -20,9 +20,11 @@ metadata:
       users/agents with valid tokens can access MCP tools.
 spec:
   targetRefs:
-  - kind: HTTPRoute
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
     name: mcp-slack
-  - kind: HTTPRoute
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
     name: mcp-github
   backend:
     mcp:
