@@ -7,9 +7,9 @@ metadata:
     example: github-mcp-route
 spec:
   parentRefs:
-  - name: gh-mcp-gateway-proxy
+  - name: mcp-gateway-proxy
     namespace: agentgateway-system
-    sectionName: gh-mcp-gateway
+    sectionName: mcp-gateway
   rules:
     - matches:
         - path:

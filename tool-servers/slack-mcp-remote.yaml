@@ -4,9 +4,9 @@ metadata:
   name: slack-mcp-agentgateway
   namespace: kagent
 spec:
-  description: "Slack MCP tools via AgentGateway (mcp-slack-gateway-proxy)"
+  description: "Slack MCP tools via AgentGateway (consolidated mcp-gateway-proxy)"
   protocol: STREAMABLE_HTTP
-  url: http://172.16.10.168:31481/mcp/slack
+  url: http://172.16.10.168:30168/mcp/slack
   timeout: 30s
   sseReadTimeout: 5m0s
   terminateOnClose: true

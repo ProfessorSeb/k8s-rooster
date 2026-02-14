@@ -7,9 +7,9 @@ metadata:
     example: slack-mcp-route
 spec:
   parentRefs:
-  - name: mcp-slack-gateway-proxy
+  - name: mcp-gateway-proxy
     namespace: agentgateway-system
-    sectionName: slack-mcp-gateway
+    sectionName: mcp-gateway
   rules:
     - matches:
         - path:

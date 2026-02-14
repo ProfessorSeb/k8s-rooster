@@ -2,7 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - gateway.yaml
+  # gateway.yaml removed — using shared mcp-gateway-proxy
   - deployment.yaml
   - service.yaml
   - backend.yaml
