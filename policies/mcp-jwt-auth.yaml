@@ -1,0 +1,30 @@
+###############################################################################
+# JWT Authentication for MCP Routes
+# Validates Okta-issued JWTs on all MCP tool endpoints.
+# Unauthenticated requests are rejected before reaching any MCP tool server.
+###############################################################################
+apiVersion: enterpriseagentgateway.solo.io/v1alpha1
+kind: EnterpriseAgentgatewayPolicy
+metadata:
+  name: mcp-jwt-auth
+  namespace: agentgateway-system
+  labels:
+    category: authentication
+    demo: agentgateway
+  annotations:
+    description: >-
+      Enforces Okta JWT validation on MCP routes. Only authenticated
+      users/agents with valid tokens can access MCP tools.
+spec:
+  targetRefs:
+  - kind: HTTPRoute
+    name: mcp-slack
+  - kind: HTTPRoute
+    name: mcp-github
+  traffic:
+    jwtAuthentication:
+      providers:
+      - name: okta
+        issuer: "https://integrator-7147223.okta.com/oauth2/aus104zseyg64swj3698"
+        audiences: ["api://default"]
+        jwksUri: "https://integrator-7147223.okta.com/oauth2/aus104zseyg64swj3698/v1/keys"

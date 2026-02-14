@@ -1,0 +1,73 @@
+###############################################################################
+# MCP Tool Authorization — Scope-Based Access Control
+# Controls which MCP tools each user can invoke based on Okta JWT scopes.
+# 
+# Scopes:
+#   mcp:read  — list, get, search operations only
+#   mcp:write — read + post, create, reply, add operations
+#   mcp:admin — full access including delete and admin operations
+#
+# Default action: DENY — if no rule matches, the tool call is blocked.
+###############################################################################
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: mcp-tool-rbac
+  namespace: agentgateway-system
+  labels:
+    category: authorization
+    demo: agentgateway
+  annotations:
+    description: >-
+      Scope-based MCP tool access control. Users with mcp:read can only
+      list/get/search. mcp:write adds create/post. mcp:admin gets everything.
+spec:
+  targetRefs:
+  - kind: HTTPRoute
+    name: mcp-slack
+  - kind: HTTPRoute
+    name: mcp-github
+  backend:
+    mcp:
+      toolAuth:
+        defaultAction: Deny
+        rules:
+        #----------------------------------------------------------------------
+        # mcp:read — Read-only operations
+        #----------------------------------------------------------------------
+        - tools:
+          - "slack_list_channels"
+          - "slack_get_channel_history"
+          - "slack_get_thread_replies"
+          - "slack_search_messages"
+          - "get_repository"
+          - "list_repositories"
+          - "search_issues"
+          - "get_issue"
+          - "list_pull_requests"
+          - "get_pull_request"
+          - "get_file_contents"
+          - "search_code"
+          action: Allow
+
+        #----------------------------------------------------------------------
+        # mcp:write — Read + Write operations
+        #----------------------------------------------------------------------
+        - tools:
+          - "slack_post_message"
+          - "slack_reply_to_thread"
+          - "slack_add_reaction"
+          - "create_issue"
+          - "create_pull_request"
+          - "create_or_update_file"
+          action: Allow
+
+        #----------------------------------------------------------------------
+        # Block dangerous operations — always denied, even for admin
+        #----------------------------------------------------------------------
+        - tools:
+          - "delete_repository"
+          - "delete_branch"
+          action: Deny
+          response:
+            message: "🚫 Destructive operations blocked — requires human approval"

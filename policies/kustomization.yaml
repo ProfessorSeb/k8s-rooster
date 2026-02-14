@@ -10,7 +10,15 @@ resources:
   - credential-protection.yaml
   # Prompt Enrichment / Elicitation (5 policies)
   - elicitation.yaml
-  # MCP Tool Auth (disabled)
+
+  # MCP Authentication — Okta JWT validation on MCP routes
+  - mcp-jwt-auth.yaml
+  # MCP Authorization — Scope-based tool access (read/write/admin)
+  - mcp-tool-rbac.yaml
+  # MCP Rate Limiting — Per-user tool call limits
+  - mcp-rate-limit.yaml
+
+  # MCP Tool Auth (legacy, disabled)
   # - github-mcp-read-only-policy.yaml
   # - github-mcp-safe-ops-policy.yaml
   # - mcp-block-echo-getenv-policy.yaml
