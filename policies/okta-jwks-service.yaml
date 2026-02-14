@@ -1,17 +1,15 @@
 ###############################################################################
-# ExternalName Service for Okta JWKS endpoint
-# Used by MCP authentication policies to validate JWT signatures
+# AgentgatewayBackend for Okta JWKS endpoint
+# Used by MCP authentication policies to validate JWT signatures.
 ###############################################################################
-apiVersion: v1
-kind: Service
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayBackend
 metadata:
   name: okta-jwks
   namespace: agentgateway-system
   labels:
     category: authentication
 spec:
-  type: ExternalName
-  externalName: integrator-7147223.okta.com
-  ports:
-  - port: 443
-    protocol: TCP
+  static:
+    host: integrator-7147223.okta.com
+    port: 443

@@ -3,8 +3,7 @@
 # Validates JWTs on MCP tool routes. Unauthenticated requests are rejected
 # before reaching any MCP tool server.
 #
-# Uses the OSS AgentgatewayPolicy backend.mcp.authentication field.
-# JWKS fetched from Okta via ExternalName Service (okta-jwks).
+# JWKS fetched from Okta via AgentgatewayBackend (okta-jwks).
 ###############################################################################
 apiVersion: agentgateway.dev/v1alpha1
 kind: AgentgatewayPolicy
@@ -35,6 +34,8 @@ spec:
         mode: Strict
         jwks:
           backendRef:
+            group: agentgateway.dev
+            kind: AgentgatewayBackend
             name: okta-jwks
             port: 443
           jwksPath: "/oauth2/aus104zseyg64swj3698/v1/keys"
