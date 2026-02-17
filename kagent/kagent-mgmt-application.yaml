@@ -22,7 +22,7 @@ spec:
           kagent:
             enabled: true
           agentregistry:
-            enabled: false
+            enabled: true
           agentgateway:
             enabled: true
         service:
