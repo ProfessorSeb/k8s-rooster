@@ -12,5 +12,8 @@ spec:
         port: 443
         path: /mcp/
   policies:
+    auth:
+      secretRef:
+        name: github-mcp-secret
     tls:
       sni: api.githubcopilot.com
