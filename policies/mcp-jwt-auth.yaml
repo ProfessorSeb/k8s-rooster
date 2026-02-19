@@ -28,7 +28,7 @@ spec:
   backend:
     mcp:
       authentication:
-        issuer: "https://integrator-7147223.okta.com/oauth2/aus104zseyg64swj3698"
+        issuer: "https://integrator-7147223.okta.com/oauth2/default"
         audiences:
         - "api://default"
         mode: Strict
@@ -38,4 +38,4 @@ spec:
             kind: AgentgatewayBackend
             name: okta-jwks
             port: 443
-          jwksPath: "/oauth2/aus104zseyg64swj3698/v1/keys"
+          jwksPath: "/oauth2/default/v1/keys"

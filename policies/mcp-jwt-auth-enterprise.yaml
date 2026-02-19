@@ -1,0 +1,32 @@
+###############################################################################
+# MCP Authentication — Okta JWT Validation (Enterprise)
+# Enterprise variant using EnterpriseAgentgatewayPolicy with inline JWKS.
+# Used by the aws-agentcore-demo: agent authenticates via client_credentials
+# and AgentGateway validates the JWT before allowing MCP tool access.
+#
+# Issuer: Okta "default" auth server (canonical issuer = oauth2/default)
+###############################################################################
+apiVersion: enterpriseagentgateway.solo.io/v1alpha1
+kind: EnterpriseAgentgatewayPolicy
+metadata:
+  name: mcp-jwt-auth-ent
+  namespace: agentgateway-system
+  labels:
+    category: authentication
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: mcp-slack
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: mcp-github
+  traffic:
+    jwtAuthentication:
+      mode: Strict
+      providers:
+      - audiences:
+        - api://default
+        issuer: "https://integrator-7147223.okta.com/oauth2/default"
+        jwks:
+          inline: '{"keys":[{"kty":"RSA","alg":"RS256","kid":"ZomLpMXYrmw9V0flcORv4cPRkWUIL2TO4-R83jhCMKQ","use":"sig","e":"AQAB","n":"pdTEP7w4yRgRkY5Q99cokIrx-MiulNAPsKPTR5LHuk0uQWCQkoUBttLQi-S-rzXBXxmCWEYoFvt_MI5PRg4j3PCX4N_ExCGpG1eNH39nWqKL85NmiYGVvtCD-QDusySpgNlEQNRtNBWKEQu28eOOkJCaNl-9lHb1HESRzZMP8RS_Z--nWt-uxwoShxDUfjZX0v2g8G9B2z8kjPTNRD_uWZYlPD6jcuAXPnWVghlDxivMe-c0DIYqsfNShGem7652TC6eB7CTiLoknWLgPyLlnfhjCNd2Jrz9PfqOeIgtf5g_VbmWyNF0uJ0mWe6mei0Zl0eyibmYLAxCldcQsdtFgw"}]}'
