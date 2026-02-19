@@ -26,8 +26,6 @@ spec:
   targetRefs:
   - group: gateway.networking.k8s.io
     kind: HTTPRoute
-  - group: gateway.networking.k8s.io
-    kind: HTTPRoute
     name: mcp-github
   backend:
     mcp:
@@ -64,8 +62,6 @@ spec:
   targetRefs:
   - group: gateway.networking.k8s.io
     kind: HTTPRoute
-  - group: gateway.networking.k8s.io
-    kind: HTTPRoute
     name: mcp-github
   backend:
     mcp:
@@ -99,8 +95,6 @@ metadata:
       repositories or branches. Requires human approval.
 spec:
   targetRefs:
-  - group: gateway.networking.k8s.io
-    kind: HTTPRoute
   - group: gateway.networking.k8s.io
     kind: HTTPRoute
     name: mcp-github
