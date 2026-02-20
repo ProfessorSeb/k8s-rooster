@@ -56,6 +56,14 @@ k8s-rooster/
 ├── archive/                      # Stale raw resource dumps (not referenced by ArgoCD)
 ├── scripts/                      # Utility scripts
 │   └── verify-langfuse.sh        # Verify Langfuse dual-export pipeline
+├── f5vip/                        # F5 BIG-IP VIP Terraform configs
+│   ├── main.tf                   # Virtual servers, pools, pool members, monitors
+│   ├── variables.tf              # BIG-IP connection + backend node variables
+│   ├── outputs.tf                # VIP → service mapping output
+│   ├── provider.tf               # BIG-IP provider config
+│   ├── versions.tf               # Terraform + provider version constraints
+│   ├── terraform.tfvars.example  # Example credentials file
+│   └── README.md                 # VIP assignment table + usage
 ├── docs/                         # Reference examples and guides
 │   └── langfuse-integration.md   # Langfuse setup tutorial + architecture
 └── README.md
@@ -177,6 +185,29 @@ All LLM traces from AgentGateway are dual-exported to both **Langfuse** and the 
 | Model | `gpt-4o-mini-2024-07-18` |
 | Token usage | Prompt, completion, total |
 
+## F5 BIG-IP VIPs
+
+All services are exposed via F5 BIG-IP virtual servers using Layer 4 (fastL4) profiles, backed by Kubernetes NodePorts across all Talos nodes. Managed via Terraform in `f5vip/`.
+
+| DNS | VIP IP | Port | Backend Service |
+|-----|--------|------|-----------------|
+| `solo.rooster.maniak.com` | 172.16.20.120 | 8080 | agentgateway-proxy (NP 31572) |
+| `argo.rooster.maniak.io` | 172.16.20.121 | 443/80 | argocd-server (NP 31988/32178) |
+| `xai.rooster.maniak.com` | 172.16.20.122 | 8081 | xai-gateway-proxy (NP 31990) |
+| `mcp.rooster.maniak.com` | 172.16.20.123 | 8090 | mcp-gateway-proxy (NP 30168) |
+| `model.rooster.maniak.com` | 172.16.20.124 | 8085 | model-priority-gateway-proxy (NP 30689) |
+| `github.rooster.maniak.com` | 172.16.20.125 | 8092 | github-gateway-proxy (NP 31313) |
+
+**Pool members:** All 4 Talos nodes (172.16.10.130, .132, .133, .136)
+**DNS:** Managed on FortiGate (172.16.10.1) DNS server for maniak.com and maniak.io zones
+**BIG-IP:** 172.16.10.10
+
+```bash
+cd f5vip/
+cp terraform.tfvars.example terraform.tfvars  # add BIG-IP creds
+terraform init && terraform apply
+```
+
 ## Key Decisions
 
 - **Consolidated management UI** in kagent namespace — single deployment serves both kagent and AgentGateway products
@@ -189,7 +220,7 @@ All LLM traces from AgentGateway are dual-exported to both **Langfuse** and the 
 
 ---
 
-**Last Updated**: February 13, 2026
+**Last Updated**: February 20, 2026
 **Cluster**: maniak-rooster (Talos)
 **Cluster Name (mgmt)**: rooster.maniak.io
 **Maintainer**: Seb (@sebbycorp)
