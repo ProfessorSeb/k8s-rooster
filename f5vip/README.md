@@ -2,6 +2,8 @@
 
 Terraform configuration for F5 BIG-IP virtual servers fronting the k8s-rooster Talos cluster.
 
+**BIG-IP:** 172.16.10.10 — **v21.0.0** (upgraded from 17.5.1.3 on 2026-02-20)
+
 All gateway VIPs are **Layer 4 (fastL4)** using existing Kubernetes NodePorts.
 
 ## VIP Assignments

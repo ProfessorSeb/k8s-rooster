@@ -200,7 +200,7 @@ All services are exposed via F5 BIG-IP virtual servers using Layer 4 (fastL4) pr
 
 **Pool members:** All 4 Talos nodes (172.16.10.130, .132, .133, .136)
 **DNS:** Managed on FortiGate (172.16.10.1) DNS server for maniak.com and maniak.io zones
-**BIG-IP:** 172.16.10.10
+**BIG-IP:** 172.16.10.10 — **v21.0.0** (upgraded 2026-02-20)
 
 ```bash
 cd f5vip/
