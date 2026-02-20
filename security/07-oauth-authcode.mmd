@@ -1,0 +1,40 @@
+sequenceDiagram
+    participant U as User (Browser)
+    participant AGW as AgentGateway Proxy
+    participant EA as Ext Auth Service
+    participant IdP as OIDC IdP<br/>(e.g., Keycloak)
+    participant Redis as Redis<br/>(Session Store)
+    participant LLM as LLM Provider
+
+    U->>AGW: GET /openai (no session cookie)
+    AGW->>EA: Check auth
+    EA-->>AGW: No valid session
+
+    AGW-->>U: 302 Redirect to IdP login URL
+
+    U->>IdP: User visits login page
+    U->>IdP: Enter credentials (user1 / password)
+    IdP->>IdP: Authenticate user
+
+    IdP-->>U: 302 Redirect to callback URL with code
+
+    U->>AGW: GET /openai?code=AUTH_CODE
+    AGW->>EA: Exchange authorization code
+    EA->>IdP: POST /token (code + client_id + client_secret)
+    IdP-->>EA: ID Token + Access Token
+
+    EA->>Redis: Store session (keycloak-session cookie)
+    EA-->>AGW: Authenticated ✓ Set-Cookie
+
+    AGW-->>U: Set-Cookie + redirect to /openai
+
+    Note over U,LLM: Subsequent Requests
+
+    U->>AGW: POST /openai Cookie: keycloak-session=...
+    AGW->>EA: Validate session
+    EA->>Redis: Lookup session
+    Redis-->>EA: Valid session + tokens
+    EA-->>AGW: Authenticated ✓
+    AGW->>LLM: Forward request
+    LLM-->>AGW: Response
+    AGW-->>U: 200 OK + Response

@@ -1,0 +1,34 @@
+graph LR
+    subgraph Clients["MCP Clients"]
+        C1["Cursor"]
+        C2["Claude Desktop"]
+        C3["VS Code"]
+        C4["Claude Code"]
+    end
+
+    subgraph AGW["AgentGateway"]
+        PROXY["AgentGateway Proxy<br/>Single MCP Endpoint<br/>/mcp"]
+        FED["Federation Layer<br/>Label-based discovery<br/>Tool aggregation"]
+        PROXY --> FED
+    end
+
+    subgraph Servers["Federated MCP Servers"]
+        S1["GitHub MCP Server<br/>get_me, list_repos,<br/>add_issue_comment"]
+        S2["Slack MCP Server<br/>send_message,<br/>list_channels"]
+        S3["DB MCP Server<br/>query, list_tables"]
+        S4["Custom MCP Server<br/>fetch_website,<br/>run_analysis"]
+    end
+
+    C1 -->|Single Connection| PROXY
+    C2 -->|Single Connection| PROXY
+    C3 -->|Single Connection| PROXY
+    C4 -->|Single Connection| PROXY
+    
+    FED --> S1
+    FED --> S2
+    FED --> S3
+    FED --> S4
+
+    style AGW fill:#1a1a2e,stroke:#e94560,color:#fff
+    style Clients fill:#16213e,stroke:#0f3460,color:#fff
+    style Servers fill:#0f3460,stroke:#533483,color:#fff

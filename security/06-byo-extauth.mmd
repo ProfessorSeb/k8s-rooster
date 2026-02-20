@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant C as Client / Agent
+    participant AGW as AgentGateway Proxy
+    participant BYO as Your Ext Auth Service<br/>(gRPC)
+    participant Backend as Backend<br/>(LLM / MCP / Agent / HTTP)
+
+    C->>AGW: Request to protected route
+
+    AGW->>BYO: gRPC Authorization Request<br/>(headers, path, method)
+
+    BYO->>BYO: Custom authorization logic<br/>(check headers, tokens,<br/>database lookups, etc.)
+
+    alt Authorized
+        BYO-->>AGW: ALLOW<br/>(optional: inject headers)
+        AGW->>Backend: Forward request
+        Backend-->>AGW: Response
+        AGW-->>C: 200 OK + Response
+    else Not Authorized
+        BYO-->>AGW: DENY<br/>(status code, message)
+        AGW-->>C: 403 Forbidden<br/>"denied by ext_authz"
+    end

@@ -1,0 +1,28 @@
+sequenceDiagram
+    participant Agent as AI Agent Pod<br/>(kagent)
+    participant ZT_SRC as ztunnel<br/>(source node)
+    participant ZT_DST as ztunnel<br/>(dest node)
+    participant WP as AgentGateway Waypoint<br/>(L7 policy enforcement)
+    participant MCP as MCP Server<br/>(GitHub / Slack / DB)
+
+    Note over Agent,MCP: East-West: Agent calls MCP tool (service address, not gateway)
+
+    Agent->>ZT_SRC: Call mcp-server.mcp-servers.svc:3001<br/>(plain HTTP, no gateway URL needed)
+    
+    Note over ZT_SRC: ztunnel intercepts at L4<br/>Encrypts with mTLS<br/>Adds SPIFFE identity
+
+    ZT_SRC->>ZT_DST: mTLS tunnel<br/>(encrypted, identity-aware)
+
+    Note over ZT_DST: Waypoint configured for<br/>mcp-servers namespace<br/>Traffic redirected to waypoint
+
+    ZT_DST->>WP: Redirect to AgentGateway waypoint<br/>(L7 processing)
+
+    Note over WP: AgentGateway applies full policy stack:<br/>1. JWT validation (agent identity)<br/>2. CEL-based RBAC (tool access)<br/>3. Prompt guards (if LLM traffic)<br/>4. Rate limiting<br/>5. OTel tracing<br/>6. Audit logging
+
+    WP->>MCP: Forward authorized request<br/>(mTLS maintained)
+    MCP-->>WP: MCP tool response
+    WP-->>ZT_DST: Response (traced + logged)
+    ZT_DST-->>ZT_SRC: mTLS tunnel
+    ZT_SRC-->>Agent: Tool result
+
+    Note over Agent,MCP: Key benefits:<br/>• Agent uses simple service address (not gateway URL)<br/>• Zero config on agent side<br/>• All AgentGateway policies enforced transparently<br/>• Full mTLS without sidecars<br/>• Audit trail: which agent called which tool

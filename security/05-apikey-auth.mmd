@@ -1,0 +1,28 @@
+sequenceDiagram
+    participant C as Client / Agent
+    participant AGW as AgentGateway Proxy
+    participant K8s as K8s Secrets<br/>(API Keys)
+    participant Backend as Backend<br/>(LLM / MCP / Agent / HTTP)
+
+    C->>AGW: POST /api<br/>(no Authorization header)
+
+    AGW->>AGW: API key auth check:<br/>No API key found
+
+    AGW-->>C: 401 Unauthorized<br/>"no API Key found"
+
+    Note over C,Backend: Retry with API key
+
+    C->>AGW: POST /api<br/>x-api-key: N2YwMDIx...
+
+    AGW->>K8s: Lookup referenced secret<br/>(by name or label selector)
+    K8s-->>AGW: Secret found
+
+    AGW->>AGW: Compare API key from<br/>request header vs secret
+
+    alt mode: Strict — Key valid
+        AGW->>Backend: Forward request
+        Backend-->>AGW: Response
+        AGW-->>C: 200 OK + Response
+    else Key invalid
+        AGW-->>C: 401 Unauthorized
+    end

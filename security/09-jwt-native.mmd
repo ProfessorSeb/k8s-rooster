@@ -1,0 +1,29 @@
+sequenceDiagram
+    participant C as Client / Agent
+    participant AGW as AgentGateway Proxy
+    participant JWKS as JWKS Endpoint<br/>(IdP, e.g., Keycloak)
+    participant Backend as Backend Service<br/>(LLM / MCP / Agent)
+
+    Note over AGW,JWKS: Startup: Proxy fetches and caches JWKS
+
+    AGW->>JWKS: GET /realms/master/protocol/openid-connect/certs
+    JWKS-->>AGW: JWKS response (public keys) cached for 5m
+
+    Note over C,Backend: Request Flow
+
+    C->>AGW: POST /api Authorization: Bearer <JWT>
+
+    AGW->>AGW: Extract JWT from Bearer header
+    AGW->>AGW: Read kid from JWT header
+    AGW->>AGW: Match kid to cached public key
+    AGW->>AGW: Verify signature (RS256)
+    AGW->>AGW: Validate claims: issuer, audience, expiration
+
+    alt mode: Strict — Valid JWT required
+        AGW->>Backend: Forward request
+        Backend-->>AGW: Response
+        AGW-->>C: 200 OK
+
+    else mode: Strict — No JWT or invalid
+        AGW-->>C: 401 Unauthorized
+    end

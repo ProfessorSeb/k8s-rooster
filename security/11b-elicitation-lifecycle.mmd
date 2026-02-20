@@ -1,0 +1,6 @@
+stateDiagram-v2
+    [*] --> PENDING: Request needs upstream token<br/>Token not found in STS
+    PENDING --> COMPLETED: User completes OAuth flow<br/>via Solo Enterprise UI
+    PENDING --> FAILED: OAuth flow fails or times out
+    COMPLETED --> [*]: Token available for injection
+    FAILED --> PENDING: User retries authorization

@@ -1,0 +1,14 @@
+graph LR
+    subgraph AGW["AgentGateway Proxy"]
+        JWT["JWT Authentication<br/>(EnterpriseAgentgatewayPolicy)"]
+    end
+
+    subgraph Providers["Configured JWT Providers"]
+        P1["Provider 1: Keycloak<br/>issuer: keycloak/realms/master<br/>audiences: my-app<br/>JWKS: remote"]
+        P2["Provider 2: Auth0<br/>issuer: auth0.example.com<br/>audiences: my-other-app<br/>JWKS: remote"]
+        P3["Provider 3: Custom<br/>issuer: custom-idp.internal<br/>JWKS: inline"]
+    end
+
+    JWT --> P1
+    JWT --> P2
+    JWT --> P3

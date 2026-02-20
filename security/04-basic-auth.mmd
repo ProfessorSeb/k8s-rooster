@@ -1,0 +1,26 @@
+sequenceDiagram
+    participant C as Client / Agent
+    participant AGW as AgentGateway Proxy
+    participant Backend as Backend<br/>(LLM / MCP / Agent / HTTP)
+
+    C->>AGW: POST /api<br/>(no credentials)
+
+    AGW->>AGW: Basic auth check:<br/>No Authorization header found
+
+    AGW-->>C: 401 Unauthorized<br/>"no basic authentication credentials found"
+
+    Note over C,Backend: Retry with credentials
+
+    C->>AGW: POST /api<br/>Authorization: Basic dXNlcjpwYXNzd29yZA==
+
+    AGW->>AGW: Decode base64 → user:password
+    AGW->>AGW: Lookup user in policy config
+    AGW->>AGW: Verify APR1 hash<br/>(salt + hashed password)
+
+    alt mode: Strict — Credentials valid
+        AGW->>Backend: Forward request
+        Backend-->>AGW: Response
+        AGW-->>C: 200 OK + Response
+    else Credentials invalid
+        AGW-->>C: 401 Unauthorized
+    end

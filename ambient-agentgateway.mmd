@@ -1,0 +1,68 @@
+graph TB
+    subgraph External["External Clients (North-South)"]
+        DEV["Developer<br/>(Cursor / Claude Desktop)"]
+        APP["External App / Agent"]
+    end
+
+    subgraph Mesh["Kubernetes Cluster — Ambient Mesh"]
+        subgraph Ztunnel["ztunnel (L4 — every node)"]
+            ZT1["ztunnel<br/>mTLS encryption<br/>L4 identity<br/>TCP routing"]
+        end
+
+        subgraph NS_AGW["agentgateway-system namespace"]
+            AGW_PROXY["AgentGateway Proxy<br/>(North-South Ingress)<br/>External clients enter here<br/>TLS termination + Auth + Policies"]
+            AGW_WP["AgentGateway Waypoint<br/>(East-West L7 Policy)<br/>Enforce policies on<br/>internal mesh traffic"]
+        end
+
+        subgraph NS_MCP["mcp-servers namespace"]
+            GITHUB_MCP["GitHub MCP Server"]
+            SLACK_MCP["Slack MCP Server"]
+            DB_MCP["Database MCP Server"]
+        end
+
+        subgraph NS_AGENTS["agents namespace"]
+            AGENT1["AI Agent Pod A<br/>(kagent)"]
+            AGENT2["AI Agent Pod B"]
+        end
+
+        subgraph NS_LLM["llm namespace"]
+            OLLAMA["Ollama<br/>(Self-hosted LLM)"]
+        end
+    end
+
+    subgraph CloudLLM["Cloud LLM Providers"]
+        OPENAI["OpenAI"]
+        ANTHROPIC["Anthropic"]
+    end
+
+    %% North-South: External clients enter via AgentGateway proxy
+    DEV -->|"MCP over HTTPS<br/>(North-South)"| AGW_PROXY
+    APP -->|"LLM API<br/>(North-South)"| AGW_PROXY
+
+    %% AgentGateway proxy routes to internal services
+    AGW_PROXY -->|"mTLS via ztunnel"| GITHUB_MCP
+    AGW_PROXY -->|"mTLS via ztunnel"| SLACK_MCP
+    AGW_PROXY -->|"route to cloud"| OPENAI
+    AGW_PROXY -->|"route to cloud"| ANTHROPIC
+
+    %% East-West: Internal agents talk to MCP servers
+    %% Traffic forced through waypoint for L7 policy
+    AGENT1 -->|"① Agent calls MCP service<br/>(plain service address)"| ZT1
+    ZT1 -->|"② ztunnel encrypts with mTLS<br/>routes to waypoint"| AGW_WP
+    AGW_WP -->|"③ L7 policy enforced:<br/>• JWT validation<br/>• Tool access RBAC<br/>• Prompt guards<br/>• Rate limiting<br/>• Tracing"| GITHUB_MCP
+
+    AGENT1 -->|"East-West via waypoint"| AGW_WP
+    AGW_WP -->|"Policy enforced"| SLACK_MCP
+    AGW_WP -->|"Policy enforced"| DB_MCP
+
+    AGENT2 -->|"East-West via waypoint"| AGW_WP
+    AGW_WP -->|"LLM policy"| OLLAMA
+
+    style External fill:#2e1a1a,stroke:#e94560,color:#fff
+    style Mesh fill:#0a0a1a,stroke:#333,color:#fff
+    style Ztunnel fill:#1a2e1a,stroke:#4caf50,color:#fff
+    style NS_AGW fill:#1a1a2e,stroke:#e94560,color:#fff
+    style NS_MCP fill:#0f3460,stroke:#533483,color:#fff
+    style NS_AGENTS fill:#16213e,stroke:#0f3460,color:#fff
+    style NS_LLM fill:#2e2e1a,stroke:#ffc107,color:#fff
+    style CloudLLM fill:#2e1a1a,stroke:#e94560,color:#fff

@@ -1,0 +1,51 @@
+graph TB
+    subgraph CP["Control Plane (enterprise-agentgateway pod)"]
+        CW["Config Watcher<br/>Watches Gateway API &<br/>AgentGateway CRDs"]
+        SW["Secret Watcher<br/>Monitors credential stores"]
+        TE["Translation Engine<br/>K8s resources → xDS snapshot<br/>binds → listeners → routes → policies"]
+        RP["Reporter<br/>Validates resources &<br/>writes status to etcd"]
+        XDS["xDS Server<br/>Serves config via gRPC"]
+        
+        CW --> TE
+        SW --> TE
+        TE --> RP
+        TE --> XDS
+    end
+
+    subgraph DP["Data Plane (agentgateway-proxy pods)"]
+        P1["AgentGateway Proxy"]
+        P2["AgentGateway Proxy"]
+    end
+
+    subgraph Resources["Kubernetes Resources"]
+        GW["Gateway"]
+        HR["HTTPRoute"]
+        AB["AgentgatewayBackend"]
+        AP["AgentgatewayPolicy /<br/>EnterpriseAgentgatewayPolicy"]
+        RLC["RateLimitConfig"]
+    end
+
+    subgraph Backends["Backends"]
+        LLM["LLM Providers<br/>OpenAI, Anthropic,<br/>Bedrock, Gemini, etc."]
+        MCP["MCP Servers<br/>Tools & Data Sources"]
+        A2A["A2A Agents"]
+        INF["Inference Pools<br/>Self-hosted LLMs"]
+    end
+
+    Resources --> CW
+    XDS -->|gRPC config pull| P1
+    XDS -->|gRPC config pull| P2
+    
+    Clients["MCP Clients / Agents / Apps"] -->|Requests| P1
+    Clients -->|Requests| P2
+    P1 --> LLM
+    P1 --> MCP
+    P1 --> A2A
+    P1 --> INF
+    P2 --> LLM
+    P2 --> MCP
+
+    style CP fill:#1a1a2e,stroke:#e94560,color:#fff
+    style DP fill:#16213e,stroke:#0f3460,color:#fff
+    style Resources fill:#0f3460,stroke:#533483,color:#fff
+    style Backends fill:#1a1a2e,stroke:#e94560,color:#fff

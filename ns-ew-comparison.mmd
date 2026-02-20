@@ -1,0 +1,20 @@
+graph LR
+    subgraph Without["WITHOUT Ambient Mesh"]
+        direction TB
+        A1["Agent Pod"] -->|"Must know gateway URL<br/>http://agentgateway:8080/mcp"| GW1["AgentGateway Proxy"]
+        GW1 -->|"Plain HTTP<br/>No encryption"| M1["MCP Server"]
+        
+        Note1["❌ Agent must be configured with gateway address<br/>❌ No mTLS between services<br/>❌ No identity-based policy on internal traffic<br/>❌ Must explicitly route through gateway"]
+    end
+
+    subgraph With["WITH Ambient Mesh + Waypoint"]
+        direction TB
+        A2["Agent Pod"] -->|"Just call service name<br/>mcp-server.mcp-ns.svc:3001"| ZT["ztunnel<br/>(automatic interception)"]
+        ZT -->|"mTLS + SPIFFE identity"| WP["AgentGateway Waypoint<br/>(transparent L7 policy)"]
+        WP -->|"Authorized + traced"| M2["MCP Server"]
+        
+        Note2["✅ Agent uses simple service address<br/>✅ Automatic mTLS everywhere<br/>✅ Identity-based policy (SPIFFE)<br/>✅ Transparent — no agent changes needed<br/>✅ All AGW features: RBAC, tracing, guards"]
+    end
+
+    style Without fill:#2e1a1a,stroke:#e94560,color:#fff
+    style With fill:#1a2e1a,stroke:#4caf50,color:#fff

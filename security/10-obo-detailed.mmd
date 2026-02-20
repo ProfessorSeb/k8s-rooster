@@ -1,0 +1,39 @@
+sequenceDiagram
+    participant U as User
+    participant A as AI Agent
+    participant STS as AgentGateway STS<br/>(Token Exchange Server<br/>port 7777)
+    participant IdP as OIDC IdP<br/>(e.g., Keycloak)
+    participant AGW as AgentGateway Proxy
+    participant MCP as MCP Tool Server
+
+    Note over U,MCP: Step 1: User authenticates and calls agent
+
+    U->>IdP: Authenticate (login)
+    IdP-->>U: OAuth Access Token (JWT)
+
+    U->>A: Call agent with JWT
+
+    Note over A,STS: Step 2: Agent exchanges token via STS
+
+    A->>STS: Token Exchange Request (RFC 8693)<br/>subject_token: user JWT<br/>actor_token: K8s ServiceAccount token
+
+    STS->>IdP: Validate subject token (JWKS)
+    IdP-->>STS: Token valid ✓
+
+    STS->>STS: Validate actor token (K8s token review)
+    STS->>STS: Generate delegated token<br/>Sub: user identity<br/>Act: agent identity<br/>Scopes: downscoped
+    STS-->>A: Delegated Token (JWT)
+
+    Note over A,MCP: Step 3: Agent calls MCP with delegated token
+
+    A->>AGW: MCP tool call + delegated JWT
+
+    AGW->>AGW: JWT validation (STS issuer JWKS)
+    AGW->>AGW: Policy: check user + agent identity, RBAC
+
+    AGW->>MCP: Forward tool call
+    MCP-->>AGW: Tool result
+    AGW-->>A: Tool result
+    A-->>U: Final response
+
+    Note over U,MCP: Audit log captures: User → Agent → Tool

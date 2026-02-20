@@ -1,0 +1,28 @@
+sequenceDiagram
+    participant C as Client / Agent
+    participant IdP as OIDC IdP<br/>(e.g., Keycloak)
+    participant AGW as AgentGateway Proxy
+    participant EA as Ext Auth Service
+    participant LLM as LLM Provider
+
+    Note over C,IdP: Step 1: Client obtains token out-of-band
+
+    C->>IdP: POST /token (client_credentials or password grant)
+    IdP-->>C: Access Token (JWT)
+
+    Note over C,LLM: Step 2: Client calls AgentGateway with token
+
+    C->>AGW: POST /openai Authorization: Bearer <access_token>
+    AGW->>EA: Validate token
+
+    EA->>EA: JWT Validation: verify RS256 signature, check iss, aud, exp
+
+    alt Token Valid
+        EA-->>AGW: Authenticated ✓
+        AGW->>LLM: Forward request (AGW injects LLM API key)
+        LLM-->>AGW: Response
+        AGW-->>C: 200 OK + Response
+    else Token Invalid or Expired
+        EA-->>AGW: 403 Forbidden
+        AGW-->>C: 403 Forbidden
+    end

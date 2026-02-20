@@ -1,0 +1,26 @@
+sequenceDiagram
+    participant Attacker as Malicious Site<br/>(attacker.com)
+    participant User as User's Browser
+    participant AGW as AgentGateway Proxy
+    participant Backend as Backend Service
+
+    Note over Attacker,Backend: CSRF Attack Attempt
+
+    Attacker->>User: Trick user into visiting<br/>malicious page with hidden form
+    User->>AGW: POST /api/action<br/>Origin: malicioussite.com<br/>Cookie: session=abc123
+
+    AGW->>AGW: CSRF validation:<br/>Origin (malicioussite.com)<br/>vs Destination (api.example.com)
+
+    alt Origin does NOT match destination<br/>and NOT in additionalOrigins
+        AGW-->>User: 403 Forbidden<br/>"CSRF validation failed"
+        Note over User,AGW: Attack blocked
+    end
+
+    Note over User,Backend: Legitimate Request
+
+    User->>AGW: POST /api/action<br/>Origin: allowThisOne.example.com<br/>Cookie: session=abc123
+
+    AGW->>AGW: CSRF validation:<br/>Origin in additionalOrigins list
+    AGW->>Backend: Forward request
+    Backend-->>AGW: 200 OK
+    AGW-->>User: 200 OK

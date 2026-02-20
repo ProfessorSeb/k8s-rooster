@@ -1,0 +1,21 @@
+graph TB
+    Client["Client Request"] --> AUTH
+
+    subgraph AGW["AgentGateway Security Stack"]
+        AUTH["🔐 Authentication Layer<br/>API Key / JWT / OAuth 2.0 / OIDC<br/>Basic Auth / BYO Ext Auth"]
+        RBAC["🛡️ Authorization Layer<br/>CEL-based RBAC<br/>JWT claim validation<br/>Tool-level access control"]
+        GUARDS["🚫 Prompt Guards<br/>PII detection & masking<br/>Credit card blocking<br/>Custom regex patterns"]
+        GUARDRAILS["⚠️ Advanced Guardrails<br/>Webhook API<br/>Content moderation<br/>Jailbreak prevention"]
+        RATE["⏱️ Rate Limiting<br/>Request-based (N req/min)<br/>Token-based (N tokens/min)<br/>Global (Enterprise) / Local"]
+        OBO["🔄 OBO Token Exchange<br/>RFC 8693 delegation<br/>User → Agent → Tool identity"]
+        
+        AUTH --> RBAC
+        RBAC --> GUARDS
+        GUARDS --> GUARDRAILS
+        GUARDRAILS --> RATE
+        RATE --> OBO
+    end
+
+    OBO --> Backend["✅ Backend<br/>LLM / MCP / A2A"]
+
+    style AGW fill:#1a1a2e,stroke:#e94560,color:#fff

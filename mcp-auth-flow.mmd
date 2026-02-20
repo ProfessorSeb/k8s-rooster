@@ -1,0 +1,50 @@
+sequenceDiagram
+    participant Client as MCP Client<br/>(Cursor / Claude Desktop)
+    participant AGW as AgentGateway Proxy
+    participant IDP as Identity Provider<br/>(Okta / Entra / Keycloak)
+    participant MCP as MCP Server
+
+    rect rgb(30, 30, 60)
+    Note over Client,MCP: 1️⃣ Initialization
+    Client->>AGW: Initialize MCP connection
+    AGW-->>Client: 401 Unauthorized<br/>+ resource metadata endpoint
+    end
+
+    rect rgb(20, 50, 80)
+    Note over Client,MCP: 2️⃣ Discovery
+    Client->>AGW: GET /.well-known/oauth-protected-resource/mcp
+    AGW-->>Client: Resource metadata + required scopes
+    Client->>AGW: GET /.well-known/oauth-authorization-server
+    AGW->>IDP: Fetch OpenID configuration
+    IDP-->>AGW: Authorization server metadata
+    AGW->>AGW: Modify metadata (set AGW as endpoint)
+    AGW-->>Client: Modified authorization server metadata
+    end
+
+    rect rgb(30, 60, 40)
+    Note over Client,MCP: 3️⃣ Dynamic Client Registration
+    Client->>AGW: Register MCP client
+    AGW->>IDP: Register client with IdP
+    IDP-->>AGW: Client ID
+    AGW-->>Client: Client ID
+    end
+
+    rect rgb(60, 30, 30)
+    Note over Client,MCP: 4️⃣ OAuth Authentication
+    Client->>IDP: Initiate OAuth flow
+    IDP-->>Client: Login page redirect
+    Client->>IDP: Submit credentials
+    IDP-->>Client: Authorization code
+    Client->>IDP: Exchange code for token
+    IDP-->>Client: JWT access token
+    end
+
+    rect rgb(20, 60, 60)
+    Note over Client,MCP: 5️⃣ Authenticated MCP Access
+    Client->>AGW: MCP request + Bearer token
+    AGW->>IDP: Validate JWT (JWKS)
+    IDP-->>AGW: Public keys ✓
+    AGW->>MCP: Forward authenticated request
+    MCP-->>AGW: MCP response (tools, resources)
+    AGW-->>Client: Return tools & data
+    end

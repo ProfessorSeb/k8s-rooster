@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant User as End User
+    participant Agent as AI Agent
+    participant STS as AgentGateway STS<br/>(Token Exchange)
+    participant MCP as MCP Tool Server
+
+    User->>Agent: Request with OAuth access token (JWT)
+    Note over Agent: Agent authenticates as actor<br/>with K8s service account token
+    Agent->>STS: Token exchange request<br/>subject_token = user JWT<br/>actor_token = agent SA token
+    STS->>STS: Validate subject token (JWKS)<br/>Validate actor identity (K8s SA)
+    STS-->>Agent: Delegated token<br/>(downscoped audience + scopes)
+    Agent->>MCP: Call tool with delegated token
+    Note over MCP: Policies reference both<br/>User identity + Agent identity
+    MCP-->>Agent: Tool result
+    Agent-->>User: Final response
+
+    Note over User,MCP: 🔒 Full audit trail: User → Agent → Tool

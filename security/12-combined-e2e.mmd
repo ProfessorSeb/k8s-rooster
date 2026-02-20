@@ -1,0 +1,60 @@
+sequenceDiagram
+    participant U as End User / AI Agent Client
+    participant IdP as OIDC Identity Provider
+    participant AGW as AgentGateway Proxy
+    participant EA as Ext Auth Service
+    participant STS as STS Token Exchange (Port 7777)
+    participant Agent as AI Agent (K8s Pod)
+    participant LLM as LLM Provider
+    participant MCP as MCP Tool Server
+    participant ExtAPI as External API
+
+    Note over U,ExtAPI: Layer 1: Browser Security (CORS + CSRF)
+
+    U->>AGW: Preflight OPTIONS (if browser)
+    AGW->>AGW: CORS validate origin, CSRF validate
+
+    Note over U,ExtAPI: Layer 2: Authentication
+
+    U->>IdP: Authenticate (login / client_credentials)
+    IdP-->>U: Access Token (JWT)
+
+    U->>AGW: Request + Bearer JWT
+    AGW->>AGW: JWT Auth: Verify via JWKS, check iss, aud, exp
+
+    Note over U,ExtAPI: Layer 3: Token Exchange (OBO)
+
+    AGW->>Agent: Forward to AI Agent
+    Agent->>STS: Exchange user JWT for delegated token
+    STS->>STS: Validate user token + agent SA
+    STS-->>Agent: Delegated token (user + agent identity)
+
+    Note over U,ExtAPI: Layer 4: Downstream Calls
+
+    Agent->>AGW: LLM request
+    AGW->>AGW: PII redaction, prompt guard
+    AGW->>LLM: Forward (inject API key)
+    LLM-->>AGW: Response
+    AGW->>AGW: Credential leak check
+    AGW-->>Agent: Sanitized response
+
+    Agent->>AGW: MCP tool call + delegated JWT
+    AGW->>AGW: Validate token, check RBAC
+    AGW->>MCP: Execute tool call
+    MCP-->>AGW: Result
+    AGW-->>Agent: Tool result
+
+    Note over U,ExtAPI: Layer 5: Elicitations (if needed)
+
+    Agent->>AGW: Call upstream API
+    AGW->>STS: Need upstream OAuth token
+    STS-->>AGW: Elicitation URL (PENDING)
+    Note over U: User completes OAuth via Solo UI
+    STS->>STS: Store token (COMPLETED)
+    Agent->>AGW: Retry upstream call
+    AGW->>STS: Fetch stored token
+    AGW->>ExtAPI: Inject upstream OAuth token
+    ExtAPI-->>AGW: Response
+    AGW-->>Agent: Response
+
+    Agent-->>U: Final response

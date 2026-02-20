@@ -1,0 +1,62 @@
+graph TB
+    subgraph Clients["Client Layer"]
+        Browser["Browser / Web App"]
+        Agent["AI Agent / Service"]
+        MCP_Client["MCP Client"]
+    end
+
+    subgraph AGW["Solo Enterprise for AgentGateway"]
+        direction TB
+        GW["Gateway Proxy<br/>(Rust-based)"]
+
+        subgraph BrowserSec["Browser Security"]
+            CORS["CORS Policy"]
+            CSRF["CSRF Protection"]
+        end
+
+        subgraph NativeAuthN["Native Authentication (Built-in)"]
+            JWT_Auth["JWT Authentication"]
+            BasicAuth["Basic Auth"]
+            APIKey["API Key Auth"]
+        end
+
+        subgraph ExtAuthN["External Auth Service"]
+            OAuth_AC["OAuth Authorization Code"]
+            OAuth_AT["OAuth Access Token<br/>Validation"]
+            BYO["BYO Ext Auth Service"]
+        end
+
+        subgraph TokenExchange["Token Exchange (STS)"]
+            OBO["On-Behalf-Of<br/>Token Exchange"]
+            Elicit["Elicitations<br/>(Credential Gathering)"]
+        end
+    end
+
+    subgraph IdPs["Identity Providers"]
+        Keycloak["Keycloak / OIDC IdP"]
+        ExtOAuth["External OAuth Provider<br/>(e.g., GitHub)"]
+    end
+
+    subgraph Backends["Backend Services"]
+        LLM["LLM Providers<br/>(OpenAI, Anthropic, etc.)"]
+        MCP_Server["MCP Tool Servers"]
+        AgentBackend["AI Agents"]
+        HTTPWorkload["HTTP Workloads<br/>(Non-agentic)"]
+    end
+
+    Browser --> CORS & CSRF
+    CORS & CSRF --> GW
+    Agent --> GW
+    MCP_Client --> GW
+
+    GW --> JWT_Auth & BasicAuth & APIKey
+    GW --> OAuth_AC & OAuth_AT & BYO
+    GW --> OBO & Elicit
+
+    JWT_Auth -.->|JWKS| Keycloak
+    OAuth_AC -.->|OIDC| Keycloak
+    OAuth_AT -.->|OIDC| Keycloak
+    OBO -.->|Subject Token Validation| Keycloak
+    Elicit -.->|OAuth Flow| ExtOAuth
+
+    GW --> LLM & MCP_Server & AgentBackend & HTTPWorkload

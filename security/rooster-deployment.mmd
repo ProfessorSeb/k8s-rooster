@@ -1,0 +1,87 @@
+graph TB
+    subgraph K8s["k8s-rooster Cluster (Talos + ArgoCD)"]
+        subgraph CP["Control Plane"]
+            EAG["enterprise-agentgateway<br/>Control Plane Pod<br/>xDS Server + Translation Engine"]
+            ExtAuth["ext-auth-service<br/>Enterprise Auth Service"]
+            ExtCache["ext-cache (Redis)<br/>Session Store"]
+            RateLimiter["rate-limiter<br/>Global Rate Limiting"]
+        end
+
+        subgraph Gateways["Gateway Proxies (Data Plane)"]
+            AGW["agentgateway-proxy<br/>:8080<br/>LLM Gateway (OpenAI, Anthropic)"]
+            MCP_GW["mcp-gateway-proxy<br/>:8090<br/>MCP Gateway"]
+            XAI_GW["xai-gateway-proxy<br/>:8081<br/>xAI/Grok Gateway"]
+            MODEL_GW["model-priority-gateway-proxy<br/>:8085<br/>Model Failover Gateway"]
+        end
+
+        subgraph MCPServers["MCP Servers"]
+            EVERYTHING["mcp-server-everything<br/>:3001<br/>Utility tools"]
+            SLACK["slack-mcp<br/>:3000<br/>Slack tools"]
+            EXCALIDRAW["excalidraw-mcp<br/>:3001 (CrashLoop)"]
+        end
+
+        subgraph Observability["Observability Stack"]
+            OTEL["otel-collector<br/>:4317/:4318<br/>OTLP receiver"]
+            LANGFUSE["langfuse-otel-collector<br/>:4317/:4318<br/>Langfuse exporter"]
+        end
+
+        subgraph Auth["Auth / Identity"]
+            OKTA["okta-jwks backend<br/>→ integrator-7147223.okta.com"]
+        end
+    end
+
+    subgraph External["External Services"]
+        OPENAI["OpenAI API<br/>gpt-4o-mini"]
+        ANTHROPIC["Anthropic API<br/>claude-sonnet-4-5"]
+        XAI["xAI API<br/>grok-4-1-fast-reasoning"]
+        GITHUB_MCP["GitHub Copilot MCP<br/>api.githubcopilot.com"]
+        OKTA_EXT["Okta IdP<br/>integrator-7147223.okta.com"]
+    end
+
+    subgraph Clients["Clients"]
+        CURSOR["Cursor / Claude Desktop"]
+        APPS["Apps / Agents"]
+    end
+
+    %% Client connections
+    CLIENTS_GROUP[" "] ~~~ CURSOR
+    CURSOR -->|MCP| MCP_GW
+    APPS -->|LLM API| AGW
+    APPS -->|xAI| XAI_GW
+    APPS -->|Failover| MODEL_GW
+
+    %% Gateway to backends
+    AGW -->|/openai| OPENAI
+    AGW -->|/anthropic| ANTHROPIC
+    XAI_GW -->|/xai| XAI
+    MODEL_GW -->|gpt-4.1 → gpt-5.1 → gpt-3.5-turbo| OPENAI
+
+    %% MCP routing
+    MCP_GW -->|/mcp| EVERYTHING
+    MCP_GW -->|/mcp-slack| SLACK
+    MCP_GW -->|/mcp-github| GITHUB_MCP
+
+    %% Control plane connections
+    EAG -.->|xDS config| AGW
+    EAG -.->|xDS config| MCP_GW
+    EAG -.->|xDS config| XAI_GW
+    EAG -.->|xDS config| MODEL_GW
+
+    %% Auth chain
+    XAI_GW -.->|rate limit check| RateLimiter
+    AGW -.->|ext auth| ExtAuth
+    ExtAuth -.->|sessions| ExtCache
+
+    %% Observability
+    AGW -.->|traces| OTEL
+    MCP_GW -.->|traces| OTEL
+    OTEL -.->|export| LANGFUSE
+
+    %% Okta
+    OKTA -.->|JWKS| OKTA_EXT
+
+    style CP fill:#1a1a2e,stroke:#e94560,color:#fff
+    style Gateways fill:#16213e,stroke:#0f3460,color:#fff
+    style MCPServers fill:#0f3460,stroke:#533483,color:#fff
+    style Observability fill:#1a3a2e,stroke:#4caf50,color:#fff
+    style External fill:#2e1a1a,stroke:#e94560,color:#fff

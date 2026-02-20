@@ -1,0 +1,37 @@
+sequenceDiagram
+    participant C as Client / Agent
+    participant AGW as AgentGateway Proxy
+    participant STS as AgentGateway STS<br/>(Token Exchange Server)
+    participant UI as Solo Enterprise UI
+    participant ExtIdP as External OAuth Provider<br/>(e.g., GitHub)
+    participant API as Upstream API<br/>(e.g., GitHub API)
+
+    Note over C,API: Step 1: Initial request — no upstream token available
+
+    C->>AGW: Request to upstream API + Bearer user_jwt
+    AGW->>STS: Request upstream token for user + service
+    STS->>STS: No stored token found
+    STS-->>AGW: Elicitation URL (PENDING)
+    AGW-->>C: Token exchange needed, elicitation URL provided
+
+    Note over UI,ExtIdP: Step 2: User authorizes via Solo Enterprise UI
+
+    UI->>UI: Admin opens Elicitations page, sees pending
+    UI->>ExtIdP: Click Authorize, redirect to OAuth provider
+    ExtIdP->>ExtIdP: User logs in and grants consent
+    ExtIdP-->>UI: Redirect back with authorization code
+    UI->>STS: Complete elicitation (authorization code)
+    STS->>ExtIdP: Exchange code for token
+    ExtIdP-->>STS: Access Token for upstream API
+    STS->>STS: Store token, Elicitation → COMPLETED
+
+    Note over C,API: Step 3: Retry request — token now available
+
+    C->>AGW: Retry request + Bearer user_jwt
+    AGW->>STS: Request upstream token
+    STS-->>AGW: Stored token found ✓
+    AGW->>API: Forward request + inject upstream OAuth token
+    API-->>AGW: Response
+    AGW-->>C: 200 OK + Response
+
+    Note over C,API: Upstream credentials never exposed to MCP servers or agents

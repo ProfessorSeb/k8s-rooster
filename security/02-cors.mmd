@@ -1,0 +1,20 @@
+sequenceDiagram
+    participant B as Browser (JavaScript)
+    participant AGW as AgentGateway Proxy
+    participant Backend as Backend Service<br/>(LLM / MCP / Agent)
+
+    Note over B,Backend: CORS Preflight Flow
+
+    B->>AGW: OPTIONS /api (Preflight)<br/>Origin: https://app.example.com
+    AGW->>AGW: Check origin against<br/>allowOrigins list
+
+    alt Origin Allowed
+        AGW-->>B: 200 OK<br/>access-control-allow-origin: https://app.example.com<br/>access-control-allow-methods: GET, POST, OPTIONS<br/>access-control-allow-headers: Authorization, Content-Type<br/>access-control-max-age: 86400
+        B->>AGW: POST /api (Actual Request)<br/>Origin: https://app.example.com<br/>Authorization: Bearer <token>
+        AGW->>Backend: Forward request
+        Backend-->>AGW: Response
+        AGW-->>B: Response + CORS headers
+    else Origin NOT Allowed
+        AGW-->>B: 200 OK (no CORS headers)<br/>Browser blocks the response
+        Note over B: Browser denies access<br/>to response data
+    end
