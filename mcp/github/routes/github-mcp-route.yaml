@@ -15,12 +15,6 @@ spec:
         - path:
             type: PathPrefix
             value: /mcp-github
-      filters:
-        - type: RequestHeaderModifier
-          requestHeaderModifier:
-            set:
-              - name: Authorization
-                value: "Bearer ${GH_PAT}"
       backendRefs:
       - name: github-mcp-backend
         group: agentgateway.dev

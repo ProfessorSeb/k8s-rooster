@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: github-mcp-server-token
+  namespace: agentgateway-system
+type: Opaque
+stringData:
+  GITHUB_PERSONAL_ACCESS_TOKEN: "PLACEHOLDER"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: github-mcp-server
+  namespace: agentgateway-system
+  labels:
+    app: github-mcp-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: github-mcp-server
+  template:
+    metadata:
+      labels:
+        app: github-mcp-server
+    spec:
+      containers:
+      # GitHub MCP server (HTTP mode with OAuth)
+      - name: github-mcp-server
+        image: ghcr.io/github/github-mcp-server:latest
+        args: ["http", "--port", "8080", "--toolsets", "all"]
+        ports:
+        - containerPort: 8080
+          name: mcp-internal
+        env:
+        - name: GITHUB_PERSONAL_ACCESS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: github-mcp-server-token
+              key: GITHUB_PERSONAL_ACCESS_TOKEN
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 256Mi
+      # Nginx sidecar — injects PAT auth header for upstream requests
+      - name: nginx-auth
+        image: nginx:alpine
+        ports:
+        - containerPort: 8081
+          name: mcp
+        volumeMounts:
+        - name: nginx-conf
+          mountPath: /etc/nginx/conf.d
+        resources:
+          requests:
+            cpu: 50m
+            memory: 32Mi
+          limits:
+            cpu: 200m
+            memory: 64Mi
+      volumes:
+      - name: nginx-conf
+        configMap:
+          name: github-mcp-nginx-conf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: github-mcp-server
+  namespace: agentgateway-system
+  labels:
+    app: github-mcp-server
+spec:
+  selector:
+    app: github-mcp-server
+  ports:
+  - port: 8080
+    targetPort: 8081
+    name: mcp

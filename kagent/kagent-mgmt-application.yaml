@@ -11,7 +11,7 @@ spec:
   source:
     chart: management
     repoURL: us-docker.pkg.dev/solo-public/solo-enterprise-helm/charts
-    targetRevision: 0.3.4
+    targetRevision: 0.3.7
     helm:
       valuesObject:
         imagePullSecrets: []
