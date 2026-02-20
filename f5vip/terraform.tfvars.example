@@ -1,0 +1,3 @@
+bigip_address  = "https://172.16.10.1"
+bigip_username = "admin"
+bigip_password = "changeme"
