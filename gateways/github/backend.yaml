@@ -1,0 +1,19 @@
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayBackend
+metadata:
+  name: github-dedicated-backend
+  namespace: agentgateway-system
+spec:
+  mcp:
+    targets:
+    - name: github-copilot
+      static:
+        host: api.githubcopilot.com
+        port: 443
+        path: /mcp/
+  policies:
+    auth:
+      secretRef:
+        name: github-mcp-secret
+    tls:
+      sni: api.githubcopilot.com
