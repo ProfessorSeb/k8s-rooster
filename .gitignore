@@ -5,6 +5,7 @@
 secrets/
 *.secret
 
+howto/
 # Temporary files
 *.tmp
 *.bak
