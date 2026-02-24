@@ -9,7 +9,7 @@ spec:
     matchLabels:
       app: fetch-mcp-server
   template:
-    metadata:
+    metadata
       labels:
         app: fetch-mcp-server
     spec:
@@ -20,4 +20,4 @@ spec:
         - containerPort: 3010
         env:
         - name: MCP_SERVER_TRANSPORT
-          value: &quot;streamable_http&quot;
+                  value: streamable_http
