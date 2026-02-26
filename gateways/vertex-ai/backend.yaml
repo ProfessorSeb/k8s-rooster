@@ -1,0 +1,22 @@
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayBackend
+metadata:
+  name: vertex-ai
+  namespace: agentgateway-system
+spec:
+  ai:
+    provider:
+      vertexai:
+        # TODO: set these for your GCP project
+        projectId: "REPLACE_ME_PROJECT_ID"
+        region: "us-central1"
+
+        # Pick a Vertex model you have access to (examples):
+        # - gemini-2.0-flash
+        # - gemini-2.0-pro
+        model: gemini-2.0-flash
+
+  # Auth NOTE:
+  # - Vertex AI backends use GCP Application Default Credentials (ADC).
+  # - Recommended on GKE: Workload Identity (no key files).
+  # - Alternative: mount a service account JSON and set GOOGLE_APPLICATION_CREDENTIALS in the agentgateway pod.

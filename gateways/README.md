@@ -54,6 +54,7 @@ Once deployed, the gateway will be available at:
 - **OpenAI**: `http://gateway-ip:8080/openai/v1/chat/completions`
 - **Anthropic**: `http://gateway-ip:8080/anthropic/v1/messages`
 - **xAI (Grok)**: `http://gateway-ip:8080/xai/v1/chat/completions`
+- **Vertex AI**: `http://gateway-ip:8080/vertex/v1/chat/completions`
 
 ### Example Request
 ```bash
