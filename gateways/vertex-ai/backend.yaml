@@ -8,7 +8,9 @@ spec:
     provider:
       vertexai:
         projectId: "marketing-441114"
-        region: "us-central1"
+        # NOTE: Model Garden models (e.g., Anthropic Claude) are not available in all regions.
+        # If you see "not servable in region" errors, change this (common options: us-east5, europe-west4).
+        region: "us-east5"
 
         # Pick a Vertex model you have access to (examples):
         # - gemini-2.0-flash
