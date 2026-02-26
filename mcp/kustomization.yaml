@@ -6,7 +6,6 @@ resources:
   - everything/
   - github/
   - slack/
-  - fetch/
   - bank/
 
 commonLabels:
