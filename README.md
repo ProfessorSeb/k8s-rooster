@@ -193,7 +193,7 @@ All services are exposed via F5 BIG-IP virtual servers using Layer 4 (fastL4) pr
 |-----|--------|------|-----------------|
 | `solo.rooster.maniak.com` | 172.16.20.120 | 8080 | agentgateway-proxy (NP 31572) |
 | `argo.rooster.maniak.io` | 172.16.20.121 | 443/80 | argocd-server (NP 31988/32178) |
-| `ui.rooster.maniak.com` | 172.16.20.126 | 80 | solo-enterprise-ui (NP 31211) |
+| `ui.rooster.maniak.com` | 172.16.20.130 | 80 | solo-enterprise-ui (NP 31211) |
 | `xai.rooster.maniak.com` | 172.16.20.122 | 8081 | xai-gateway-proxy (NP 31990) |
 | `mcp.rooster.maniak.com` | 172.16.20.123 | 8090 | mcp-gateway-proxy (NP 30168) |
 | `model.rooster.maniak.com` | 172.16.20.124 | 8085 | model-priority-gateway-proxy (NP 30689) |

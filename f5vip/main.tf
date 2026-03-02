@@ -7,7 +7,7 @@ locals {
   vips = {
     solo_rooster = "172.16.20.120" # solo.rooster.maniak.com (main agentgateway)
     argo_rooster = "172.16.20.121" # argo.rooster.maniak.io (ArgoCD)
-    ui_rooster   = "172.16.20.126" # ui.rooster.maniak.com (Solo Enterprise UI)
+    ui_rooster   = "172.16.20.130" # ui.rooster.maniak.com (Solo Enterprise UI)
     xai_gateway  = "172.16.20.122" # xai-gateway-proxy
     mcp_gateway  = "172.16.20.123" # mcp-gateway-proxy
     model_gw     = "172.16.20.124" # model-priority-gateway-proxy
