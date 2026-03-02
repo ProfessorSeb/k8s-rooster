@@ -56,7 +56,7 @@ resource "bigip_ltm_pool" "solo_rooster" {
 resource "bigip_ltm_pool_attachment" "solo_rooster" {
   for_each = toset(local.pool_members["solo_rooster"])
   pool     = bigip_ltm_pool.solo_rooster.name
-  node     = each.value
+  node     = "/${var.partition}/${each.value}"
 }
 
 resource "bigip_ltm_pool" "argo_https" {
@@ -68,7 +68,7 @@ resource "bigip_ltm_pool" "argo_https" {
 resource "bigip_ltm_pool_attachment" "argo_https" {
   for_each = toset(local.pool_members["argo_https"])
   pool     = bigip_ltm_pool.argo_https.name
-  node     = each.value
+  node     = "/${var.partition}/${each.value}"
 }
 
 resource "bigip_ltm_pool" "argo_http" {
@@ -80,7 +80,7 @@ resource "bigip_ltm_pool" "argo_http" {
 resource "bigip_ltm_pool_attachment" "argo_http" {
   for_each = toset(local.pool_members["argo_http"])
   pool     = bigip_ltm_pool.argo_http.name
-  node     = each.value
+  node     = "/${var.partition}/${each.value}"
 }
 
 resource "bigip_ltm_pool" "ui_rooster" {
@@ -92,7 +92,7 @@ resource "bigip_ltm_pool" "ui_rooster" {
 resource "bigip_ltm_pool_attachment" "ui_rooster" {
   for_each = toset(local.pool_members["ui_rooster"])
   pool     = bigip_ltm_pool.ui_rooster.name
-  node     = each.value
+  node     = "/${var.partition}/${each.value}"
 }
 
 resource "bigip_ltm_pool" "xai_gateway" {
@@ -104,7 +104,7 @@ resource "bigip_ltm_pool" "xai_gateway" {
 resource "bigip_ltm_pool_attachment" "xai_gateway" {
   for_each = toset(local.pool_members["xai_gateway"])
   pool     = bigip_ltm_pool.xai_gateway.name
-  node     = each.value
+  node     = "/${var.partition}/${each.value}"
 }
 
 resource "bigip_ltm_pool" "mcp_gateway" {
@@ -116,7 +116,7 @@ resource "bigip_ltm_pool" "mcp_gateway" {
 resource "bigip_ltm_pool_attachment" "mcp_gateway" {
   for_each = toset(local.pool_members["mcp_gateway"])
   pool     = bigip_ltm_pool.mcp_gateway.name
-  node     = each.value
+  node     = "/${var.partition}/${each.value}"
 }
 
 resource "bigip_ltm_pool" "model_gw" {
@@ -128,7 +128,7 @@ resource "bigip_ltm_pool" "model_gw" {
 resource "bigip_ltm_pool_attachment" "model_gw" {
   for_each = toset(local.pool_members["model_gw"])
   pool     = bigip_ltm_pool.model_gw.name
-  node     = each.value
+  node     = "/${var.partition}/${each.value}"
 }
 
 resource "bigip_ltm_pool" "github_gw" {
@@ -140,7 +140,7 @@ resource "bigip_ltm_pool" "github_gw" {
 resource "bigip_ltm_pool_attachment" "github_gw" {
   for_each = toset(local.pool_members["github_gw"])
   pool     = bigip_ltm_pool.github_gw.name
-  node     = each.value
+  node     = "/${var.partition}/${each.value}"
 }
 
 ###############################################################################
