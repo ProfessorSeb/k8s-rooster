@@ -4,7 +4,7 @@ metadata:
   name: claude-model-config
   namespace: kagent
 spec:
-  apiKeySecret: kagent-anthropic
+  apiKeySecret: anthropic-api-keys
   apiKeySecretKey: ANTHROPIC_API_KEY
   model: claude-sonnet-4-5-20250929
   provider: Anthropic
