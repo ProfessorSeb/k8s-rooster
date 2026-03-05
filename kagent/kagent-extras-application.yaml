@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kagent-extras
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ProfessorSeb/k8s-rooster.git
+    targetRevision: main
+    path: kagent/extras
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kagent
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
