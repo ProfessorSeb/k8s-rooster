@@ -22,16 +22,40 @@ All gateway VIPs are **Layer 4 (fastL4)** using existing Kubernetes NodePorts.
 
 All 4 Talos nodes: `172.16.10.130`, `172.16.10.132`, `172.16.10.133`, `172.16.10.136`
 
-## Usage
+## Usage (recommended)
+
+Store BIG-IP creds outside the repo and run Terraform via the wrapper script.
+
+1) Create secrets file on the host (permissions matter):
 
 ```bash
-cp terraform.tfvars.example terraform.tfvars
-# Edit terraform.tfvars with your BIG-IP credentials
-
-terraform init
-terraform plan
-terraform apply
+cat > ~/.openclaw/secrets/k8s-rooster.json <<'EOF'
+{
+  "bigip": {
+    "address": "https://172.16.10.10",
+    "username": "admin",
+    "password": "..."
+  }
+}
+EOF
+chmod 600 ~/.openclaw/secrets/k8s-rooster.json
 ```
+
+2) Plan/apply using the standardized local state path:
+
+```bash
+cd f5vip
+./tf.sh plan
+./tf.sh apply
+```
+
+Overrides:
+- `K8S_ROOSTER_F5VIP_SECRETS` (default: `~/.openclaw/secrets/k8s-rooster.json`)
+- `K8S_ROOSTER_F5VIP_STATE` (default: `~/.terraform-state/k8s-rooster/f5vip/terraform.tfstate`)
+
+## Usage (legacy)
+
+`terraform.tfvars` is `.gitignore`’d, but prefer the wrapper + secrets file above.
 
 ## Notes
 
