@@ -1,19 +1,20 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kagent-crds
+  name: enterprise-agentgateway
   namespace: argocd
 spec:
   destination:
-    namespace: kagent
+    namespace: agentgateway-system
     server: https://kubernetes.default.svc
   project: default
   source:
-    chart: kagent-enterprise-crds
-    repoURL: us-docker.pkg.dev/solo-public/kagent-enterprise-helm/charts
-    targetRevision: 0.3.9
+    chart: enterprise-agentgateway
+    repoURL: us-docker.pkg.dev/solo-public/enterprise-agentgateway-helm/charts
+    targetRevision: v2.2.0-rc.5
     helm:
-      skipCrds: false
+      valuesObject:
+        enableAgentgateway: true
   syncPolicy:
     automated:
       prune: true
