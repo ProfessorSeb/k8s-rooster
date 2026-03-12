@@ -4,14 +4,14 @@ metadata:
   name: enterprise-agentgateway
   namespace: argocd
 spec:
+  project: default
   destination:
     namespace: agentgateway-system
     server: https://kubernetes.default.svc
-  project: default
   source:
-    chart: enterprise-agentgateway
     repoURL: us-docker.pkg.dev/solo-public/enterprise-agentgateway-helm/charts
-    targetRevision: v2.2.0-rc.5
+    chart: enterprise-agentgateway
+    targetRevision: v2.2.0
     helm:
       valuesObject:
         enableAgentgateway: true
