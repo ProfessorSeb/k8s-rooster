@@ -15,6 +15,9 @@ spec:
     helm:
       valuesObject:
         enableAgentgateway: true
+        licensing:
+          createSecret: false
+          secretName: enterprise-agentgateway-license
   syncPolicy:
     automated:
       prune: true
