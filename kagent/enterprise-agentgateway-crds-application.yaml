@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: enterprise-agentgateway
+  name: enterprise-agentgateway-crds
   namespace: argocd
 spec:
   project: default
@@ -10,11 +10,10 @@ spec:
     server: https://kubernetes.default.svc
   source:
     repoURL: us-docker.pkg.dev/solo-public/enterprise-agentgateway/charts
-    chart: enterprise-agentgateway
+    chart: enterprise-agentgateway-crds
     targetRevision: v2.2.0
     helm:
-      valuesObject:
-        enableAgentgateway: true
+      releaseName: enterprise-agentgateway-crds
   syncPolicy:
     automated:
       prune: true
