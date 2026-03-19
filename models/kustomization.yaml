@@ -5,6 +5,7 @@ resources:
   - xai-grok-config.yaml
   - claude-model-config.yaml
   - llm-agentgateway.yaml
+  - llm-xai-gateway.yaml
   - gemini-model-config.yaml
 
 commonLabels:

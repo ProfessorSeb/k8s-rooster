@@ -1,0 +1,12 @@
+apiVersion: kagent.dev/v1alpha2
+kind: ModelConfig
+metadata:
+  name: llm-xai-gateway
+  namespace: kagent
+spec:
+  apiKeySecret: kagent-xai-provider
+  apiKeySecretKey: PROVIDER_API_KEY
+  model: grok-4-1-fast-reasoning
+  provider: OpenAI
+  openAI:
+    baseUrl: "http://172.16.20.122:8081/xai"
