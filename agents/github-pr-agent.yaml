@@ -7,7 +7,7 @@ spec:
   description: GitHub Pull Request Review and Fix Agent
   type: Declarative
   declarative:
-    modelConfig: xai-grok-config
+    modelConfig: llm-agentgateway
     systemMessage: |-
       You're an expert GitHub pull request agent that helps users review, fix, and manage pull requests in their repositories.
 

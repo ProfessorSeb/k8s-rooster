@@ -7,7 +7,7 @@ spec:
   description: Team Lead Agent - Orchestrates GitHub, Kubernetes, Slack, and PR agents with emphasis on comprehensive documentation
   type: Declarative
   declarative:
-    modelConfig: default-model-config
+    modelConfig: llm-agentgateway
     systemMessage: |-
       You're a Team Lead agent that orchestrates specialized agents to help users manage their development workflow across GitHub, Kubernetes, and Slack with a strong emphasis on comprehensive documentation.
 
