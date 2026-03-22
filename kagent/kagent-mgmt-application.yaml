@@ -34,6 +34,12 @@ spec:
           enabled: true
         tracing:
           verbose: true
+  ignoreDifferences:
+    - group: ""
+      kind: ConfigMap
+      name: solo-enterprise-telemetry-collector-config
+      jsonPointers:
+        - /data/relay
   syncPolicy:
     automated:
       prune: true
