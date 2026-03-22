@@ -130,17 +130,3 @@ spec:
     - type: Agent
       agent:
         name: k8s-agent
-    # Slack tools via AgentGateway
-    - type: McpServer
-      mcpServer:
-        name: slack-mcp-agentgateway
-        kind: RemoteMCPServer
-        toolNames:
-        - slack_post_message
-        - slack_list_channels
-        - slack_reply_to_thread
-        - slack_add_reaction
-        - slack_get_channel_history
-        - slack_get_thread_replies
-        - slack_get_users
-        - slack_get_user_profile
