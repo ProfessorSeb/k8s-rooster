@@ -16,7 +16,8 @@
 #     "f5_password": "...",
 #     "anthropic_api_key": "sk-ant-...",
 #     "openai_api_key": "sk-...",
-#     "xai_api_key": "xai-..."
+#     "xai_api_key": "xai-...",
+#     "github_pat": "ghp_..."
 #   }
 #
 # Usage:
@@ -42,7 +43,8 @@ if [[ ! -f "$SECRETS_FILE" ]]; then
   echo '    "f5_password": "YOUR_F5_PASSWORD",'
   echo '    "anthropic_api_key": "sk-ant-...",'
   echo '    "openai_api_key": "sk-...",'
-  echo '    "xai_api_key": "xai-..."'
+  echo '    "xai_api_key": "xai-...",'
+  echo '    "github_pat": "ghp_..."'
   echo '  }'
   echo '  EOF'
   echo ""
@@ -56,9 +58,10 @@ F5_PASSWORD=$(jq -r '.f5_password' "$SECRETS_FILE")
 ANTHROPIC_API_KEY=$(jq -r '.anthropic_api_key' "$SECRETS_FILE")
 OPENAI_API_KEY=$(jq -r '.openai_api_key' "$SECRETS_FILE")
 XAI_API_KEY=$(jq -r '.xai_api_key' "$SECRETS_FILE")
+GITHUB_PAT=$(jq -r '.github_pat' "$SECRETS_FILE")
 
 # Validate all secrets are present
-for var in F5_HOST F5_USERNAME F5_PASSWORD ANTHROPIC_API_KEY OPENAI_API_KEY XAI_API_KEY; do
+for var in F5_HOST F5_USERNAME F5_PASSWORD ANTHROPIC_API_KEY OPENAI_API_KEY XAI_API_KEY GITHUB_PAT; do
   if [[ -z "${!var}" || "${!var}" == "null" ]]; then
     echo "ERROR: Missing '$var' in $SECRETS_FILE"
     exit 1
@@ -141,8 +144,16 @@ kubectl -n "$VAULT_NS" exec "$VAULT_POD" -- \
     xai-api-key="$XAI_API_KEY"
 echo "  LLM provider API keys stored."
 
+# ── Write GitHub PAT ──────────────────────────────────────────────────────────
+echo "[7/8] Writing GitHub PAT to secret/data/github..."
+kubectl -n "$VAULT_NS" exec "$VAULT_POD" -- \
+  env VAULT_TOKEN="$ROOT_TOKEN" \
+  vault kv put secret/github \
+    personal-access-token="$GITHUB_PAT"
+echo "  GitHub PAT stored."
+
 # ── Create Vault token secret for External Secrets Operator ──────────────────
-echo "[7/7] Creating Vault token K8s secret for External Secrets Operator..."
+echo "[8/8] Creating Vault token K8s secret for External Secrets Operator..."
 kubectl create namespace "$ESO_NS" 2>/dev/null || true
 kubectl -n "$ESO_NS" create secret generic vault-token \
   --from-literal=token="$ROOT_TOKEN" \
@@ -159,6 +170,7 @@ echo ""
 echo " Secrets stored:"
 echo "   - secret/data/f5/bigip    (host, username, password)"
 echo "   - secret/data/llm         (anthropic-api-key, openai-api-key, xai-api-key)"
+echo "   - secret/data/github     (personal-access-token)"
 echo ""
 echo " External Secrets Operator will sync these to K8s secrets"
 echo " in agentgateway-system and kagent namespaces."
