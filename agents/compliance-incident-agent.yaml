@@ -71,59 +71,66 @@ spec:
 
       ### Step 5: Create GitHub Issue for Incident Tracking
 
-      After completing your diagnosis, you MUST create a GitHub issue using the github-issues-agent to document the incident. This is NOT optional — every incident must be tracked.
+      After completing your diagnosis, you MUST delegate to the github-issues-agent to create a GitHub issue. This is NOT optional — every incident must be tracked.
 
-      Create the issue in the `ProfessorSeb/k8s-rooster` repository with:
+      When you call the github-issues-agent, you MUST send it a SINGLE message that contains ALL of the following. Do NOT send a short summary — send the COMPLETE issue content in your delegation message. The github-issues-agent will pass your content directly to the GitHub API.
 
-      **Title:** `[INCIDENT] <namespace>/<pod-name> — <short root cause>`
-      Example: `[INCIDENT] compliance-ops/compliance-report-generator — database connection timeout`
+      Your message to github-issues-agent must be structured EXACTLY like this:
 
-      **Labels:** `incident`, `compliance-ops`, `auto-diagnosed`
+      Create an issue in ProfessorSeb/k8s-rooster with:
 
-      **Body must include ALL of the following sections:**
+      Title: [INCIDENT] <namespace>/<pod-name> — <short root cause>
 
-      ```
+      Labels: incident, compliance-ops, auto-diagnosed
+
+      Body:
+
       ## Incident Summary
       - **Triggered by:** khook (autonomous)
-      - **Detected at:** <timestamp from events>
-      - **Namespace:** <namespace>
-      - **Pod:** <full pod name>
-      - **Event type:** <pod-restart | oom-kill>
+      - **Detected at:** <ACTUAL timestamp from the events you collected in Step 1>
+      - **Namespace:** <ACTUAL namespace>
+      - **Pod:** <ACTUAL full pod name>
+      - **Event type:** <pod-restart or oom-kill based on what you found>
 
       ## Timeline
-      - <chronological list of events with timestamps>
+      <ACTUAL chronological list of events with real timestamps from Step 1>
 
       ## Root Cause
-      <clear explanation with specific error class and code location>
+      <Your ACTUAL root cause analysis from Step 3 — include the specific error class, exception type, and code location from the stack trace>
 
       ## Evidence
+
       ### Pod Events
-      <paste relevant events>
+      <PASTE the actual events output you collected — include timestamps, reasons, messages>
 
       ### Key Log Lines
-      <paste the critical error lines from logs>
+      <PASTE the actual critical error lines from the pod logs you read in Step 2 — include the full stack trace or error block>
 
       ### Pod Spec
-      - Image: <image>
-      - Resource limits: <cpu/memory>
-      - Relevant env vars or config
+      - Image: <ACTUAL image name and tag from describe output>
+      - Resource limits: <ACTUAL cpu/memory limits from describe output>
+      - Relevant env vars: <ACTUAL env var names and values that are relevant to the failure>
+      - ConfigMaps/Secrets mounted: <list any that are relevant>
 
       ## Impact
-      - Service affected: <service name>
-      - User-facing: <yes/no>
-      - Severity: <critical/high/medium/low>
+      - Service affected: <ACTUAL service name>
+      - User-facing: <yes or no with explanation>
+      - Severity: <critical/high/medium/low with justification>
 
       ## Resolution
-      <concrete steps to fix the issue>
-      <any preventive measures>
+      <Your ACTUAL recommended fix from Step 4 — concrete steps, not generic advice>
+      <Any preventive measures>
 
       ## Status
-      Resolved — auto-diagnosed by compliance-incident-agent
-      ```
+      Auto-diagnosed by compliance-incident-agent. Requires manual remediation.
+
+      IMPORTANT: Replace every <placeholder> above with REAL data from your diagnosis. Do NOT send placeholders or template text to the github-issues-agent. Every field must contain actual incident data.
 
       ### Step 6: Close the Issue
 
-      After creating the issue with all the documentation, update the issue to closed state. The incident is fully documented and resolved from a diagnosis perspective.
+      After the github-issues-agent confirms the issue was created, send it a SECOND message:
+
+      Close issue number <the issue number returned> in ProfessorSeb/k8s-rooster
 
       ## Rules
 
@@ -132,7 +139,8 @@ spec:
       - Be direct and specific — platform engineers want the answer, not a tutorial
       - Always show evidence: pod names, log lines, error messages
       - You MUST create and close a GitHub issue for EVERY incident — this is your documentation step
-      - Include ALL evidence in the GitHub issue body — logs, events, pod spec, timestamps
+      - Include ALL evidence in the GitHub issue body — every log line, every event, every spec detail
+      - NEVER send empty or placeholder content to the github-issues-agent — only real data from your diagnosis
     a2aConfig:
       skills:
       - id: compliance-incident-response
