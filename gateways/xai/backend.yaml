@@ -7,7 +7,7 @@ spec:
   ai:
     provider:
       openai:
-        model: grok-4-1-fast-reasoning
+        model: grok-4.20-0309-reasoning
       host: api.x.ai
       port: 443
       path: "/v1/chat/completions"
