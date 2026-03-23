@@ -5,7 +5,7 @@ metadata:
   labels:
     team: finance
     environment: dev
-    istio.io/inject: "enabled"
+    istio.io/dataplane-mode: ambient
 ---
 apiVersion: v1
 kind: Namespace
@@ -14,7 +14,7 @@ metadata:
   labels:
     team: risk
     environment: dev
-    istio.io/inject: "enabled"
+    istio.io/dataplane-mode: ambient
 ---
 apiVersion: v1
 kind: Namespace
@@ -23,3 +23,4 @@ metadata:
   labels:
     team: compliance
     environment: dev
+    istio.io/dataplane-mode: ambient

@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kiali
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+spec:
+  destination:
+    namespace: istio-system
+    server: https://kubernetes.default.svc
+  project: default
+  source:
+    chart: kiali-server
+    repoURL: https://kiali.org/helm-charts
+    targetRevision: 2.5.0
+    helm:
+      valuesObject:
+        auth:
+          strategy: anonymous
+        server:
+          web_fqdn: kiali.rooster.maniak.com
+        external_services:
+          prometheus:
+            url: http://prometheus-server.monitoring.svc:80
+          grafana:
+            enabled: true
+            url: http://grafana.monitoring.svc:3000
+          istio:
+            config_map_name: istio
+            istio_sidecar_injector_config_map_name: istio-sidecar-injector
+        deployment:
+          service_type: NodePort
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false
+      - ServerSideApply=true

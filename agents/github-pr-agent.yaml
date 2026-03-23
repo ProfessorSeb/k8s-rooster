@@ -14,7 +14,7 @@ spec:
       ## GitHub Integration Rules (IMPORTANT)
       - Default GitHub repository: ProfessorSeb/ai-kagent-demo
       - When working with this repository:
-        * Use owner: "sebbycorp"
+        * Use owner: "ProfessorSeb"
         * Use repo: "ai-kagent-demo"
       - Always confirm destructive actions before executing (merges, closing PRs)
 

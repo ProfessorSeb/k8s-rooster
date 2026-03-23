@@ -457,7 +457,7 @@
   <div class="hero">
     <div class="hero-badge">CNCF Sandbox Project</div>
     <h1><span>kagent</span> Bank Platform Demo</h1>
-    <p>AI-powered Kubernetes operations for financial services. Crash diagnosis, migration planning, Istio troubleshooting, and capacity forecasting — all from a single agent.</p>
+    <p>AI-powered Kubernetes operations for financial services. Crash diagnosis, migration planning, Istio ambient mesh troubleshooting, and capacity forecasting — driven by an orchestrator agent with specialist sub-agents.</p>
     <a href="architecture.html" style="display: inline-block; margin-top: 24px; padding: 12px 28px; background: rgba(99, 102, 241, 0.15); color: var(--accent-light); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 8px; font-weight: 600; font-size: 0.95rem; text-decoration: none; transition: background 0.15s;">View Architecture Diagram &rarr;</a>
   </div>
 
@@ -506,26 +506,37 @@
   <section>
     <div class="container">
       <h2>Demo <span>Architecture</span></h2>
-      <p>The bank-platform-agent connects to Kubernetes tools and Prometheus via MCP to diagnose issues across the platform.</p>
+      <p>The bank-platform-agent orchestrates specialist sub-agents (k8s, Istio, Helm) and queries Prometheus/Grafana directly. All demo namespaces run on Istio ambient mesh (ztunnel L4, no sidecars).</p>
 
       <div class="arch-diagram">
-        <div class="arch-label">kagent UI / Chat Interface</div>
+        <div class="arch-label">kagent UI / Chat / Slack A2A / khook</div>
         <div class="arch-row">
-          <div class="arch-box accent">bank-platform-agent</div>
+          <div class="arch-box accent">bank-platform-agent (orchestrator)</div>
         </div>
         <div class="arch-arrow">&darr;</div>
-        <div class="arch-label">MCP Tool Servers</div>
+        <div class="arch-label">Sub-Agents (A2A delegation)</div>
         <div class="arch-row">
-          <div class="arch-box green">k8s tools</div>
+          <div class="arch-box accent">k8s-agent</div>
+          <div class="arch-box accent">istio-agent</div>
+          <div class="arch-box accent">helm-agent</div>
+        </div>
+        <div class="arch-label" style="margin-top: 12px;">Direct MCP Tools</div>
+        <div class="arch-row">
           <div class="arch-box green">prometheus-mcp</div>
           <div class="arch-box green">grafana-mcp</div>
         </div>
         <div class="arch-arrow">&darr;</div>
-        <div class="arch-label">Kubernetes Cluster</div>
+        <div class="arch-label">Kubernetes Cluster &middot; Istio Ambient Mesh</div>
         <div class="arch-row">
           <div class="arch-box">finance-payments</div>
           <div class="arch-box">risk-management</div>
           <div class="arch-box">compliance-ops</div>
+        </div>
+        <div class="arch-row" style="margin-top: 8px;">
+          <div class="arch-box green" style="font-size: 0.78rem;">ztunnel (L4)</div>
+          <div class="arch-box green" style="font-size: 0.78rem;">istiod</div>
+          <div class="arch-box green" style="font-size: 0.78rem;">istio-cni</div>
+          <div class="arch-box" style="font-size: 0.78rem;"><a href="http://kiali.rooster.maniak.com:20001" target="_blank" style="color: inherit;">Kiali UI</a></div>
         </div>
       </div>
     </div>
@@ -535,7 +546,7 @@
   <section>
     <div class="container">
       <h2>Demo <span>Scenarios</span></h2>
-      <p>Five scenarios that show kagent solving real platform engineering problems. Chaos is injected on demand — everything starts healthy.</p>
+      <p>Seven scenarios that show kagent solving real platform engineering problems. Chaos is injected on demand — everything starts healthy.</p>
 
       <div class="scenarios">
 
@@ -609,6 +620,22 @@
           </div>
         </div>
 
+        <div class="scenario">
+          <div class="scenario-num">7</div>
+          <div class="scenario-body">
+            <h3>Ambient Mesh Security Lockdown &nbsp;<span class="tag tag-red">chaos.sh mesh</span></h3>
+            <p>Istio ambient mesh protects all demo namespaces with ztunnel L4 encryption (no sidecars). <code>chaos.sh mesh</code> injects a STRICT PeerAuthentication + deny-all AuthorizationPolicy on finance-payments, blocking all traffic to payment-service. kagent diagnoses the security policy misconfiguration and shows the fix.</p>
+            <div class="code-block">
+              <span class="prompt">&gt;</span> <span class="cmd">The payment-service in finance-payments is rejecting all connections. Can you check the Istio security policies and figure out what's blocking traffic?</span>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 10px; font-size: 0.8rem;">
+              <span class="tag tag-cyan">ambient mesh</span>
+              <span class="tag tag-red">security policy</span>
+              <span class="tag tag-yellow">ztunnel L4</span>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
@@ -639,6 +666,7 @@
           <button onclick="triggerChaos('crash')" class="chaos-btn chaos-btn-red">Crash Loop</button>
           <button onclick="triggerChaos('istio')" class="chaos-btn chaos-btn-red">Break Istio</button>
           <button onclick="triggerChaos('khook')" class="chaos-btn chaos-btn-red">khook</button>
+          <button onclick="triggerChaos('mesh')" class="chaos-btn chaos-btn-red">Break Mesh</button>
           <button onclick="triggerChaos('all')" class="chaos-btn chaos-btn-red">All Chaos</button>
           <button onclick="triggerChaos('reset')" class="chaos-btn chaos-btn-green">Reset</button>
           <button onclick="triggerChaos('status')" class="chaos-btn chaos-btn-cyan">Status</button>
@@ -777,6 +805,9 @@
 <div class="line"><span class="muted"># Inject chaos for Scenario 6 (khook auto-response)</span></div>
 <div class="line"><span class="red">$</span> ./chaos.sh khook</div>
 <div class="line"></div>
+<div class="line"><span class="muted"># Inject chaos for Scenario 7 (break ambient mesh)</span></div>
+<div class="line"><span class="red">$</span> ./chaos.sh mesh</div>
+<div class="line"></div>
 <div class="line"><span class="muted"># Inject all chaos at once</span></div>
 <div class="line"><span class="red">$</span> ./chaos.sh all</div>
 <div class="line"></div>
@@ -817,8 +848,12 @@
             <td>Break compliance-report-generator — khook auto-triggers agent diagnosis</td>
           </tr>
           <tr>
+            <td><code>./chaos.sh mesh</code></td>
+            <td>Inject STRICT mTLS + deny-all AuthorizationPolicy — blocks mesh traffic</td>
+          </tr>
+          <tr>
             <td><code>./chaos.sh all</code></td>
-            <td>Inject crash + Istio + khook failures at once</td>
+            <td>Inject crash + Istio + khook + mesh failures at once</td>
           </tr>
           <tr>
             <td><code>./chaos.sh reset</code></td>
@@ -869,6 +904,11 @@
             <td>AI agent + Prometheus tool server + event watcher</td>
           </tr>
           <tr>
+            <td><code>istio-system</code></td>
+            <td>istiod, ztunnel, istio-cni, Kiali</td>
+            <td>Ambient mesh control plane + L4 data plane + mesh UI</td>
+          </tr>
+          <tr>
             <td><code>monitoring</code></td>
             <td>Prometheus + kube-state-metrics (optional)</td>
             <td>Capacity forecasting data source</td>
@@ -885,7 +925,10 @@
       <a href="https://www.solo.io/products/kagent">Solo Enterprise for kagent</a> &middot;
       <a href="https://github.com/kagent-dev/kagent">GitHub</a>
     </p>
-    <p style="margin-top: 12px;">Built with kagent Enterprise on the maniak-rooster cluster.</p>
+    <p style="margin-top: 12px;">
+      Built with kagent Enterprise on the maniak-rooster cluster.
+      &middot; <a href="http://kiali.rooster.maniak.com:20001">Kiali Mesh UI</a>
+    </p>
   </footer>
 
   <script>
@@ -894,12 +937,13 @@
 
     /* ── Cluster Visualization State ── */
     // Track individual chaos states so they stack independently
-    var vizState = { crash: false, istio: false, khook: false };
+    var vizState = { crash: false, istio: false, khook: false, mesh: false };
 
     function applyVizState() {
       var crashOn = vizState.crash;
       var istioOn = vizState.istio;
       var khookOn = vizState.khook;
+      var meshOn = vizState.mesh;
 
       // payment-service pod
       var dotPay = document.getElementById('dot-payment');
@@ -912,13 +956,17 @@
       // VirtualService
       var vsInd = document.getElementById('vs-payment');
       var vsTgt = document.getElementById('vs-payment-target');
-      vsInd.className = 'vs-indicator ' + (istioOn ? 'error' : 'healthy');
-      vsTgt.innerHTML = istioOn
-        ? 'VirtualService \u2192 <strong>payment-svc-v2 NOT FOUND</strong>'
-        : 'VirtualService \u2192 payment-service:8080';
+      vsInd.className = 'vs-indicator ' + ((istioOn || meshOn) ? 'error' : 'healthy');
+      if (meshOn) {
+        vsTgt.innerHTML = 'DENY policy \u2192 <strong>all traffic blocked</strong>';
+      } else if (istioOn) {
+        vsTgt.innerHTML = 'VirtualService \u2192 <strong>payment-svc-v2 NOT FOUND</strong>';
+      } else {
+        vsTgt.innerHTML = 'VirtualService \u2192 payment-service:8080';
+      }
 
       // finance namespace card border
-      nsFin.className = 'ns-card' + ((crashOn || istioOn) ? ' has-error' : '');
+      nsFin.className = 'ns-card' + ((crashOn || istioOn || meshOn) ? ' has-error' : '');
 
       // compliance-report-generator pod
       var dotRG = document.getElementById('dot-report-gen');
@@ -986,7 +1034,7 @@
 
         if (resp.status === 204) {
           const colors = {
-            crash: '#ef4444', istio: '#ef4444', all: '#ef4444',
+            crash: '#ef4444', istio: '#ef4444', mesh: '#ef4444', all: '#ef4444',
             reset: '#10b981', status: '#06b6d4'
           };
           msgEl.style.color = colors[action] || '#10b981';
@@ -999,8 +1047,9 @@
           if (action === 'crash') { vizState.crash = true; }
           else if (action === 'istio') { vizState.istio = true; }
           else if (action === 'khook') { vizState.khook = true; }
-          else if (action === 'all') { vizState.crash = true; vizState.istio = true; vizState.khook = true; }
-          else if (action === 'reset') { vizState.crash = false; vizState.istio = false; vizState.khook = false; }
+          else if (action === 'mesh') { vizState.mesh = true; }
+          else if (action === 'all') { vizState.crash = true; vizState.istio = true; vizState.khook = true; vizState.mesh = true; }
+          else if (action === 'reset') { vizState.crash = false; vizState.istio = false; vizState.khook = false; vizState.mesh = false; }
           applyVizState();
         } else if (resp.status === 401 || resp.status === 403) {
           msgEl.style.color = '#ef4444';

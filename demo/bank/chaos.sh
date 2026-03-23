@@ -8,6 +8,7 @@
 #   ./chaos.sh crash        # Scenario 1: Java OOM crashloop
 #   ./chaos.sh istio        # Scenario 4: Broken VirtualService
 #   ./chaos.sh khook        # Scenario 6: Break compliance-report-generator (khook auto-responds)
+#   ./chaos.sh mesh         # Scenario 7: Break ambient mesh — STRICT mTLS + deny-all AuthorizationPolicy
 #   ./chaos.sh all          # All chaos at once
 #   ./chaos.sh reset        # Restore everything to healthy
 
@@ -147,6 +148,43 @@ YAML
     prompt "Watch the kagent UI — the agent will start diagnosing automatically (no human prompt needed)"
 }
 
+inject_mesh() {
+    chaos "Breaking ambient mesh — injecting STRICT mTLS + deny-all AuthorizationPolicy..."
+
+    # PeerAuthentication: force STRICT mTLS — breaks any non-mesh client
+    kubectl apply -n finance-payments -f - <<'YAML'
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: chaos-strict-mtls
+  namespace: finance-payments
+spec:
+  mtls:
+    mode: STRICT
+YAML
+
+    # AuthorizationPolicy: deny all traffic to payment-service
+    kubectl apply -n finance-payments -f - <<'YAML'
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: chaos-deny-all
+  namespace: finance-payments
+spec:
+  selector:
+    matchLabels:
+      app: payment-service
+  action: DENY
+  rules:
+  - from:
+    - source:
+        namespaces: ["*"]
+YAML
+
+    chaos "payment-service is now unreachable — STRICT mTLS + DENY policy active"
+    prompt "Ask kagent: \"The payment-service in finance-payments is rejecting all connections. Can you check the Istio security policies and figure out what's blocking traffic?\""
+}
+
 reset_all() {
     info "Restoring healthy state..."
 
@@ -161,6 +199,10 @@ reset_all() {
     kubectl apply -f "$SCRIPT_DIR/khook-workload.yaml"
     kubectl rollout restart deployment/compliance-report-generator -n compliance-ops
 
+    # Remove mesh chaos policies
+    kubectl delete peerauthentication chaos-strict-mtls -n finance-payments 2>/dev/null || true
+    kubectl delete authorizationpolicy chaos-deny-all -n finance-payments 2>/dev/null || true
+
     info "All workloads restored to healthy state"
 }
 
@@ -174,22 +216,28 @@ case "${ACTION}" in
     khook)
         inject_khook
         ;;
+    mesh)
+        inject_mesh
+        ;;
     all)
         inject_crash
         echo ""
         inject_istio
         echo ""
         inject_khook
+        echo ""
+        inject_mesh
         ;;
     reset|restore|fix)
         reset_all
         ;;
     *)
-        echo "Usage: $0 {crash|istio|all|reset}"
+        echo "Usage: $0 {crash|istio|khook|mesh|all|reset}"
         echo ""
         echo "  crash   Inject Java OOM crashloop into payment-service"
         echo "  istio   Break VirtualService routing to non-existent service"
         echo "  khook   Break compliance-report-generator (khook auto-responds)"
+        echo "  mesh    Break ambient mesh — STRICT mTLS + deny-all policy"
         echo "  all     Inject all chaos at once"
         echo "  reset   Restore everything to healthy"
         exit 1

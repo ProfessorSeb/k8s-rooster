@@ -224,4 +224,4 @@ terraform init && terraform apply
 **Last Updated**: February 20, 2026
 **Cluster**: maniak-rooster (Talos)
 **Cluster Name (mgmt)**: rooster.maniak.io
-**Maintainer**: Seb (@sebbycorp)
+**Maintainer**: Seb (@ProfessorSeb)

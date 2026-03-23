@@ -13,6 +13,7 @@ locals {
     model_gw     = "172.16.20.124" # model-priority-gateway-proxy
     github_gw    = "172.16.20.125" # github-gateway-proxy
     vault_ui     = "172.16.20.126" # vault.rooster.maniak.com (Vault UI)
+    kiali        = "172.16.20.127" # kiali.rooster.maniak.com (Kiali mesh UI)
   }
 
   # NodePort mappings from live cluster
@@ -26,6 +27,7 @@ locals {
     model_gw     = 30689 # model-priority-gateway-proxy 8085:30689
     github_gw    = 31313 # github-gateway-proxy 8092:31313
     vault_ui     = 30820 # vault 8200:30820
+    kiali        = 31094 # kiali 20001:31094
   }
 
   # Build pool member lists: each node on the relevant NodePort
@@ -157,6 +159,18 @@ resource "bigip_ltm_pool_attachment" "vault_ui" {
   node     = "/${var.partition}/${each.value}"
 }
 
+resource "bigip_ltm_pool" "kiali" {
+  name                = "/${var.partition}/pool_kiali"
+  load_balancing_mode = "round-robin"
+  monitors            = [bigip_ltm_monitor.tcp.name]
+}
+
+resource "bigip_ltm_pool_attachment" "kiali" {
+  for_each = toset(local.pool_members["kiali"])
+  pool     = bigip_ltm_pool.kiali.name
+  node     = "/${var.partition}/${each.value}"
+}
+
 ###############################################################################
 # Virtual Servers
 ###############################################################################
@@ -244,6 +258,17 @@ resource "bigip_ltm_virtual_server" "github_gw" {
   destination                = local.vips["github_gw"]
   port                       = 8092
   pool                       = bigip_ltm_pool.github_gw.name
+  ip_protocol                = "tcp"
+  source_address_translation = "automap"
+  profiles                   = ["/Common/fastL4"]
+}
+
+# --- kiali.rooster.maniak.com (Kiali Mesh UI - L4 TCP) ---
+resource "bigip_ltm_virtual_server" "kiali" {
+  name                       = "/${var.partition}/vs_kiali"
+  destination                = local.vips["kiali"]
+  port                       = 20001
+  pool                       = bigip_ltm_pool.kiali.name
   ip_protocol                = "tcp"
   source_address_translation = "automap"
   profiles                   = ["/Common/fastL4"]
