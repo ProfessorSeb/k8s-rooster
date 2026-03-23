@@ -59,7 +59,7 @@
     <svg viewBox="0 0 1060 790" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-          <path d="M0,0 L8,3 L0,6" fill="#a89e8e"/>
+          <path d="M0,0 L8,3 L0,6" fill="#6b7280"/>
         </marker>
         <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
           <path d="M0,0 L8,3 L0,6" fill="#3a72b0"/>
@@ -76,17 +76,17 @@
       </defs>
 
       <!-- ============ ROW 1: User Layer ============ -->
-      <text x="530" y="28" text-anchor="middle" fill="#7a6f5f" font-size="11" font-weight="600" letter-spacing="0.08em">USER LAYER</text>
+      <text x="530" y="28" text-anchor="middle" fill="#9ca3af" font-size="11" font-weight="600" letter-spacing="0.08em">USER LAYER</text>
 
       <!-- User / kagent UI -->
-      <rect x="370" y="40" width="320" height="56" rx="12" fill="#fffdf8" stroke="#2d5a8e" stroke-width="2"/>
+      <rect x="370" y="40" width="320" height="56" rx="12" fill="#111827" stroke="#2d5a8e" stroke-width="2"/>
       <text x="530" y="65" text-anchor="middle" fill="#3a72b0" font-size="14" font-weight="700">kagent UI / Chat</text>
-      <text x="530" y="82" text-anchor="middle" fill="#7a6f5f" font-size="11">Platform engineer sends natural language prompts</text>
+      <text x="530" y="82" text-anchor="middle" fill="#9ca3af" font-size="11">Platform engineer sends natural language prompts</text>
 
       <!-- Chaos trigger (browser) -->
-      <rect x="750" y="40" width="200" height="56" rx="12" fill="#fffdf8" stroke="#b33a3a" stroke-width="1.5" stroke-dasharray="6,3"/>
+      <rect x="750" y="40" width="200" height="56" rx="12" fill="#111827" stroke="#b33a3a" stroke-width="1.5" stroke-dasharray="6,3"/>
       <text x="850" y="65" text-anchor="middle" fill="#b33a3a" font-size="12" font-weight="600">Chaos Control Panel</text>
-      <text x="850" y="82" text-anchor="middle" fill="#7a6f5f" font-size="10">GitHub Pages + Actions</text>
+      <text x="850" y="82" text-anchor="middle" fill="#9ca3af" font-size="10">GitHub Pages + Actions</text>
 
       <!-- Arrow: User -> Agent -->
       <line x1="530" y1="96" x2="530" y2="148" stroke="#3a72b0" stroke-width="2" marker-end="url(#arrow-accent)"/>
@@ -97,52 +97,52 @@
       <text x="862" y="128" fill="#b33a3a" font-size="10">trigger</text>
 
       <!-- ============ ROW 2: Agent Layer ============ -->
-      <text x="530" y="148" text-anchor="middle" fill="#7a6f5f" font-size="11" font-weight="600" letter-spacing="0.08em">AGENT LAYER</text>
+      <text x="530" y="148" text-anchor="middle" fill="#9ca3af" font-size="11" font-weight="600" letter-spacing="0.08em">AGENT LAYER</text>
 
       <!-- LLM Gateway -->
-      <rect x="120" y="160" width="180" height="50" rx="10" fill="#fffdf8" stroke="#c9bfae" stroke-width="1.5"/>
-      <text x="210" y="182" text-anchor="middle" fill="#2c2416" font-size="12" font-weight="600">LLM Gateway</text>
-      <text x="210" y="197" text-anchor="middle" fill="#7a6f5f" font-size="10">AgentGateway proxy</text>
+      <rect x="120" y="160" width="180" height="50" rx="10" fill="#111827" stroke="#374151" stroke-width="1.5"/>
+      <text x="210" y="182" text-anchor="middle" fill="#f3f4f6" font-size="12" font-weight="600">LLM Gateway</text>
+      <text x="210" y="197" text-anchor="middle" fill="#9ca3af" font-size="10">AgentGateway proxy</text>
 
       <!-- bank-platform-agent -->
-      <rect x="370" y="155" width="320" height="60" rx="12" fill="#fffdf8" stroke="#c4652f" stroke-width="2"/>
+      <rect x="370" y="155" width="320" height="60" rx="12" fill="#111827" stroke="#c4652f" stroke-width="2"/>
       <text x="530" y="180" text-anchor="middle" fill="#c4652f" font-size="14" font-weight="700">bank-platform-agent (orchestrator)</text>
-      <text x="530" y="197" text-anchor="middle" fill="#7a6f5f" font-size="10">Delegates to k8s-agent (Claude Sonnet 4.6), istio-agent, helm-agent, github-issues-agent (Grok)</text>
+      <text x="530" y="197" text-anchor="middle" fill="#9ca3af" font-size="10">Delegates to k8s-agent (Claude Sonnet 4.6), istio-agent, helm-agent, github-issues-agent (Grok)</text>
 
       <!-- GH Actions runner -->
-      <rect x="770" y="160" width="160" height="50" rx="10" fill="#fffdf8" stroke="#b33a3a" stroke-width="1.5" stroke-dasharray="6,3"/>
+      <rect x="770" y="160" width="160" height="50" rx="10" fill="#111827" stroke="#b33a3a" stroke-width="1.5" stroke-dasharray="6,3"/>
       <text x="850" y="182" text-anchor="middle" fill="#b33a3a" font-size="12" font-weight="600">Self-Hosted Runner</text>
-      <text x="850" y="197" text-anchor="middle" fill="#7a6f5f" font-size="10">chaos.sh / setup.sh</text>
+      <text x="850" y="197" text-anchor="middle" fill="#9ca3af" font-size="10">chaos.sh / setup.sh</text>
 
       <!-- Arrow: Agent <-> LLM -->
-      <line x1="370" y1="185" x2="300" y2="185" stroke="#a89e8e" stroke-width="1.5" marker-end="url(#arrow)"/>
-      <text x="335" y="178" text-anchor="middle" fill="#7a6f5f" font-size="9">OpenAI / Claude / Grok</text>
+      <line x1="370" y1="185" x2="300" y2="185" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <text x="335" y="178" text-anchor="middle" fill="#9ca3af" font-size="9">OpenAI / Claude / Grok</text>
 
       <!-- ============ SUB-AGENTS ROW ============ -->
-      <text x="530" y="230" text-anchor="middle" fill="#7a6f5f" font-size="10" font-weight="600" letter-spacing="0.06em">SUB-AGENTS (A2A delegation)</text>
+      <text x="530" y="230" text-anchor="middle" fill="#9ca3af" font-size="10" font-weight="600" letter-spacing="0.06em">SUB-AGENTS (A2A delegation)</text>
 
       <!-- Arrow: Agent -> Sub-agents -->
       <line x1="530" y1="215" x2="530" y2="238" stroke="#c4652f" stroke-width="1.5" marker-end="url(#arrow)"/>
 
       <!-- k8s-agent -->
-      <rect x="80" y="240" width="200" height="50" rx="8" fill="#fffdf8" stroke="#c4652f" stroke-width="1.5"/>
+      <rect x="80" y="240" width="200" height="50" rx="8" fill="#111827" stroke="#c4652f" stroke-width="1.5"/>
       <text x="180" y="260" text-anchor="middle" fill="#c4652f" font-size="11" font-weight="700">k8s-agent</text>
-      <text x="180" y="276" text-anchor="middle" fill="#7a6f5f" font-size="9">Claude Sonnet 4.6</text>
+      <text x="180" y="276" text-anchor="middle" fill="#9ca3af" font-size="9">Claude Sonnet 4.6</text>
 
       <!-- istio-agent -->
-      <rect x="300" y="240" width="160" height="50" rx="8" fill="#fffdf8" stroke="#c4652f" stroke-width="1.5"/>
+      <rect x="300" y="240" width="160" height="50" rx="8" fill="#111827" stroke="#c4652f" stroke-width="1.5"/>
       <text x="380" y="260" text-anchor="middle" fill="#c4652f" font-size="11" font-weight="700">istio-agent</text>
-      <text x="380" y="276" text-anchor="middle" fill="#7a6f5f" font-size="9">GPT-5.2 (default)</text>
+      <text x="380" y="276" text-anchor="middle" fill="#9ca3af" font-size="9">GPT-5.2 (default)</text>
 
       <!-- helm-agent -->
-      <rect x="480" y="240" width="160" height="50" rx="8" fill="#fffdf8" stroke="#c4652f" stroke-width="1.5"/>
+      <rect x="480" y="240" width="160" height="50" rx="8" fill="#111827" stroke="#c4652f" stroke-width="1.5"/>
       <text x="560" y="260" text-anchor="middle" fill="#c4652f" font-size="11" font-weight="700">helm-agent</text>
-      <text x="560" y="276" text-anchor="middle" fill="#7a6f5f" font-size="9">GPT-5.2 (default)</text>
+      <text x="560" y="276" text-anchor="middle" fill="#9ca3af" font-size="9">GPT-5.2 (default)</text>
 
       <!-- github-issues-agent -->
-      <rect x="660" y="240" width="210" height="50" rx="8" fill="#fffdf8" stroke="#c4652f" stroke-width="1.5"/>
+      <rect x="660" y="240" width="210" height="50" rx="8" fill="#111827" stroke="#c4652f" stroke-width="1.5"/>
       <text x="765" y="260" text-anchor="middle" fill="#c4652f" font-size="11" font-weight="700">github-issues-agent</text>
-      <text x="765" y="276" text-anchor="middle" fill="#7a6f5f" font-size="9">xAI Grok</text>
+      <text x="765" y="276" text-anchor="middle" fill="#9ca3af" font-size="9">xAI Grok</text>
 
       <!-- Arrows: orchestrator -> sub-agents -->
       <line x1="430" y1="215" x2="180" y2="240" stroke="#c4652f" stroke-width="1" stroke-dasharray="4,2"/>
@@ -151,7 +151,7 @@
       <line x1="630" y1="215" x2="765" y2="240" stroke="#c4652f" stroke-width="1" stroke-dasharray="4,2"/>
 
       <!-- ============ HITL Gate ============ -->
-      <rect x="80" y="300" width="200" height="32" rx="6" fill="#fffdf8" stroke="#c4882f" stroke-width="1.5"/>
+      <rect x="80" y="300" width="200" height="32" rx="6" fill="#111827" stroke="#c4882f" stroke-width="1.5"/>
       <text x="180" y="320" text-anchor="middle" fill="#c4882f" font-size="10" font-weight="600">Human-in-the-Loop Gate</text>
 
       <!-- Arrow: k8s-agent -> HITL -->
@@ -162,71 +162,71 @@
       <text x="292" y="325" fill="#b33a3a" font-size="9" font-weight="600">Reject</text>
 
       <!-- Arrow: HITL -> Tools -->
-      <line x1="180" y1="332" x2="180" y2="380" stroke="#a89e8e" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <line x1="180" y1="332" x2="180" y2="380" stroke="#6b7280" stroke-width="1.5" marker-end="url(#arrow)"/>
       <!-- Arrow: other agents -> Tools -->
-      <line x1="380" y1="290" x2="380" y2="380" stroke="#a89e8e" stroke-width="1" stroke-dasharray="4,2"/>
-      <line x1="560" y1="290" x2="560" y2="380" stroke="#a89e8e" stroke-width="1" stroke-dasharray="4,2"/>
-      <line x1="765" y1="290" x2="870" y2="380" stroke="#a89e8e" stroke-width="1" stroke-dasharray="4,2"/>
+      <line x1="380" y1="290" x2="380" y2="380" stroke="#6b7280" stroke-width="1" stroke-dasharray="4,2"/>
+      <line x1="560" y1="290" x2="560" y2="380" stroke="#6b7280" stroke-width="1" stroke-dasharray="4,2"/>
+      <line x1="765" y1="290" x2="870" y2="380" stroke="#6b7280" stroke-width="1" stroke-dasharray="4,2"/>
 
       <!-- ============ ROW 3: MCP Tool Servers ============ -->
-      <text x="530" y="375" text-anchor="middle" fill="#7a6f5f" font-size="11" font-weight="600" letter-spacing="0.08em">MCP TOOL SERVERS</text>
+      <text x="530" y="375" text-anchor="middle" fill="#9ca3af" font-size="11" font-weight="600" letter-spacing="0.08em">MCP TOOL SERVERS</text>
 
       <!-- Kubernetes Tools -->
-      <rect x="80" y="388" width="200" height="70" rx="10" fill="#fffdf8" stroke="#2d7d8e" stroke-width="1.5"/>
+      <rect x="80" y="388" width="200" height="70" rx="10" fill="#111827" stroke="#2d7d8e" stroke-width="1.5"/>
       <text x="180" y="413" text-anchor="middle" fill="#2d7d8e" font-size="12" font-weight="700">kagent-tool-server</text>
-      <text x="180" y="428" text-anchor="middle" fill="#7a6f5f" font-size="9">k8s_get_resources, get_pod_logs</text>
-      <text x="180" y="441" text-anchor="middle" fill="#7a6f5f" font-size="9">describe_resource, get_events</text>
-      <text x="180" y="454" text-anchor="middle" fill="#7a6f5f" font-size="9">helm_list_releases, execute_command</text>
+      <text x="180" y="428" text-anchor="middle" fill="#9ca3af" font-size="9">k8s_get_resources, get_pod_logs</text>
+      <text x="180" y="441" text-anchor="middle" fill="#9ca3af" font-size="9">describe_resource, get_events</text>
+      <text x="180" y="454" text-anchor="middle" fill="#9ca3af" font-size="9">helm_list_releases, execute_command</text>
 
       <!-- Prometheus MCP -->
-      <rect x="310" y="388" width="200" height="70" rx="10" fill="#fffdf8" stroke="#2d7d8e" stroke-width="1.5"/>
+      <rect x="310" y="388" width="200" height="70" rx="10" fill="#111827" stroke="#2d7d8e" stroke-width="1.5"/>
       <text x="410" y="413" text-anchor="middle" fill="#2d7d8e" font-size="12" font-weight="700">prometheus-mcp</text>
-      <text x="410" y="430" text-anchor="middle" fill="#7a6f5f" font-size="9">execute_query, execute_range_query</text>
-      <text x="410" y="443" text-anchor="middle" fill="#7a6f5f" font-size="9">get_metric_metadata, list_metrics</text>
+      <text x="410" y="430" text-anchor="middle" fill="#9ca3af" font-size="9">execute_query, execute_range_query</text>
+      <text x="410" y="443" text-anchor="middle" fill="#9ca3af" font-size="9">get_metric_metadata, list_metrics</text>
 
       <!-- Grafana MCP -->
-      <rect x="540" y="388" width="200" height="70" rx="10" fill="#fffdf8" stroke="#2d7d8e" stroke-width="1.5"/>
+      <rect x="540" y="388" width="200" height="70" rx="10" fill="#111827" stroke="#2d7d8e" stroke-width="1.5"/>
       <text x="640" y="413" text-anchor="middle" fill="#2d7d8e" font-size="12" font-weight="700">grafana-mcp</text>
-      <text x="640" y="430" text-anchor="middle" fill="#7a6f5f" font-size="9">query_prometheus</text>
-      <text x="640" y="443" text-anchor="middle" fill="#7a6f5f" font-size="9">list_dashboards, get_dashboard</text>
+      <text x="640" y="430" text-anchor="middle" fill="#9ca3af" font-size="9">query_prometheus</text>
+      <text x="640" y="443" text-anchor="middle" fill="#9ca3af" font-size="9">list_dashboards, get_dashboard</text>
 
       <!-- GitHub MCP -->
-      <rect x="770" y="388" width="200" height="70" rx="10" fill="#fffdf8" stroke="#2d7d8e" stroke-width="1.5"/>
+      <rect x="770" y="388" width="200" height="70" rx="10" fill="#111827" stroke="#2d7d8e" stroke-width="1.5"/>
       <text x="870" y="413" text-anchor="middle" fill="#2d7d8e" font-size="12" font-weight="700">github-mcp-remote</text>
-      <text x="870" y="430" text-anchor="middle" fill="#7a6f5f" font-size="9">create_issue, create_pull_request</text>
-      <text x="870" y="443" text-anchor="middle" fill="#7a6f5f" font-size="9">list_branches, read_file</text>
+      <text x="870" y="430" text-anchor="middle" fill="#9ca3af" font-size="9">create_issue, create_pull_request</text>
+      <text x="870" y="443" text-anchor="middle" fill="#9ca3af" font-size="9">list_branches, read_file</text>
 
       <!-- ============ ROW 4: Observability ============ -->
-      <text x="530" y="498" text-anchor="middle" fill="#7a6f5f" font-size="11" font-weight="600" letter-spacing="0.08em">OBSERVABILITY</text>
+      <text x="530" y="498" text-anchor="middle" fill="#9ca3af" font-size="11" font-weight="600" letter-spacing="0.08em">OBSERVABILITY</text>
 
       <!-- OTel Collector -->
-      <rect x="310" y="510" width="200" height="44" rx="8" fill="#fffdf8" stroke="#c9bfae" stroke-width="1"/>
-      <text x="410" y="530" text-anchor="middle" fill="#2c2416" font-size="11" font-weight="600">OTel Collector</text>
-      <text x="410" y="544" text-anchor="middle" fill="#7a6f5f" font-size="9">Langfuse + ClickHouse dual-export</text>
+      <rect x="310" y="510" width="200" height="44" rx="8" fill="#111827" stroke="#374151" stroke-width="1"/>
+      <text x="410" y="530" text-anchor="middle" fill="#f3f4f6" font-size="11" font-weight="600">OTel Collector</text>
+      <text x="410" y="544" text-anchor="middle" fill="#9ca3af" font-size="9">Langfuse + ClickHouse dual-export</text>
 
       <!-- Solo Enterprise UI -->
-      <rect x="540" y="510" width="200" height="44" rx="8" fill="#fffdf8" stroke="#c9bfae" stroke-width="1"/>
-      <text x="640" y="530" text-anchor="middle" fill="#2c2416" font-size="11" font-weight="600">Solo Enterprise UI</text>
-      <text x="640" y="544" text-anchor="middle" fill="#7a6f5f" font-size="9">AgentOps dashboard + traces</text>
+      <rect x="540" y="510" width="200" height="44" rx="8" fill="#111827" stroke="#374151" stroke-width="1"/>
+      <text x="640" y="530" text-anchor="middle" fill="#f3f4f6" font-size="11" font-weight="600">Solo Enterprise UI</text>
+      <text x="640" y="544" text-anchor="middle" fill="#9ca3af" font-size="9">AgentOps dashboard + traces</text>
 
       <!-- Arrow: Agent -> OTel -->
-      <line x1="480" y1="215" x2="410" y2="510" stroke="#c9bfae" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="480" y1="215" x2="410" y2="510" stroke="#374151" stroke-width="1" stroke-dasharray="4,3"/>
 
       <!-- ============ ROW 5: Kubernetes Cluster ============ -->
-      <text x="530" y="590" text-anchor="middle" fill="#7a6f5f" font-size="11" font-weight="600" letter-spacing="0.08em">KUBERNETES CLUSTER &middot; ISTIO AMBIENT MESH</text>
+      <text x="530" y="590" text-anchor="middle" fill="#9ca3af" font-size="11" font-weight="600" letter-spacing="0.08em">KUBERNETES CLUSTER &middot; ISTIO AMBIENT MESH</text>
 
       <!-- Cluster background -->
       <rect x="60" y="602" width="940" height="170" rx="14" fill="none" stroke="#3a7d44" stroke-width="1" stroke-dasharray="8,4"/>
 
       <!-- finance-payments -->
-      <rect x="90" y="622" width="260" height="130" rx="10" fill="#fffdf8" stroke="#3a7d44" stroke-width="1.5"/>
+      <rect x="90" y="622" width="260" height="130" rx="10" fill="#111827" stroke="#3a7d44" stroke-width="1.5"/>
       <text x="220" y="642" text-anchor="middle" fill="#3a7d44" font-size="12" font-weight="700">finance-payments</text>
 
-      <rect x="110" y="654" width="100" height="32" rx="6" fill="#fffdf8" stroke="#c9bfae" stroke-width="1"/>
-      <text x="160" y="674" text-anchor="middle" fill="#2c2416" font-size="10">payment-svc</text>
+      <rect x="110" y="654" width="100" height="32" rx="6" fill="#111827" stroke="#374151" stroke-width="1"/>
+      <text x="160" y="674" text-anchor="middle" fill="#f3f4f6" font-size="10">payment-svc</text>
 
-      <rect x="230" y="654" width="100" height="32" rx="6" fill="#fffdf8" stroke="#c9bfae" stroke-width="1"/>
-      <text x="280" y="674" text-anchor="middle" fill="#2c2416" font-size="10">payment-vs</text>
+      <rect x="230" y="654" width="100" height="32" rx="6" fill="#111827" stroke="#374151" stroke-width="1"/>
+      <text x="280" y="674" text-anchor="middle" fill="#f3f4f6" font-size="10">payment-vs</text>
 
       <!-- Chaos targets -->
       <rect x="110" y="694" width="100" height="24" rx="4" fill="rgba(239,68,68,0.1)" stroke="#b33a3a" stroke-width="1" stroke-dasharray="4,2"/>
@@ -236,15 +236,15 @@
       <text x="280" y="710" text-anchor="middle" fill="#b33a3a" font-size="9">chaos: istio</text>
 
       <!-- risk-management -->
-      <rect x="380" y="622" width="260" height="130" rx="10" fill="#fffdf8" stroke="#3a7d44" stroke-width="1.5"/>
+      <rect x="380" y="622" width="260" height="130" rx="10" fill="#111827" stroke="#3a7d44" stroke-width="1.5"/>
       <text x="510" y="642" text-anchor="middle" fill="#3a7d44" font-size="12" font-weight="700">risk-management</text>
 
-      <rect x="400" y="654" width="90" height="32" rx="6" fill="#fffdf8" stroke="#c9bfae" stroke-width="1"/>
-      <text x="445" y="674" text-anchor="middle" fill="#2c2416" font-size="10">risk-api x3</text>
+      <rect x="400" y="654" width="90" height="32" rx="6" fill="#111827" stroke="#374151" stroke-width="1"/>
+      <text x="445" y="674" text-anchor="middle" fill="#f3f4f6" font-size="10">risk-api x3</text>
 
-      <rect x="510" y="654" width="110" height="32" rx="6" fill="#fffdf8" stroke="#c9bfae" stroke-width="1"/>
-      <text x="565" y="669" text-anchor="middle" fill="#2c2416" font-size="10">market-data</text>
-      <text x="565" y="681" text-anchor="middle" fill="#7a6f5f" font-size="8">stateful + PVC</text>
+      <rect x="510" y="654" width="110" height="32" rx="6" fill="#111827" stroke="#374151" stroke-width="1"/>
+      <text x="565" y="669" text-anchor="middle" fill="#f3f4f6" font-size="10">market-data</text>
+      <text x="565" y="681" text-anchor="middle" fill="#9ca3af" font-size="8">stateful + PVC</text>
 
       <rect x="400" y="694" width="90" height="24" rx="4" fill="rgba(16,185,129,0.1)" stroke="#3a7d44" stroke-width="1"/>
       <text x="445" y="710" text-anchor="middle" fill="#3a7d44" font-size="9">stateless</text>
@@ -253,11 +253,11 @@
       <text x="565" y="710" text-anchor="middle" fill="#c4882f" font-size="9">not migratable</text>
 
       <!-- compliance-ops -->
-      <rect x="670" y="622" width="260" height="130" rx="10" fill="#fffdf8" stroke="#3a7d44" stroke-width="1.5"/>
+      <rect x="670" y="622" width="260" height="130" rx="10" fill="#111827" stroke="#3a7d44" stroke-width="1.5"/>
       <text x="800" y="642" text-anchor="middle" fill="#3a7d44" font-size="12" font-weight="700">compliance-ops</text>
 
-      <rect x="700" y="654" width="120" height="32" rx="6" fill="#fffdf8" stroke="#c9bfae" stroke-width="1"/>
-      <text x="760" y="674" text-anchor="middle" fill="#2c2416" font-size="10">compliance x2</text>
+      <rect x="700" y="654" width="120" height="32" rx="6" fill="#111827" stroke="#374151" stroke-width="1"/>
+      <text x="760" y="674" text-anchor="middle" fill="#f3f4f6" font-size="10">compliance x2</text>
 
       <rect x="700" y="694" width="120" height="24" rx="4" fill="rgba(16,185,129,0.1)" stroke="#3a7d44" stroke-width="1"/>
       <text x="760" y="710" text-anchor="middle" fill="#3a7d44" font-size="9">stateless</text>
