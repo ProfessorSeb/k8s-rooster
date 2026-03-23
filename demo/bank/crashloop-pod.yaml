@@ -1,5 +1,4 @@
-# Scenario 1: Java CrashLoopBackOff — payment-service with OOM stack trace
-# kagent will diagnose the crash, find the NullPointerException + OutOfMemoryError buried in logs.
+# payment-service — runs healthy until chaos.sh swaps the ConfigMap
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -24,22 +23,12 @@ data:
     echo 'INFO  2026-03-25 12:01:07 PaymentProcessor - Starting gRPC server on port 9090'
     echo 'INFO  2026-03-25 12:01:07 PaymentProcessor - Starting HTTP server on port 8080'
     echo 'INFO  2026-03-25 12:01:07 PaymentProcessor - Service ready — processing payments'
-    echo 'INFO  2026-03-25 12:01:08 PaymentProcessor - Processing batch settlement #BT-20260325-001'
-    echo 'INFO  2026-03-25 12:01:08 PaymentProcessor - Batch contains 12,481 transactions (GBP 4.2M)'
-    echo 'WARN  2026-03-25 12:01:09 CacheManager - Heap usage at 78% — approaching threshold'
-    echo 'WARN  2026-03-25 12:01:09 CacheManager - GC pause detected: 1,240ms (exceeds 500ms SLA)'
-    echo 'ERROR 2026-03-25 12:01:10 PaymentProcessor - Exception in thread "main" during batch settlement'
-    echo 'java.lang.NullPointerException: Cannot invoke method getAmount() on null transaction reference'
-    echo '    at com.bank.payments.PaymentProcessor.processPayment(PaymentProcessor.java:314)'
-    echo '    at com.bank.payments.PaymentProcessor.processBatch(PaymentProcessor.java:201)'
-    echo '    at com.bank.payments.PaymentProcessor.run(PaymentProcessor.java:89)'
-    echo '    at java.lang.Thread.run(Thread.java:750)'
-    echo 'Caused by: java.lang.OutOfMemoryError: Java heap space'
-    echo '    at com.bank.payments.TransactionCache.loadAll(TransactionCache.java:201)'
-    echo '    at com.bank.payments.CacheManager.warmCache(CacheManager.java:147)'
-    echo '    at com.bank.payments.PaymentProcessor.initialize(PaymentProcessor.java:52)'
-    echo 'FATAL 2026-03-25 12:01:10 PaymentProcessor - Service shutting down due to unrecoverable error'
-    exit 1
+    echo 'INFO  2026-03-25 12:01:08 PaymentProcessor - Health check: OK'
+    # Stay alive
+    while true; do
+      echo "INFO  $(date '+%Y-%m-%d %H:%M:%S') PaymentProcessor - Heartbeat OK — 0 errors"
+      sleep 30
+    done
 ---
 apiVersion: apps/v1
 kind: Deployment

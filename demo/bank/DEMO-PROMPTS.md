@@ -4,7 +4,22 @@
 
 ---
 
+## Setup (30 min before)
+
+```bash
+./setup.sh apply     # Everything deploys HEALTHY
+./setup.sh status    # Verify all green
+```
+
+---
+
 ## Scenario 1 — Crash Loop Diagnosis (3 min) — THE HOOK
+
+**Inject chaos:**
+```bash
+./chaos.sh crash
+```
+Wait ~15 seconds for CrashLoopBackOff, then ask kagent:
 
 **Prompt:**
 ```
@@ -22,6 +37,8 @@ What would you recommend to fix the OutOfMemoryError? Should we increase the hea
 
 ## Scenario 2 — Migration Candidate Identification (3 min)
 
+> No chaos needed — this uses the healthy workloads
+
 **Prompt:**
 ```
 We're planning a workload migration to a new cluster. Which workloads across all namespaces are stateless and would be safe to migrate first?
@@ -34,13 +51,11 @@ We're planning a workload migration to a new cluster. Which workloads across all
 For risk-api specifically, what dependencies or risks should we be aware of before migrating it?
 ```
 
-**Expected:** Checks resource quota, replicas, ConfigMaps, service dependencies, istio injection status.
-
 ---
 
 ## Scenario 3 — Cluster Capacity Forecasting (2 min)
 
-> Requires Prometheus + kube-state-metrics (deploy prometheus-stack.yaml if not present)
+> No chaos needed — requires Prometheus + kube-state-metrics
 
 **Prompt:**
 ```
@@ -53,6 +68,12 @@ Based on current resource consumption trends, when will this cluster run out of 
 
 ## Scenario 4 — Istio Troubleshooting (3 min)
 
+**Inject chaos:**
+```bash
+./chaos.sh istio
+```
+Then ask kagent:
+
 **Prompt:**
 ```
 The payment-service in finance-payments isn't receiving any traffic through the mesh. Can you check the Istio configuration and find what's wrong?
@@ -64,7 +85,7 @@ The payment-service in finance-payments isn't receiving any traffic through the 
 
 ## Scenario 5 — Extensibility Teaser (2 min)
 
-> Narrate this while showing kagent agent config screen. No live API call needed.
+> Narrate while showing kagent agent config screen. No live demo needed.
 
 **Talking points:**
 - "kagent supports custom MCP tool servers — we can wire any internal API"
@@ -74,20 +95,27 @@ The payment-service in finance-payments isn't receiving any traffic through the 
 
 ---
 
-## Pre-Demo Checklist (30 min before)
+## Quick Reference
 
-- [ ] `./setup.sh apply` — deploy everything
-- [ ] `./setup.sh status` — verify all green
-- [ ] payment-service is in CrashLoopBackOff with restarts > 2
-- [ ] bank-platform-agent shows up in kagent UI
-- [ ] prometheus-mcp-server pod is Running in kagent namespace
+| Command | What it does |
+|---------|-------------|
+| `./setup.sh apply` | Deploy everything healthy |
+| `./setup.sh status` | Check all pods/agents/tools |
+| `./chaos.sh crash` | Break payment-service (Java OOM) |
+| `./chaos.sh istio` | Break VirtualService routing |
+| `./chaos.sh all` | Both at once |
+| `./chaos.sh reset` | Restore healthy state |
+| `./setup.sh delete` | Tear down everything |
+
+---
+
+## Pre-Demo Checklist
+
+- [ ] `./setup.sh apply` — deploy everything healthy
+- [ ] `./setup.sh status` — all pods Running, agent registered
+- [ ] bank-platform-agent shows in kagent UI
+- [ ] prometheus-mcp-server pod Running in kagent namespace
 - [ ] kagent UI accessible and responsive
-- [ ] Run Scenario 1 prompt once to warm up / verify output
+- [ ] Dry-run: `./chaos.sh crash` → test Scenario 1 prompt → `./chaos.sh reset`
 - [ ] Observability dashboard shows agent traces
 - [ ] Close unnecessary browser tabs / notifications
-
-## Teardown
-
-```bash
-./setup.sh delete
-```

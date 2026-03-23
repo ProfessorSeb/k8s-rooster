@@ -1,6 +1,6 @@
 #!/bin/bash
 # kagent Bank Demo Environment Setup
-# Run this 30 minutes before the demo call.
+# Deploys everything in a HEALTHY state. Use chaos.sh to inject failures.
 #
 # Usage: ./setup.sh [apply|delete|status]
 
@@ -46,18 +46,18 @@ check_prerequisites() {
 }
 
 apply_demo() {
-    info "Deploying bank demo environment..."
+    info "Deploying bank demo environment (healthy state)..."
 
     # 1. Namespaces first
     kubectl apply -f "$SCRIPT_DIR/namespaces.yaml"
     info "Namespaces created"
 
-    # 2. Demo workloads
+    # 2. Demo workloads — all healthy
     kubectl apply -f "$SCRIPT_DIR/resource-quotas.yaml"
     kubectl apply -f "$SCRIPT_DIR/crashloop-pod.yaml"
     kubectl apply -f "$SCRIPT_DIR/stateless-workloads.yaml"
     kubectl apply -f "$SCRIPT_DIR/istio-virtualservice.yaml" 2>/dev/null || warn "Istio CRDs not found — VirtualService not created (Scenario 4 needs Istio)"
-    info "Demo workloads deployed"
+    info "Demo workloads deployed (all healthy)"
 
     # 3. Prometheus MCP server + RemoteMCPServer CR
     kubectl apply -f "$SCRIPT_DIR/prometheus-mcp-server.yaml"
@@ -68,11 +68,15 @@ apply_demo() {
     kubectl apply -f "$SCRIPT_DIR/bank-platform-agent.yaml"
     info "bank-platform-agent deployed"
 
-    # 5. Wait for crashloop to start cycling
-    info "Waiting for payment-service to enter CrashLoopBackOff..."
-    sleep 15
+    # 5. Wait for pods to settle
+    info "Waiting for pods to start..."
+    sleep 10
 
     check_status
+
+    echo ""
+    info "Environment is healthy and ready."
+    info "When you're ready to demo, run: ./chaos.sh crash|istio|all"
 }
 
 check_status() {
@@ -116,12 +120,12 @@ check_status() {
     kubectl get resourcequota -A -l demo=bank 2>/dev/null || true
     echo ""
 
-    # Verify crashloop is happening
-    RESTART_COUNT=$(kubectl get pod -n finance-payments -l app=payment-service -o jsonpath='{.items[0].status.containerStatuses[0].restartCount}' 2>/dev/null || echo "0")
-    if [ "$RESTART_COUNT" -gt 0 ]; then
-        info "payment-service is crash-looping (restarts: $RESTART_COUNT) — ready for Scenario 1"
+    # Check pod health
+    UNHEALTHY=$(kubectl get pods -n finance-payments -o jsonpath='{.items[?(@.status.phase!="Running")].metadata.name}' 2>/dev/null)
+    if [ -z "$UNHEALTHY" ]; then
+        info "All finance-payments pods are healthy"
     else
-        warn "payment-service has not restarted yet — give it a minute"
+        warn "Unhealthy pods: $UNHEALTHY"
     fi
 
     # Verify bank-platform-agent exists

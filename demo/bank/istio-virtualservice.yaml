@@ -1,6 +1,5 @@
-# Scenario 4: Misconfigured Istio VirtualService
-# Routes to payment-svc-v2 which does NOT exist as a k8s Service.
-# kagent will find this mismatch and flag it as root cause.
+# payment-service Service + VirtualService — starts HEALTHY
+# chaos.sh will swap the destination to a non-existent host
 apiVersion: v1
 kind: Service
 metadata:
@@ -27,6 +26,6 @@ spec:
   http:
   - route:
     - destination:
-        host: payment-svc-v2
+        host: payment-service
         port:
           number: 8080
