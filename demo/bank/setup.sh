@@ -56,6 +56,7 @@ apply_demo() {
     kubectl apply -f "$SCRIPT_DIR/resource-quotas.yaml"
     kubectl apply -f "$SCRIPT_DIR/crashloop-pod.yaml"
     kubectl apply -f "$SCRIPT_DIR/stateless-workloads.yaml"
+    kubectl apply -f "$SCRIPT_DIR/khook-workload.yaml"
     kubectl apply -f "$SCRIPT_DIR/istio-virtualservice.yaml" 2>/dev/null || warn "Istio CRDs not found — VirtualService not created (Scenario 4 needs Istio)"
     info "Demo workloads deployed (all healthy)"
 
@@ -68,7 +69,11 @@ apply_demo() {
     kubectl apply -f "$SCRIPT_DIR/bank-platform-agent.yaml"
     info "bank-platform-agent deployed"
 
-    # 5. Wait for pods to settle
+    # 5. khook Hook — auto-triggers agent on pod-restart events in compliance-ops
+    kubectl apply -f "$SCRIPT_DIR/khook-hook.yaml" 2>/dev/null || warn "Hook CRD not found — install khook first (ArgoCD syncs kagent/khook-*-application.yaml)"
+    info "khook Hook deployed (watches compliance-ops for pod-restart events)"
+
+    # 6. Wait for pods to settle
     info "Waiting for pods to start..."
     sleep 10
 
@@ -116,6 +121,10 @@ check_status() {
     kubectl get virtualservices -n finance-payments 2>/dev/null || warn "No VirtualServices (Istio CRDs may not be installed)"
     echo ""
 
+    info "--- khook Hooks ---"
+    kubectl get hooks -n compliance-ops 2>/dev/null || warn "No Hooks (khook CRDs may not be installed)"
+    echo ""
+
     info "--- Resource Quotas ---"
     kubectl get resourcequota -A -l demo=bank 2>/dev/null || true
     echo ""
@@ -138,10 +147,12 @@ check_status() {
 
 delete_demo() {
     warn "Tearing down bank demo environment..."
+    kubectl delete -f "$SCRIPT_DIR/khook-hook.yaml" --ignore-not-found
     kubectl delete -f "$SCRIPT_DIR/bank-platform-agent.yaml" --ignore-not-found
     kubectl delete -f "$SCRIPT_DIR/prometheus-mcp-remote.yaml" --ignore-not-found
     kubectl delete -f "$SCRIPT_DIR/prometheus-mcp-server.yaml" --ignore-not-found
     kubectl delete -f "$SCRIPT_DIR/istio-virtualservice.yaml" --ignore-not-found
+    kubectl delete -f "$SCRIPT_DIR/khook-workload.yaml" --ignore-not-found
     kubectl delete -f "$SCRIPT_DIR/stateless-workloads.yaml" --ignore-not-found
     kubectl delete -f "$SCRIPT_DIR/crashloop-pod.yaml" --ignore-not-found
     kubectl delete -f "$SCRIPT_DIR/resource-quotas.yaml" --ignore-not-found

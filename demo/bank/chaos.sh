@@ -7,7 +7,8 @@
 # Usage:
 #   ./chaos.sh crash        # Scenario 1: Java OOM crashloop
 #   ./chaos.sh istio        # Scenario 4: Broken VirtualService
-#   ./chaos.sh all          # Both at once
+#   ./chaos.sh khook        # Scenario 6: Break compliance-report-generator (khook auto-responds)
+#   ./chaos.sh all          # All chaos at once
 #   ./chaos.sh reset        # Restore everything to healthy
 
 set -euo pipefail
@@ -103,6 +104,49 @@ YAML
     prompt "Ask kagent: \"The payment-service in finance-payments isn't receiving any traffic through the mesh. Can you check the Istio configuration and find what's wrong?\""
 }
 
+inject_khook() {
+    chaos "Injecting database connection failure into compliance-report-generator..."
+
+    # Swap ConfigMap to the crashing version — DB connection timeout
+    kubectl apply -n compliance-ops -f - <<'YAML'
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: compliance-report-config
+  namespace: compliance-ops
+data:
+  startup.sh: |
+    #!/bin/sh
+    echo 'INFO  2026-03-23 09:00:01 ReportGenerator - Compliance Report Generator v2.1.0 starting'
+    echo 'INFO  2026-03-23 09:00:01 ReportGenerator - Environment: prod-cluster-uk-east'
+    echo 'INFO  2026-03-23 09:00:02 HikariPool - Initializing connection pool (min=2, max=10)'
+    echo 'WARN  2026-03-23 09:00:32 HikariPool - Connection attempt 1/3 timed out after 30000ms'
+    echo 'WARN  2026-03-23 09:01:02 HikariPool - Connection attempt 2/3 timed out after 30000ms'
+    echo 'ERROR 2026-03-23 09:01:32 HikariPool - Connection attempt 3/3 failed — pool exhausted'
+    echo 'ERROR 2026-03-23 09:01:32 ReportGenerator - Failed to connect to regulatory-db.compliance-ops.svc:5432'
+    echo 'java.sql.SQLTransientConnectionException: HikariPool-1 - Connection not available, request timed out after 30000ms'
+    echo '    at com.zaxxer.hikari.pool.HikariPool.createTimeoutException(HikariPool.java:696)'
+    echo '    at com.zaxxer.hikari.pool.HikariPool.getConnection(HikariPool.java:197)'
+    echo '    at com.bank.compliance.db.RegulationDAO.query(RegulationDAO.java:84)'
+    echo '    at com.bank.compliance.ReportGenerator.loadDataset(ReportGenerator.java:187)'
+    echo '    at com.bank.compliance.ReportGenerator.init(ReportGenerator.java:63)'
+    echo '    at java.lang.Thread.run(Thread.java:750)'
+    echo 'Caused by: org.postgresql.util.PSQLException: Connection to regulatory-db.compliance-ops.svc:5432 refused'
+    echo '    at org.postgresql.core.v3.ConnectionFactoryImpl.openConnectionImpl(ConnectionFactoryImpl.java:319)'
+    echo '    at org.postgresql.core.ConnectionFactory.openConnection(ConnectionFactory.java:49)'
+    echo '    at org.postgresql.jdbc.PgConnection.<init>(PgConnection.java:247)'
+    echo 'FATAL 2026-03-23 09:01:32 ReportGenerator - Cannot generate compliance reports without database access'
+    echo 'FATAL 2026-03-23 09:01:32 ReportGenerator - Shutting down — MiFID II reporting SLA at risk'
+    exit 1
+YAML
+
+    # Restart to pick up broken ConfigMap
+    kubectl rollout restart deployment/compliance-report-generator -n compliance-ops
+    chaos "compliance-report-generator will enter CrashLoopBackOff in ~15 seconds"
+    chaos "khook will auto-detect the pod-restart event and trigger bank-platform-agent"
+    prompt "Watch the kagent UI — the agent will start diagnosing automatically (no human prompt needed)"
+}
+
 reset_all() {
     info "Restoring healthy state..."
 
@@ -112,6 +156,10 @@ reset_all() {
 
     # Restore correct VirtualService
     kubectl apply -f "$SCRIPT_DIR/istio-virtualservice.yaml" 2>/dev/null || true
+
+    # Restore healthy compliance-report-generator
+    kubectl apply -f "$SCRIPT_DIR/khook-workload.yaml"
+    kubectl rollout restart deployment/compliance-report-generator -n compliance-ops
 
     info "All workloads restored to healthy state"
 }
@@ -123,10 +171,15 @@ case "${ACTION}" in
     istio)
         inject_istio
         ;;
+    khook)
+        inject_khook
+        ;;
     all)
         inject_crash
         echo ""
         inject_istio
+        echo ""
+        inject_khook
         ;;
     reset|restore|fix)
         reset_all
@@ -136,6 +189,7 @@ case "${ACTION}" in
         echo ""
         echo "  crash   Inject Java OOM crashloop into payment-service"
         echo "  istio   Break VirtualService routing to non-existent service"
+        echo "  khook   Break compliance-report-generator (khook auto-responds)"
         echo "  all     Inject all chaos at once"
         echo "  reset   Restore everything to healthy"
         exit 1

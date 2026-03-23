@@ -1,0 +1,42 @@
+apiVersion: kagent.dev/v1alpha2
+kind: Hook
+metadata:
+  name: bank-incident-responder
+  namespace: compliance-ops
+spec:
+  eventConfigurations:
+  # Auto-diagnose pod restarts — triggered when compliance-report-generator crashes
+  - eventType: pod-restart
+    agentId: kagent/bank-platform-agent
+    prompt: |
+      AUTOMATED INCIDENT ALERT — khook detected a pod restart.
+
+      Pod {{.ResourceName}} in the compliance-ops namespace restarted at {{.EventTime}}.
+      No human initiated this request — this is an autonomous incident response.
+
+      Perform a full diagnosis:
+      1. Get all pods in the compliance-ops namespace and identify the unhealthy one
+      2. Get pod events to find the restart reason
+      3. Read the COMPLETE pod logs — scan through ALL output carefully
+      4. Look for root causes in stack traces:
+         - Database connection failures (HikariPool timeouts, SQLTransientConnectionException)
+         - Java exceptions or application errors
+      5. Identify the specific error class and code location from stack traces
+      6. Check if there are any related services or dependencies that might be down
+
+      End with a clear "Root Cause" and "Recommended Fix" section.
+      This is a READ-ONLY diagnosis — do not make any changes.
+
+  # Auto-respond to OOM kills in the namespace
+  - eventType: oom-kill
+    agentId: kagent/bank-platform-agent
+    prompt: |
+      CRITICAL AUTOMATED INCIDENT: Pod {{.ResourceName}} was OOM-killed at {{.EventTime}}.
+
+      Analyze memory usage for this workload:
+      1. Check current resource limits and requests
+      2. Query Prometheus for container memory usage trends if available
+      3. Determine if this is a memory leak or insufficient limits
+      4. Recommend specific resource limit adjustments
+
+      End with a clear "Root Cause" and "Recommended Fix" section.

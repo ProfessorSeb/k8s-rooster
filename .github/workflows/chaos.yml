@@ -10,6 +10,7 @@ on:
         options:
           - crash
           - istio
+          - khook
           - all
           - reset
           - status

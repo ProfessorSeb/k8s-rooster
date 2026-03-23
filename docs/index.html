@@ -591,6 +591,24 @@
           </div>
         </div>
 
+        <div class="scenario">
+          <div class="scenario-num">6</div>
+          <div class="scenario-body">
+            <h3>Autonomous Incident Response with khook &nbsp;<span class="tag tag-red">chaos.sh khook</span></h3>
+            <p><a href="https://github.com/kagent-dev/khook">khook</a> is a Kubernetes controller that watches cluster events and auto-triggers kagent agents — no human prompt needed. A <code>Hook</code> CR in <code>compliance-ops</code> watches for pod-restart events. When <code>chaos.sh khook</code> breaks the compliance-report-generator (database connection failure), khook detects the restart, creates a kagent session via A2A, and the bank-platform-agent diagnoses the crash autonomously.</p>
+            <div class="code-block" style="margin-bottom: 10px;">
+              <span class="comment"># No human prompt — khook auto-triggers the agent</span><br>
+              <span class="prompt">$</span> <span class="cmd">./chaos.sh khook</span><br>
+              <span class="comment"># Watch kagent UI — agent starts diagnosing within seconds</span>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 10px; font-size: 0.8rem;">
+              <span class="tag tag-cyan">event-driven</span>
+              <span class="tag tag-green">autonomous</span>
+              <span class="tag tag-yellow">A2A protocol</span>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
@@ -620,6 +638,7 @@
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
           <button onclick="triggerChaos('crash')" class="chaos-btn chaos-btn-red">Crash Loop</button>
           <button onclick="triggerChaos('istio')" class="chaos-btn chaos-btn-red">Break Istio</button>
+          <button onclick="triggerChaos('khook')" class="chaos-btn chaos-btn-red">khook</button>
           <button onclick="triggerChaos('all')" class="chaos-btn chaos-btn-red">All Chaos</button>
           <button onclick="triggerChaos('reset')" class="chaos-btn chaos-btn-green">Reset</button>
           <button onclick="triggerChaos('status')" class="chaos-btn chaos-btn-cyan">Status</button>
@@ -690,6 +709,19 @@
                   </div>
                 </div>
               </div>
+              <div class="pod-row">
+                <div class="pod-box">
+                  <div class="pod-dot healthy" id="dot-report-gen"></div>
+                  <div>
+                    <div class="pod-name">compliance-report-generator</div>
+                    <div class="pod-status healthy" id="status-report-gen">1/1 Running</div>
+                  </div>
+                </div>
+              </div>
+              <div id="khook-indicator" style="margin-top: 10px; padding: 6px 10px; border-radius: 6px; font-size: 0.7rem; font-family: 'SF Mono', monospace; background: rgba(99, 102, 241, 0.06); border: 1px solid rgba(99, 102, 241, 0.15); color: var(--text-muted); display: flex; align-items: center; gap: 6px; transition: all 0.3s;">
+                <span style="font-size: 0.8rem;">&#x1f514;</span>
+                <span id="khook-label">khook watching &middot; idle</span>
+              </div>
             </div>
           </div>
 
@@ -705,6 +737,10 @@
             <div class="viz-legend-item">
               <div class="viz-legend-dot" style="background: var(--yellow);"></div>
               <span>VirtualService</span>
+            </div>
+            <div class="viz-legend-item">
+              <div class="viz-legend-dot" style="background: var(--accent-light);"></div>
+              <span>khook Hook</span>
             </div>
           </div>
         </div>
@@ -737,6 +773,9 @@
 <div class="line"></div>
 <div class="line"><span class="muted"># Inject chaos for Scenario 4 (broken Istio routing)</span></div>
 <div class="line"><span class="red">$</span> ./chaos.sh istio</div>
+<div class="line"></div>
+<div class="line"><span class="muted"># Inject chaos for Scenario 6 (khook auto-response)</span></div>
+<div class="line"><span class="red">$</span> ./chaos.sh khook</div>
 <div class="line"></div>
 <div class="line"><span class="muted"># Inject all chaos at once</span></div>
 <div class="line"><span class="red">$</span> ./chaos.sh all</div>
@@ -774,8 +813,12 @@
             <td>Patch VirtualService to route to non-existent <code>payment-svc-v2</code></td>
           </tr>
           <tr>
+            <td><code>./chaos.sh khook</code></td>
+            <td>Break compliance-report-generator — khook auto-triggers agent diagnosis</td>
+          </tr>
+          <tr>
             <td><code>./chaos.sh all</code></td>
-            <td>Inject both crash + Istio failures at once</td>
+            <td>Inject crash + Istio + khook failures at once</td>
           </tr>
           <tr>
             <td><code>./chaos.sh reset</code></td>
@@ -817,13 +860,13 @@
           </tr>
           <tr>
             <td><code>compliance-ops</code></td>
-            <td>compliance-batch (stateless)</td>
-            <td>Migration candidate identification</td>
+            <td>compliance-batch, compliance-report-generator, khook Hook</td>
+            <td>Migration candidates + khook auto-response target</td>
           </tr>
           <tr>
             <td><code>kagent</code></td>
-            <td>bank-platform-agent, prometheus-mcp-server</td>
-            <td>AI agent + Prometheus tool server</td>
+            <td>bank-platform-agent, prometheus-mcp-server, khook controller</td>
+            <td>AI agent + Prometheus tool server + event watcher</td>
           </tr>
           <tr>
             <td><code>monitoring</code></td>
@@ -850,22 +893,25 @@
     const WORKFLOW = 'chaos.yml';
 
     /* ── Cluster Visualization State ── */
-    function setVizState(state) {
-      // state: 'healthy' | 'crash' | 'istio' | 'all'
-      const crashOn = (state === 'crash' || state === 'all');
-      const istioOn = (state === 'istio' || state === 'all');
+    // Track individual chaos states so they stack independently
+    var vizState = { crash: false, istio: false, khook: false };
+
+    function applyVizState() {
+      var crashOn = vizState.crash;
+      var istioOn = vizState.istio;
+      var khookOn = vizState.khook;
 
       // payment-service pod
-      const dotPay = document.getElementById('dot-payment');
-      const stPay = document.getElementById('status-payment');
-      const nsFin = document.getElementById('ns-finance');
+      var dotPay = document.getElementById('dot-payment');
+      var stPay = document.getElementById('status-payment');
+      var nsFin = document.getElementById('ns-finance');
       dotPay.className = 'pod-dot ' + (crashOn ? 'error' : 'healthy');
       stPay.className = 'pod-status ' + (crashOn ? 'error' : 'healthy');
       stPay.textContent = crashOn ? 'CrashLoopBackOff' : 'Running';
 
       // VirtualService
-      const vsInd = document.getElementById('vs-payment');
-      const vsTgt = document.getElementById('vs-payment-target');
+      var vsInd = document.getElementById('vs-payment');
+      var vsTgt = document.getElementById('vs-payment-target');
       vsInd.className = 'vs-indicator ' + (istioOn ? 'error' : 'healthy');
       vsTgt.innerHTML = istioOn
         ? 'VirtualService \u2192 <strong>payment-svc-v2 NOT FOUND</strong>'
@@ -873,6 +919,30 @@
 
       // finance namespace card border
       nsFin.className = 'ns-card' + ((crashOn || istioOn) ? ' has-error' : '');
+
+      // compliance-report-generator pod
+      var dotRG = document.getElementById('dot-report-gen');
+      var stRG = document.getElementById('status-report-gen');
+      var nsComp = document.getElementById('ns-compliance');
+      dotRG.className = 'pod-dot ' + (khookOn ? 'error' : 'healthy');
+      stRG.className = 'pod-status ' + (khookOn ? 'error' : 'healthy');
+      stRG.textContent = khookOn ? 'CrashLoopBackOff' : '1/1 Running';
+      nsComp.className = 'ns-card' + (khookOn ? ' has-error' : '');
+
+      // khook indicator
+      var khookInd = document.getElementById('khook-indicator');
+      var khookLabel = document.getElementById('khook-label');
+      if (khookOn) {
+        khookInd.style.background = 'rgba(239, 68, 68, 0.08)';
+        khookInd.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+        khookInd.style.color = '#ef4444';
+        khookLabel.innerHTML = 'khook FIRING \u2192 bank-platform-agent auto-diagnosing';
+      } else {
+        khookInd.style.background = 'rgba(99, 102, 241, 0.06)';
+        khookInd.style.borderColor = 'rgba(99, 102, 241, 0.15)';
+        khookInd.style.color = '#9ca3af';
+        khookLabel.innerHTML = 'khook watching &middot; idle';
+      }
     }
 
     /* ── Chaos Trigger ── */
@@ -926,16 +996,12 @@
           linkEl.style.display = 'inline';
 
           // Update cluster visualization
-          if (action === 'crash' || action === 'istio' || action === 'all') {
-            // Merge with current state
-            const cur = document.getElementById('dot-payment').classList.contains('error') ? 'crash' : 'healthy';
-            const curIstio = document.getElementById('vs-payment').classList.contains('error');
-            if (action === 'crash') setVizState(curIstio ? 'all' : 'crash');
-            else if (action === 'istio') setVizState(cur === 'crash' ? 'all' : 'istio');
-            else setVizState('all');
-          } else if (action === 'reset') {
-            setVizState('healthy');
-          }
+          if (action === 'crash') { vizState.crash = true; }
+          else if (action === 'istio') { vizState.istio = true; }
+          else if (action === 'khook') { vizState.khook = true; }
+          else if (action === 'all') { vizState.crash = true; vizState.istio = true; vizState.khook = true; }
+          else if (action === 'reset') { vizState.crash = false; vizState.istio = false; vizState.khook = false; }
+          applyVizState();
         } else if (resp.status === 401 || resp.status === 403) {
           msgEl.style.color = '#ef4444';
           msgEl.textContent = 'Auth failed — check your PAT has repo scope.';

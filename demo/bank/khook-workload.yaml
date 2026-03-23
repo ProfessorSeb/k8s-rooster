@@ -1,0 +1,68 @@
+# Compliance Report Generator — HEALTHY version
+# khook watches this workload for pod-restart events.
+# Use ./chaos.sh khook to inject a database connection failure.
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: compliance-report-config
+  namespace: compliance-ops
+data:
+  startup.sh: |
+    #!/bin/sh
+    echo 'INFO  2026-03-23 09:00:01 ReportGenerator - Compliance Report Generator v2.1.0 starting'
+    echo 'INFO  2026-03-23 09:00:01 ReportGenerator - Environment: prod-cluster-uk-east'
+    echo 'INFO  2026-03-23 09:00:02 HikariPool - Initializing connection pool (min=2, max=10)'
+    echo 'INFO  2026-03-23 09:00:02 HikariPool - Pool ready — 2 connections established'
+    echo 'INFO  2026-03-23 09:00:03 ReportGenerator - Connected to regulatory database'
+    echo 'INFO  2026-03-23 09:00:03 ReportGenerator - Report generator ready — awaiting schedule trigger'
+    while true; do
+      echo "INFO  $(date +%Y-%m-%d\ %H:%M:%S) ReportGenerator - Heartbeat — idle"
+      sleep 30
+    done
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: compliance-report-generator
+  namespace: compliance-ops
+  labels:
+    app: compliance-report-generator
+    demo: bank
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: compliance-report-generator
+  template:
+    metadata:
+      labels:
+        app: compliance-report-generator
+    spec:
+      containers:
+      - name: report-gen
+        image: busybox:1.36
+        command: ["/bin/sh", "/config/startup.sh"]
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "50m"
+          limits:
+            memory: "64Mi"
+            cpu: "100m"
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          seccompProfile:
+            type: RuntimeDefault
+      volumes:
+      - name: config
+        configMap:
+          name: compliance-report-config
+          defaultMode: 0755
