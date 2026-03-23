@@ -73,6 +73,12 @@ apply_demo() {
     kubectl apply -f "$SCRIPT_DIR/khook-hook.yaml" 2>/dev/null || warn "Hook CRD not found — install khook first (ArgoCD syncs kagent/khook-*-application.yaml)"
     info "khook Hook deployed (watches compliance-ops for pod-restart events)"
 
+    # 6. Slack A2A bot + MCP + agent
+    kubectl apply -f "$SCRIPT_DIR/slack-mcp.yaml" 2>/dev/null || warn "MCPServer CRD not found — ensure kagent is deployed with kmcp enabled"
+    kubectl apply -f "$SCRIPT_DIR/slack-agent.yaml"
+    kubectl apply -f "$SCRIPT_DIR/slack-bot-deployment.yaml"
+    info "Slack bot deployed (slackbot-k8s-agent + slack-mcp + A2A bridge)"
+
     # 6. Wait for pods to settle
     info "Waiting for pods to start..."
     sleep 10
@@ -125,6 +131,11 @@ check_status() {
     kubectl get hooks -n compliance-ops 2>/dev/null || warn "No Hooks (khook CRDs may not be installed)"
     echo ""
 
+    info "--- Slack Bot ---"
+    kubectl get pods -n kagent -l app=kagent-slack-bot 2>/dev/null || true
+    kubectl get mcpservers -n kagent 2>/dev/null || true
+    echo ""
+
     info "--- Resource Quotas ---"
     kubectl get resourcequota -A -l demo=bank 2>/dev/null || true
     echo ""
@@ -147,6 +158,9 @@ check_status() {
 
 delete_demo() {
     warn "Tearing down bank demo environment..."
+    kubectl delete -f "$SCRIPT_DIR/slack-bot-deployment.yaml" --ignore-not-found
+    kubectl delete -f "$SCRIPT_DIR/slack-agent.yaml" --ignore-not-found
+    kubectl delete -f "$SCRIPT_DIR/slack-mcp.yaml" --ignore-not-found
     kubectl delete -f "$SCRIPT_DIR/khook-hook.yaml" --ignore-not-found
     kubectl delete -f "$SCRIPT_DIR/bank-platform-agent.yaml" --ignore-not-found
     kubectl delete -f "$SCRIPT_DIR/prometheus-mcp-remote.yaml" --ignore-not-found

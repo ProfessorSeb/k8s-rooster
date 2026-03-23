@@ -5,6 +5,7 @@ resources:
   - cluster-secret-store.yaml
   - agentgateway-secrets.yaml
   - kagent-secrets.yaml
+  - slack-secrets.yaml
 
 commonLabels:
   app.kubernetes.io/name: vault-external-secrets

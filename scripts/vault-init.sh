@@ -17,7 +17,11 @@
 #     "anthropic_api_key": "sk-ant-...",
 #     "openai_api_key": "sk-...",
 #     "xai_api_key": "xai-...",
-#     "github_pat": "ghp_..."
+#     "github_pat": "ghp_...",
+#     "slack_bot_token": "xoxb-...",
+#     "slack_app_token": "xapp-...",
+#     "slack_channel_ids": "C0...",
+#     "slack_team_id": "T..."
 #   }
 #
 # Usage:
@@ -44,7 +48,11 @@ if [[ ! -f "$SECRETS_FILE" ]]; then
   echo '    "anthropic_api_key": "sk-ant-...",'
   echo '    "openai_api_key": "sk-...",'
   echo '    "xai_api_key": "xai-...",'
-  echo '    "github_pat": "ghp_..."'
+  echo '    "github_pat": "ghp_...",'
+  echo '    "slack_bot_token": "xoxb-...",'
+  echo '    "slack_app_token": "xapp-...",'
+  echo '    "slack_channel_ids": "C0...",'
+  echo '    "slack_team_id": "T..."'
   echo '  }'
   echo '  EOF'
   echo ""
@@ -59,6 +67,10 @@ ANTHROPIC_API_KEY=$(jq -r '.anthropic_api_key' "$SECRETS_FILE")
 OPENAI_API_KEY=$(jq -r '.openai_api_key' "$SECRETS_FILE")
 XAI_API_KEY=$(jq -r '.xai_api_key' "$SECRETS_FILE")
 GITHUB_PAT=$(jq -r '.github_pat' "$SECRETS_FILE")
+SLACK_BOT_TOKEN=$(jq -r '.slack_bot_token // empty' "$SECRETS_FILE")
+SLACK_APP_TOKEN=$(jq -r '.slack_app_token // empty' "$SECRETS_FILE")
+SLACK_CHANNEL_IDS=$(jq -r '.slack_channel_ids // empty' "$SECRETS_FILE")
+SLACK_TEAM_ID=$(jq -r '.slack_team_id // empty' "$SECRETS_FILE")
 
 # Validate all secrets are present
 for var in F5_HOST F5_USERNAME F5_PASSWORD ANTHROPIC_API_KEY OPENAI_API_KEY XAI_API_KEY GITHUB_PAT; do
@@ -145,15 +157,30 @@ kubectl -n "$VAULT_NS" exec "$VAULT_POD" -- \
 echo "  LLM provider API keys stored."
 
 # ── Write GitHub PAT ──────────────────────────────────────────────────────────
-echo "[7/8] Writing GitHub PAT to secret/data/github..."
+echo "[7/9] Writing GitHub PAT to secret/data/github..."
 kubectl -n "$VAULT_NS" exec "$VAULT_POD" -- \
   env VAULT_TOKEN="$ROOT_TOKEN" \
   vault kv put secret/github \
     personal-access-token="$GITHUB_PAT"
 echo "  GitHub PAT stored."
 
+# ── Write Slack credentials (optional) ────────────────────────────────────────
+echo "[8/9] Writing Slack credentials to secret/data/slack..."
+if [[ -n "$SLACK_BOT_TOKEN" && -n "$SLACK_APP_TOKEN" ]]; then
+  kubectl -n "$VAULT_NS" exec "$VAULT_POD" -- \
+    env VAULT_TOKEN="$ROOT_TOKEN" \
+    vault kv put secret/slack \
+      SLACK_BOT_TOKEN="$SLACK_BOT_TOKEN" \
+      SLACK_APP_TOKEN="$SLACK_APP_TOKEN" \
+      SLACK_CHANNEL_IDS="${SLACK_CHANNEL_IDS:-}" \
+      SLACK_TEAM_ID="${SLACK_TEAM_ID:-}"
+  echo "  Slack credentials stored."
+else
+  echo "  Skipped — slack_bot_token / slack_app_token not in secrets file."
+fi
+
 # ── Create Vault token secret for External Secrets Operator ──────────────────
-echo "[8/8] Creating Vault token K8s secret for External Secrets Operator..."
+echo "[9/9] Creating Vault token K8s secret for External Secrets Operator..."
 kubectl create namespace "$ESO_NS" 2>/dev/null || true
 kubectl -n "$ESO_NS" create secret generic vault-token \
   --from-literal=token="$ROOT_TOKEN" \
@@ -170,7 +197,8 @@ echo ""
 echo " Secrets stored:"
 echo "   - secret/data/f5/bigip    (host, username, password)"
 echo "   - secret/data/llm         (anthropic-api-key, openai-api-key, xai-api-key)"
-echo "   - secret/data/github     (personal-access-token)"
+echo "   - secret/data/github      (personal-access-token)"
+echo "   - secret/data/slack       (SLACK_BOT_TOKEN, SLACK_APP_TOKEN, SLACK_CHANNEL_IDS, SLACK_TEAM_ID)"
 echo ""
 echo " External Secrets Operator will sync these to K8s secrets"
 echo " in agentgateway-system and kagent namespaces."
