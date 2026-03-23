@@ -50,10 +50,19 @@ spec:
         app: payment-service
         version: v3.2.1
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: payment-service
         image: busybox
         command: ["/bin/sh", "/app/startup.sh"]
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         volumeMounts:
         - name: scripts
           mountPath: /app
@@ -63,6 +72,7 @@ spec:
             cpu: "50m"
           limits:
             memory: "64Mi"
+            cpu: "100m"
       volumes:
       - name: scripts
         configMap:

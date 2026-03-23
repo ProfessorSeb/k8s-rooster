@@ -23,11 +23,20 @@ spec:
         app: risk-api
         istio.io/inject: "enabled"
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: risk-api
-        image: nginx:1.25-alpine
+        image: nginxinc/nginx-unprivileged:1.25-alpine
         ports:
         - containerPort: 8080
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         resources:
           requests:
             memory: "128Mi"
@@ -88,11 +97,20 @@ spec:
       labels:
         app: market-data-store
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: market-data-store
         image: redis:7-alpine
         ports:
         - containerPort: 6379
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         volumeMounts:
         - name: data
           mountPath: /data
@@ -128,11 +146,20 @@ spec:
       labels:
         app: compliance-batch
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: compliance-batch
-        image: nginx:1.25-alpine
+        image: nginxinc/nginx-unprivileged:1.25-alpine
         ports:
         - containerPort: 8080
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         resources:
           requests:
             memory: "64Mi"
