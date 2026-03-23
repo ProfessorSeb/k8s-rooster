@@ -322,9 +322,123 @@
     }
     .chaos-btn-cyan:hover { background: rgba(6, 182, 212, 0.2); }
 
+    /* Cluster Viz */
+    .cluster-viz-title {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 16px;
+      font-weight: 600;
+    }
+    .ns-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+    }
+    .ns-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      transition: border-color 0.3s;
+    }
+    .ns-card.has-error { border-color: rgba(239, 68, 68, 0.5); }
+    .ns-header {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .pod-row { margin-bottom: 10px; }
+    .pod-row:last-child { margin-bottom: 0; }
+    .pod-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .pod-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .pod-dot.healthy {
+      background: var(--green);
+      box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+    }
+    .pod-dot.error {
+      background: var(--red);
+      box-shadow: 0 0 6px rgba(239, 68, 68, 0.5);
+      animation: pulse-red 1.5s ease-in-out infinite;
+    }
+    @keyframes pulse-red {
+      0%, 100% { box-shadow: 0 0 6px rgba(239, 68, 68, 0.5); }
+      50% { box-shadow: 0 0 14px rgba(239, 68, 68, 0.8); }
+    }
+    .pod-name {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .pod-status {
+      font-size: 0.72rem;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      transition: color 0.3s;
+    }
+    .pod-status.healthy { color: var(--green); }
+    .pod-status.error { color: var(--red); }
+    .vs-indicator {
+      margin-top: 12px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-family: 'SF Mono', monospace;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .vs-indicator.healthy {
+      background: rgba(16, 185, 129, 0.06);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: var(--green);
+    }
+    .vs-indicator.error {
+      background: rgba(239, 68, 68, 0.06);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: var(--red);
+    }
+    .vs-arrow {
+      font-size: 0.9rem;
+      transition: color 0.3s;
+    }
+    .viz-legend {
+      display: flex;
+      gap: 20px;
+      margin-top: 14px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+    .viz-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .viz-legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
     @media (max-width: 640px) {
       .hero h1 { font-size: 2rem; }
       .scenario { flex-direction: column; gap: 12px; }
+      .ns-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -517,6 +631,83 @@
             <a id="chaos-link" href="#" target="_blank" style="display: none; margin-left: 8px;"></a>
           </div>
         </div>
+
+        <!-- Live Cluster Status Visualization -->
+        <div style="margin-top: 28px;">
+          <div class="cluster-viz-title">Live Cluster Status</div>
+
+          <div class="ns-grid">
+            <!-- finance-payments -->
+            <div class="ns-card" id="ns-finance">
+              <div class="ns-header">finance-payments</div>
+              <div class="pod-row">
+                <div class="pod-box">
+                  <div class="pod-dot healthy" id="dot-payment"></div>
+                  <div>
+                    <div class="pod-name">payment-service</div>
+                    <div class="pod-status healthy" id="status-payment">Running</div>
+                  </div>
+                </div>
+              </div>
+              <div class="vs-indicator healthy" id="vs-payment">
+                <span class="vs-arrow">&#x2192;</span>
+                <span id="vs-payment-target">VirtualService &#x2192; payment-service:8080</span>
+              </div>
+            </div>
+
+            <!-- risk-management -->
+            <div class="ns-card" id="ns-risk">
+              <div class="ns-header">risk-management</div>
+              <div class="pod-row">
+                <div class="pod-box">
+                  <div class="pod-dot healthy" id="dot-risk-api"></div>
+                  <div>
+                    <div class="pod-name">risk-api</div>
+                    <div class="pod-status healthy" id="status-risk-api">3/3 Running</div>
+                  </div>
+                </div>
+              </div>
+              <div class="pod-row">
+                <div class="pod-box">
+                  <div class="pod-dot healthy" id="dot-market-data"></div>
+                  <div>
+                    <div class="pod-name">market-data-store</div>
+                    <div class="pod-status healthy" id="status-market-data">1/1 Running &middot; PVC</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- compliance-ops -->
+            <div class="ns-card" id="ns-compliance">
+              <div class="ns-header">compliance-ops</div>
+              <div class="pod-row">
+                <div class="pod-box">
+                  <div class="pod-dot healthy" id="dot-compliance"></div>
+                  <div>
+                    <div class="pod-name">compliance-batch</div>
+                    <div class="pod-status healthy" id="status-compliance">2/2 Running</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="viz-legend">
+            <div class="viz-legend-item">
+              <div class="viz-legend-dot" style="background: var(--green);"></div>
+              <span>Healthy</span>
+            </div>
+            <div class="viz-legend-item">
+              <div class="viz-legend-dot" style="background: var(--red);"></div>
+              <span>Error / Broken</span>
+            </div>
+            <div class="viz-legend-item">
+              <div class="viz-legend-dot" style="background: var(--yellow);"></div>
+              <span>VirtualService</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -658,6 +849,33 @@
     const REPO = 'ProfessorSeb/k8s-rooster';
     const WORKFLOW = 'chaos.yml';
 
+    /* ── Cluster Visualization State ── */
+    function setVizState(state) {
+      // state: 'healthy' | 'crash' | 'istio' | 'all'
+      const crashOn = (state === 'crash' || state === 'all');
+      const istioOn = (state === 'istio' || state === 'all');
+
+      // payment-service pod
+      const dotPay = document.getElementById('dot-payment');
+      const stPay = document.getElementById('status-payment');
+      const nsFin = document.getElementById('ns-finance');
+      dotPay.className = 'pod-dot ' + (crashOn ? 'error' : 'healthy');
+      stPay.className = 'pod-status ' + (crashOn ? 'error' : 'healthy');
+      stPay.textContent = crashOn ? 'CrashLoopBackOff' : 'Running';
+
+      // VirtualService
+      const vsInd = document.getElementById('vs-payment');
+      const vsTgt = document.getElementById('vs-payment-target');
+      vsInd.className = 'vs-indicator ' + (istioOn ? 'error' : 'healthy');
+      vsTgt.innerHTML = istioOn
+        ? 'VirtualService \u2192 <strong>payment-svc-v2 NOT FOUND</strong>'
+        : 'VirtualService \u2192 payment-service:8080';
+
+      // finance namespace card border
+      nsFin.className = 'ns-card' + ((crashOn || istioOn) ? ' has-error' : '');
+    }
+
+    /* ── Chaos Trigger ── */
     async function triggerChaos(action) {
       const token = document.getElementById('gh-token').value.trim();
       const statusEl = document.getElementById('chaos-status');
@@ -706,6 +924,18 @@
           linkEl.href = 'https://github.com/' + REPO + '/actions/workflows/' + WORKFLOW;
           linkEl.textContent = 'View run';
           linkEl.style.display = 'inline';
+
+          // Update cluster visualization
+          if (action === 'crash' || action === 'istio' || action === 'all') {
+            // Merge with current state
+            const cur = document.getElementById('dot-payment').classList.contains('error') ? 'crash' : 'healthy';
+            const curIstio = document.getElementById('vs-payment').classList.contains('error');
+            if (action === 'crash') setVizState(curIstio ? 'all' : 'crash');
+            else if (action === 'istio') setVizState(cur === 'crash' ? 'all' : 'istio');
+            else setVizState('all');
+          } else if (action === 'reset') {
+            setVizState('healthy');
+          }
         } else if (resp.status === 401 || resp.status === 403) {
           msgEl.style.color = '#ef4444';
           msgEl.textContent = 'Auth failed — check your PAT has repo scope.';
