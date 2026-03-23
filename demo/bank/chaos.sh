@@ -185,6 +185,61 @@ YAML
     prompt "Ask kagent: \"The payment-service in finance-payments is rejecting all connections. Can you check the Istio security policies and figure out what's blocking traffic?\""
 }
 
+test_connectivity() {
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${CYAN}  Mesh Connectivity Test — payment-service:8080${NC}"
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+
+    # Check for blocking policies
+    local strict_mtls deny_policy
+    strict_mtls=$(kubectl get peerauthentication -n finance-payments chaos-strict-mtls -o name 2>/dev/null || true)
+    deny_policy=$(kubectl get authorizationpolicy -n finance-payments chaos-deny-all -o name 2>/dev/null || true)
+
+    if [[ -n "$strict_mtls" || -n "$deny_policy" ]]; then
+        echo -e "  ${RED}■${NC} Blocking policies detected:"
+        [[ -n "$strict_mtls" ]] && echo -e "    ${RED}✗${NC} PeerAuthentication/chaos-strict-mtls  ${RED}STRICT mTLS${NC}"
+        [[ -n "$deny_policy" ]] && echo -e "    ${RED}✗${NC} AuthorizationPolicy/chaos-deny-all    ${RED}DENY ALL${NC}"
+        echo ""
+    else
+        echo -e "  ${GREEN}■${NC} No blocking policies found"
+        echo ""
+    fi
+
+    # Test HTTP from inside the existing payment-service pod (busybox has wget)
+    echo -e "  Testing from payment-service pod via wget..."
+    echo ""
+
+    local result exit_code
+    result=$(kubectl exec -n finance-payments deployment/payment-service -- \
+        wget -q -O - --timeout=3 http://payment-service.finance-payments.svc:8080/ 2>&1)
+    exit_code=$?
+
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    if [[ "$exit_code" -eq 0 ]]; then
+        echo -e "  ${GREEN}████████████████████████████████████████████${NC}"
+        echo -e "  ${GREEN}█                                          █${NC}"
+        echo -e "  ${GREEN}█      ✓  CONNECTION SUCCESSFUL            █${NC}"
+        echo -e "  ${GREEN}█                                          █${NC}"
+        echo -e "  ${GREEN}████████████████████████████████████████████${NC}"
+        echo ""
+        echo -e "  Response: ${GREEN}${result}${NC}"
+    else
+        echo -e "  ${RED}████████████████████████████████████████████${NC}"
+        echo -e "  ${RED}█                                          █${NC}"
+        echo -e "  ${RED}█      ✗  CONNECTION FAILED                █${NC}"
+        echo -e "  ${RED}█         Traffic blocked by mesh policy   █${NC}"
+        echo -e "  ${RED}█                                          █${NC}"
+        echo -e "  ${RED}████████████████████████████████████████████${NC}"
+        echo ""
+        echo -e "  Error: ${RED}${result}${NC}"
+    fi
+    echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "  ${CYAN}Kiali UI:${NC} http://172.16.20.127:20001"
+    echo ""
+}
+
 reset_all() {
     info "Restoring healthy state..."
 
@@ -219,6 +274,9 @@ case "${ACTION}" in
     mesh)
         inject_mesh
         ;;
+    test)
+        test_connectivity
+        ;;
     all)
         inject_crash
         echo ""
@@ -232,7 +290,7 @@ case "${ACTION}" in
         reset_all
         ;;
     *)
-        echo "Usage: $0 {crash|istio|khook|mesh|all|reset}"
+        echo "Usage: $0 {crash|istio|khook|mesh|all|reset|test}"
         echo ""
         echo "  crash   Inject Java OOM crashloop into payment-service"
         echo "  istio   Break VirtualService routing to non-existent service"
@@ -240,6 +298,7 @@ case "${ACTION}" in
         echo "  mesh    Break ambient mesh — STRICT mTLS + deny-all policy"
         echo "  all     Inject all chaos at once"
         echo "  reset   Restore everything to healthy"
+        echo "  test    Test connectivity to payment-service (visual pass/fail)"
         exit 1
         ;;
 esac

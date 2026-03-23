@@ -24,7 +24,14 @@ data:
     echo 'INFO  2026-03-25 12:01:07 PaymentProcessor - Starting HTTP server on port 8080'
     echo 'INFO  2026-03-25 12:01:07 PaymentProcessor - Service ready — processing payments'
     echo 'INFO  2026-03-25 12:01:08 PaymentProcessor - Health check: OK'
-    # Stay alive
+    # Start a lightweight HTTP server on port 8080
+    mkdir -p /tmp/www /tmp/www/healthz
+    echo '{"status":"healthy","service":"payment-service","version":"v3.2.1"}' > /tmp/www/index.html
+    echo '{"status":"ok"}' > /tmp/www/healthz/index.html
+    httpd -f -p 8080 -h /tmp/www &
+    HTTP_PID=$!
+    echo "INFO  2026-03-25 12:01:08 PaymentProcessor - HTTP server started on :8080 (pid=$HTTP_PID)"
+    # Stay alive with heartbeat
     while true; do
       echo "INFO  $(date '+%Y-%m-%d %H:%M:%S') PaymentProcessor - Heartbeat OK — 0 errors"
       sleep 30
