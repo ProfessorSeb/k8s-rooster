@@ -289,6 +289,39 @@
     .tag-yellow { background: rgba(245, 158, 11, 0.12); color: var(--yellow); }
     .tag-cyan { background: rgba(6, 182, 212, 0.12); color: var(--cyan); }
 
+    /* Chaos buttons */
+    .chaos-btn {
+      padding: 10px 20px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .chaos-btn:hover { transform: translateY(-1px); }
+    .chaos-btn:active { transform: translateY(0); }
+    .chaos-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .chaos-btn-red {
+      background: rgba(239, 68, 68, 0.12);
+      color: var(--red);
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+    .chaos-btn-red:hover { background: rgba(239, 68, 68, 0.2); }
+    .chaos-btn-green {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--green);
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    .chaos-btn-green:hover { background: rgba(16, 185, 129, 0.2); }
+    .chaos-btn-cyan {
+      background: rgba(6, 182, 212, 0.12);
+      color: var(--cyan);
+      border-color: rgba(6, 182, 212, 0.3);
+    }
+    .chaos-btn-cyan:hover { background: rgba(6, 182, 212, 0.2); }
+
     @media (max-width: 640px) {
       .hero h1 { font-size: 2rem; }
       .scenario { flex-direction: column; gap: 12px; }
@@ -438,6 +471,46 @@
     </div>
   </section>
 
+  <!-- Chaos Control Panel -->
+  <section id="chaos">
+    <div class="container">
+      <h2>Chaos <span>Control Panel</span></h2>
+      <p>Inject failures directly from this page. Triggers a GitHub Actions workflow on the self-hosted runner with kubectl access.</p>
+
+      <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-top: 24px;">
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">GitHub PAT (needs <code>repo</code> scope)</label>
+          <input type="password" id="gh-token" placeholder="ghp_..." style="
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'SF Mono', monospace;
+            font-size: 0.85rem;
+            outline: none;
+          " />
+        </div>
+
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <button onclick="triggerChaos('crash')" class="chaos-btn chaos-btn-red">Crash Loop</button>
+          <button onclick="triggerChaos('istio')" class="chaos-btn chaos-btn-red">Break Istio</button>
+          <button onclick="triggerChaos('all')" class="chaos-btn chaos-btn-red">All Chaos</button>
+          <button onclick="triggerChaos('reset')" class="chaos-btn chaos-btn-green">Reset</button>
+          <button onclick="triggerChaos('status')" class="chaos-btn chaos-btn-cyan">Status</button>
+        </div>
+
+        <div id="chaos-status" style="margin-top: 16px; display: none;">
+          <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; font-family: 'SF Mono', monospace; font-size: 0.82rem;">
+            <span id="chaos-msg"></span>
+            <a id="chaos-link" href="#" target="_blank" style="display: none; margin-left: 8px;"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Demo Commands -->
   <section>
     <div class="container">
@@ -570,6 +643,75 @@
     </p>
     <p style="margin-top: 12px;">Built with kagent Enterprise on the maniak-rooster cluster.</p>
   </footer>
+
+  <script>
+    const REPO = 'ProfessorSeb/k8s-rooster';
+    const WORKFLOW = 'chaos.yml';
+
+    async function triggerChaos(action) {
+      const token = document.getElementById('gh-token').value.trim();
+      const statusEl = document.getElementById('chaos-status');
+      const msgEl = document.getElementById('chaos-msg');
+      const linkEl = document.getElementById('chaos-link');
+
+      if (!token) {
+        statusEl.style.display = 'block';
+        msgEl.textContent = 'Enter your GitHub PAT first.';
+        msgEl.style.color = '#f59e0b';
+        linkEl.style.display = 'none';
+        return;
+      }
+
+      // Disable all buttons
+      document.querySelectorAll('.chaos-btn').forEach(b => b.disabled = true);
+      statusEl.style.display = 'block';
+      msgEl.textContent = 'Triggering ' + action + '...';
+      msgEl.style.color = '#9ca3af';
+      linkEl.style.display = 'none';
+
+      try {
+        const resp = await fetch(
+          'https://api.github.com/repos/' + REPO + '/actions/workflows/' + WORKFLOW + '/dispatches',
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer ' + token,
+              'Accept': 'application/vnd.github.v3+json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              ref: 'main',
+              inputs: { action: action }
+            })
+          }
+        );
+
+        if (resp.status === 204) {
+          const colors = {
+            crash: '#ef4444', istio: '#ef4444', all: '#ef4444',
+            reset: '#10b981', status: '#06b6d4'
+          };
+          msgEl.style.color = colors[action] || '#10b981';
+          msgEl.textContent = action.toUpperCase() + ' triggered.';
+          linkEl.href = 'https://github.com/' + REPO + '/actions/workflows/' + WORKFLOW;
+          linkEl.textContent = 'View run';
+          linkEl.style.display = 'inline';
+        } else if (resp.status === 401 || resp.status === 403) {
+          msgEl.style.color = '#ef4444';
+          msgEl.textContent = 'Auth failed — check your PAT has repo scope.';
+        } else {
+          const body = await resp.json().catch(() => ({}));
+          msgEl.style.color = '#ef4444';
+          msgEl.textContent = 'Error ' + resp.status + ': ' + (body.message || 'Unknown error');
+        }
+      } catch (err) {
+        msgEl.style.color = '#ef4444';
+        msgEl.textContent = 'Network error: ' + err.message;
+      }
+
+      document.querySelectorAll('.chaos-btn').forEach(b => b.disabled = false);
+    }
+  </script>
 
 </body>
 </html>

@@ -1,0 +1,42 @@
+name: kagent-demo-chaos
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Chaos action to run"
+        required: true
+        type: choice
+        options:
+          - crash
+          - istio
+          - all
+          - reset
+          - status
+
+concurrency:
+  group: kagent-demo-chaos
+  cancel-in-progress: false
+
+jobs:
+  chaos:
+    name: "${{ inputs.action }}"
+    runs-on: [self-hosted]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify kubectl access
+        run: kubectl cluster-info
+
+      - name: Run chaos action
+        if: inputs.action != 'status'
+        run: |
+          chmod +x demo/bank/chaos.sh
+          ./demo/bank/chaos.sh ${{ inputs.action }}
+
+      - name: Run setup status
+        if: inputs.action == 'status'
+        run: |
+          chmod +x demo/bank/setup.sh
+          ./demo/bank/setup.sh status
