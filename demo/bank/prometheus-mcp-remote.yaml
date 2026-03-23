@@ -6,7 +6,7 @@ metadata:
   namespace: kagent
 spec:
   description: Prometheus MCP Server — PromQL queries for cluster metrics, capacity planning, and resource usage analysis
-  url: http://prometheus-mcp-server.kagent.svc.cluster.local:9090/sse
+  url: http://prometheus-mcp-server.kagent.svc.cluster.local:8080/sse
   protocol: SSE
   timeout: 30s
   terminateOnClose: true

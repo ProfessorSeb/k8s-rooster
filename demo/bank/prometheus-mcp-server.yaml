@@ -17,19 +17,30 @@ spec:
       labels:
         app: prometheus-mcp-server
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: prometheus-mcp
-        image: pab1it0/prometheus-mcp-server:latest
+        image: ghcr.io/pab1it0/prometheus-mcp-server:1.6.0
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         ports:
-        - containerPort: 9090
+        - containerPort: 8080
           name: mcp
         env:
         - name: PROMETHEUS_URL
           value: "http://prometheus-server.monitoring.svc.cluster.local:80"
-        - name: MCP_TRANSPORT
+        - name: PROMETHEUS_MCP_SERVER_TRANSPORT
           value: "sse"
-        - name: MCP_PORT
-          value: "9090"
+        - name: PROMETHEUS_MCP_BIND_HOST
+          value: "0.0.0.0"
+        - name: PROMETHEUS_MCP_BIND_PORT
+          value: "8080"
         resources:
           requests:
             memory: "64Mi"
@@ -38,15 +49,13 @@ spec:
             memory: "128Mi"
             cpu: "200m"
         livenessProbe:
-          httpGet:
-            path: /health
-            port: 9090
+          tcpSocket:
+            port: 8080
           initialDelaySeconds: 10
           periodSeconds: 30
         readinessProbe:
-          httpGet:
-            path: /health
-            port: 9090
+          tcpSocket:
+            port: 8080
           initialDelaySeconds: 5
           periodSeconds: 10
 ---
@@ -61,6 +70,6 @@ spec:
   selector:
     app: prometheus-mcp-server
   ports:
-  - port: 9090
-    targetPort: 9090
+  - port: 8080
+    targetPort: 8080
     name: mcp
