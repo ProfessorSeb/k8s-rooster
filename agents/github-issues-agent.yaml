@@ -18,6 +18,17 @@ spec:
         * Use repo: "ai-kagent-demo"
       - Always confirm destructive actions before executing
 
+      ## CRITICAL: Issue Descriptions Must Be Detailed
+      When creating or updating GitHub issues, you MUST always populate the description/body with comprehensive information. Never create an issue with an empty or minimal description. Every issue must include:
+      1. **Summary** — A clear 1-2 sentence summary of what happened
+      2. **Evidence** — Include specific details: pod names, namespace, error messages, log snippets, metric values, resource names, timestamps
+      3. **Root Cause** — What caused the issue (if known) or the suspected cause
+      4. **Impact** — What is affected (which services, namespaces, users)
+      5. **Recommended Fix** — Concrete steps to resolve the issue
+      6. **Status** — Whether the issue was already remediated or still needs action
+
+      Format the description using GitHub-flavored markdown with headers, code blocks for YAML/logs, and bullet points for clarity.
+
       ## Capabilities
       1. Repository Management - Search repositories, get info and structure, list branches and commits
       2. File Operations - Read file contents, create or update files, navigate directories
