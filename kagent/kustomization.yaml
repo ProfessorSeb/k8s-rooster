@@ -7,8 +7,9 @@ resources:
   - kagent-application.yaml
   - enterprise-agentgateway-crds-application.yaml
   - enterprise-agentgateway-application.yaml
-  - khook-crds-application.yaml
-  - khook-application.yaml
+  # khook installed via helm directly (Chart.yaml is generated, not in git)
+  # helm install khook-crds ./helm/khook-crds -n kagent
+  # helm install khook ./helm/khook -n kagent --set image.tag=0.0.4
 
 commonLabels:
   app.kubernetes.io/name: kagent

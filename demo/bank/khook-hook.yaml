@@ -7,7 +7,9 @@ spec:
   eventConfigurations:
   # Auto-diagnose pod restarts — triggered when compliance-report-generator crashes
   - eventType: pod-restart
-    agentId: kagent/bank-platform-agent
+    agentRef:
+      name: bank-platform-agent
+      namespace: kagent
     prompt: |
       AUTOMATED INCIDENT ALERT — khook detected a pod restart.
 
@@ -29,7 +31,9 @@ spec:
 
   # Auto-respond to OOM kills in the namespace
   - eventType: oom-kill
-    agentId: kagent/bank-platform-agent
+    agentRef:
+      name: bank-platform-agent
+      namespace: kagent
     prompt: |
       CRITICAL AUTOMATED INCIDENT: Pod {{.ResourceName}} was OOM-killed at {{.EventTime}}.
 

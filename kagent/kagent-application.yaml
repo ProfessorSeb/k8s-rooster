@@ -48,7 +48,7 @@ spec:
           helm-agent:
             enabled: true
           observability-agent:
-            enabled: true
+            enabled: false
           istio-agent:
             enabled: true
           cilium-crd-agent:
