@@ -506,7 +506,7 @@
   <section>
     <div class="container">
       <h2>Demo <span>Architecture</span></h2>
-      <p>The bank-platform-agent orchestrates specialist sub-agents (k8s, Istio, Helm) and queries Prometheus/Grafana directly. All demo namespaces run on Istio ambient mesh (ztunnel L4, no sidecars).</p>
+      <p>The bank-platform-agent orchestrates specialist sub-agents (k8s, Istio, Helm, GitHub Issues) and queries Prometheus/Grafana directly. k8s-agent uses Claude Sonnet 4.6 with <strong>human-in-the-loop approval</strong> for destructive operations. All demo namespaces run on Istio ambient mesh (ztunnel L4, no sidecars).</p>
 
       <div class="arch-diagram">
         <div class="arch-label">kagent UI / Chat / Slack A2A / khook</div>
@@ -516,9 +516,10 @@
         <div class="arch-arrow">&darr;</div>
         <div class="arch-label">Sub-Agents (A2A delegation)</div>
         <div class="arch-row">
-          <div class="arch-box accent">k8s-agent</div>
+          <div class="arch-box accent">k8s-agent<br><span style="font-size:0.7rem;opacity:0.7;">Claude Sonnet 4.6 &middot; HITL</span></div>
           <div class="arch-box accent">istio-agent</div>
           <div class="arch-box accent">helm-agent</div>
+          <div class="arch-box accent">github-issues-agent<br><span style="font-size:0.7rem;opacity:0.7;">xAI Grok</span></div>
         </div>
         <div class="arch-label" style="margin-top: 12px;">Direct MCP Tools</div>
         <div class="arch-row">
@@ -900,8 +901,8 @@
           </tr>
           <tr>
             <td><code>kagent</code></td>
-            <td>bank-platform-agent, prometheus-mcp-server, khook controller</td>
-            <td>AI agent + Prometheus tool server + event watcher</td>
+            <td>bank-platform-agent, k8s-agent (Claude Sonnet 4.6 + HITL), github-issues-agent (Grok), prometheus-mcp-server, khook controller</td>
+            <td>AI orchestrator + sub-agents + Prometheus tool server + event watcher</td>
           </tr>
           <tr>
             <td><code>istio-system</code></td>
