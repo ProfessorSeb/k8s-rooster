@@ -27,7 +27,7 @@
   <div class="hero">
     <div class="hero-badge">CNCF Sandbox Project</div>
     <h1><span>kagent</span> Bank Platform Demo</h1>
-    <p>AI-powered Kubernetes operations for financial services. Crash diagnosis, migration planning, Istio ambient mesh troubleshooting, and capacity forecasting — driven by an orchestrator agent with specialist sub-agents.</p>
+    <p>AI-powered Kubernetes operations for financial services. Crash diagnosis, migration planning, Istio ambient mesh troubleshooting, capacity forecasting, and Ansible infrastructure management — driven by an orchestrator agent with specialist sub-agents.</p>
     <div class="hero-buttons">
       <a href="architecture.html" class="hero-btn primary">Architecture Diagram &rarr;</a>
       <a href="khook-auth-proxy.html" class="hero-btn">khook Auth Proxy &rarr;</a>
@@ -115,7 +115,7 @@
           <div class="arch-box green" style="border-color: #a78bfa;">ansible-mcp<br><span style="font-size:0.7rem;opacity:0.5;">Semaphore API</span></div>
         </div>
         <div class="arch-arrow">&darr;</div>
-        <div class="arch-label">Kubernetes Cluster &middot; Istio Ambient Mesh &middot; Proxmox LXC &middot; Network Infrastructure</div>
+        <div class="arch-label">Kubernetes Cluster &middot; Istio Ambient Mesh &middot; Network Infrastructure</div>
         <div class="arch-row">
           <div class="arch-box">finance-payments</div>
           <div class="arch-box">risk-management</div>
@@ -128,6 +128,13 @@
           <div class="arch-box" style="font-size: 0.78rem; border-color: var(--red);">FortiGate</div>
           <div class="arch-box" style="font-size: 0.78rem;"><a href="http://kiali.rooster.maniak.com:20001" target="_blank" style="color: inherit;">Kiali UI</a></div>
         </div>
+        <div class="arch-arrow">&darr;</div>
+        <div class="arch-label">Proxmox LXC &middot; Compliance Portal (Ansible-managed)</div>
+        <div class="arch-row">
+          <div class="arch-box" style="border-color: #a78bfa; font-size: 0.78rem;">compliance-web<br><span style="opacity:0.5;">Nginx &middot; :80</span></div>
+          <div class="arch-box" style="border-color: #a78bfa; font-size: 0.78rem;">compliance-app<br><span style="opacity:0.5;">Flask/Gunicorn &middot; :5000</span></div>
+          <div class="arch-box" style="border-color: #a78bfa; font-size: 0.78rem;">compliance-db<br><span style="opacity:0.5;">PostgreSQL 16 &middot; :5432</span></div>
+        </div>
       </div>
     </div>
   </section>
@@ -136,7 +143,7 @@
   <section>
     <div class="container">
       <h2>Demo <span>Scenarios</span></h2>
-      <p>Seven scenarios that show kagent solving real platform engineering problems. Chaos is injected on demand — everything starts healthy.</p>
+      <p>Eight scenarios that show kagent solving real platform engineering problems. Chaos is injected on demand — everything starts healthy.</p>
 
       <div class="scenarios">
 
@@ -222,6 +229,27 @@
               <span class="tag tag-cyan">ambient mesh</span>
               <span class="tag tag-red">security policy</span>
               <span class="tag tag-yellow">ztunnel L4</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario">
+          <div class="scenario-num">8</div>
+          <div class="scenario-body">
+            <h3>Ansible Infrastructure Troubleshooting &nbsp;<span class="tag" style="background: rgba(167,139,250,0.12); color: #a78bfa;">proxmox</span></h3>
+            <p>The Compliance Portal runs on 3 Proxmox LXC containers managed by Ansible (Nginx &rarr; Flask &rarr; PostgreSQL). A misconfigured upstream IP in the Ansible inventory causes the portal to return 502 Bad Gateway. The <strong>ansible-infra-agent</strong> reads the Ansible code from GitHub, identifies the wrong <code>nginx_upstream_host</code> in <code>webservers.yml</code>, and submits a fix as a GitHub PR via <strong>github-pr-agent</strong>.</p>
+            <div class="code-block">
+              <span class="prompt">&gt;</span> <span class="cmd">The compliance portal at 172.16.10.186 is returning 502 Bad Gateway. Can you diagnose the issue and create a fix?</span>
+            </div>
+            <div style="margin-top: 12px; font-size: 0.8rem; color: var(--text-muted);">
+              <strong style="color: var(--text);">Portal URL:</strong> <a href="http://172.16.10.186" target="_blank" style="color: #a78bfa;">http://172.16.10.186</a><br>
+              <strong style="color: var(--text);">Containers:</strong> compliance-web (VMID 200) &middot; compliance-app (VMID 201) &middot; compliance-db (VMID 202)<br>
+              <strong style="color: var(--text);">Agent flow:</strong> ansible-infra-agent &rarr; reads GitHub &rarr; finds bad IP &rarr; delegates to github-pr-agent &rarr; PR created
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 10px; font-size: 0.8rem;">
+              <span class="tag" style="background: rgba(167,139,250,0.12); color: #a78bfa;">ansible</span>
+              <span class="tag tag-cyan">GitOps</span>
+              <span class="tag tag-green">A2A delegation</span>
             </div>
           </div>
         </div>
@@ -462,7 +490,7 @@
   <section>
     <div class="container">
       <h2>Deployed <span>Agents</span></h2>
-      <p>Six AI agents in the kagent namespace, each with specialized tools and A2A skills. Three LLM backends: Claude Sonnet 4.6, xAI Grok, and OpenAI via AgentGateway.</p>
+      <p>Eight AI agents in the kagent namespace, each with specialized tools and A2A skills. Three LLM backends: Claude Sonnet 4.6, xAI Grok, and OpenAI via AgentGateway. Agents manage both Kubernetes workloads and Proxmox LXC infrastructure.</p>
 
       <div class="features" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
 
@@ -561,10 +589,10 @@
           </div>
           <p>Ansible infrastructure automation &mdash; provisions Proxmox LXC containers, deploys the Compliance Portal stack (Nginx + Flask + PostgreSQL), runs compliance scans, and submits fixes as GitHub PRs.</p>
           <div style="margin-top: 10px; font-size: 0.78rem; color: var(--text-muted);">
-            <strong style="color: var(--text);">Tools:</strong> proxmox-mcp + ansible-mcp<br>
+            <strong style="color: var(--text);">Tools:</strong> github-mcp-remote (6 tools), kagent-tool-server (5 tools)<br>
             <strong style="color: var(--text);">Skills:</strong> ansible-infrastructure-management<br>
             <strong style="color: var(--text);">Delegates:</strong> github-pr-agent, github-issues-agent<br>
-            <strong style="color: var(--text);">Creds:</strong> Vault &rarr; proxmox-credentials
+            <strong style="color: var(--text);">Infra:</strong> 3 Proxmox LXC containers &middot; <a href="http://172.16.10.186" target="_blank" style="color: #a78bfa;">Portal UI</a>
           </div>
         </div>
 
@@ -675,6 +703,11 @@
             <td><code>kagent</code></td>
             <td>bank-platform-agent, k8s-agent, compliance-incident-agent, github-issues-agent, github-pr-agent, f5-bigip-agent, fortigate-agent, vault-agent, ansible-infra-agent, khook, khook-auth-proxy, f5-wrapper, fortigate-mcp-server, vault-mcp-server, proxmox-mcp-server, ansible-mcp-server</td>
             <td>AI agents + MCP tool servers + event watcher + auth proxy</td>
+          </tr>
+          <tr>
+            <td><code>Proxmox LXC</code></td>
+            <td>compliance-web (Nginx), compliance-app (Flask/Gunicorn), compliance-db (PostgreSQL 16)</td>
+            <td>Compliance Portal &mdash; 3-tier app managed by Ansible, agent-diagnosed via GitOps</td>
           </tr>
           <tr>
             <td><code>istio-system</code></td>
