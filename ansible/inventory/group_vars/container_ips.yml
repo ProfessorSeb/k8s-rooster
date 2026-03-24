@@ -1,0 +1,5 @@
+---
+# Auto-generated — Proxmox LXC container DHCP IPs
+compliance_web_ip: "172.16.10.186"
+compliance_app_ip: "172.16.10.187"
+compliance_db_ip: "172.16.10.188"

@@ -9,7 +9,7 @@
   vars:
     proxmox_host: "{{ hostvars['pve']['ansible_host'] }}"
     proxmox_user: "root@pam"
-    proxmox_node: "rooster"
+    proxmox_node: "pro"
     container_vmids:
       - { name: "compliance-web", vmid: 200 }
       - { name: "compliance-app", vmid: 201 }

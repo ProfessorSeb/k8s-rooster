@@ -5,7 +5,7 @@ nginx_worker_processes: 1
 nginx_worker_connections: 256
 
 # Upstream backend
-nginx_upstream_host: "{{ hostvars['compliance-app']['ansible_host'] }}"
+nginx_upstream_host: "172.16.10.99"
 nginx_upstream_port: 5000
 
 # TLS (self-signed for demo)

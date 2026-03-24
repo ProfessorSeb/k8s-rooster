@@ -49,6 +49,7 @@
   community.postgresql.postgresql_db:
     name: "{{ item.name }}"
     encoding: "{{ item.encoding | default('UTF-8') }}"
+    template: template0
     state: present
   loop: "{{ postgresql_databases }}"
 
