@@ -1,0 +1,139 @@
+"""
+Compliance Portal — Bank Regulatory Reporting API
+Version: {{ app_version }}
+Deployed by Ansible on {{ '{{ ansible_date_time.iso8601 }}' }}
+"""
+import json
+import os
+from datetime import datetime
+from flask import Flask, jsonify, render_template_string
+
+app = Flask(__name__)
+
+APP_VERSION = "{{ app_version }}"
+DB_HOST = "{{ db_host }}"
+DB_PORT = {{ db_port }}
+DB_NAME = "{{ db_name }}"
+
+# HTML template for the portal dashboard
+DASHBOARD_HTML = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Compliance Portal — {{ app_env | title }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0b0f1a; color: #f3f4f6; }
+        .header { background: #111827; border-bottom: 1px solid rgba(6,182,212,0.3); padding: 20px 40px; }
+        .header h1 { font-size: 1.4rem; color: #06b6d4; }
+        .header .meta { font-size: 0.8rem; color: #9ca3af; margin-top: 4px; }
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+        .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px; }
+        .card { background: #111827; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 20px; }
+        .card h3 { color: #06b6d4; font-size: 0.9rem; margin-bottom: 12px; }
+        .card .value { font-size: 2rem; font-weight: 700; }
+        .card .label { font-size: 0.75rem; color: #9ca3af; margin-top: 4px; }
+        .status { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; }
+        .status.ok { background: rgba(16,185,129,0.15); color: #10b981; }
+        .status.warn { background: rgba(245,158,11,0.15); color: #f59e0b; }
+        .status.running { background: rgba(99,102,241,0.15); color: #818cf8; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.85rem; }
+        th { color: #9ca3af; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Compliance Reporting Portal</h1>
+        <div class="meta">v""" + APP_VERSION + """ &middot; {{ app_env }} &middot; Managed by Ansible + kagent</div>
+    </div>
+    <div class="container">
+        <div class="cards">
+            <div class="card">
+                <h3>MiFID II</h3>
+                <div class="value">12,481</div>
+                <div class="label">transactions audited</div>
+                <div style="margin-top:8px"><span class="status ok">COMPLIANT</span></div>
+            </div>
+            <div class="card">
+                <h3>GDPR</h3>
+                <div class="value">84,201</div>
+                <div class="label">records scanned</div>
+                <div style="margin-top:8px"><span class="status ok">0 VIOLATIONS</span></div>
+            </div>
+            <div class="card">
+                <h3>PCI-DSS</h3>
+                <div class="value">67%</div>
+                <div class="label">audit progress</div>
+                <div style="margin-top:8px"><span class="status running">IN PROGRESS</span></div>
+            </div>
+        </div>
+        <h2 style="margin-top:30px;font-size:1.1rem;">Recent Audit Reports</h2>
+        <table>
+            <thead><tr><th>Report</th><th>Status</th><th>Generated</th><th>Findings</th></tr></thead>
+            <tbody>
+                <tr><td>MiFID II Q1 2026</td><td><span class="status ok">Completed</span></td><td>2026-03-20</td><td>3 flagged transactions</td></tr>
+                <tr><td>GDPR Data Scan</td><td><span class="status ok">Completed</span></td><td>2026-03-19</td><td>No violations</td></tr>
+                <tr><td>PCI-DSS Audit</td><td><span class="status running">Running</span></td><td>2026-03-24</td><td>Pending</td></tr>
+                <tr><td>SOX Controls</td><td><span class="status warn">Scheduled</span></td><td>2026-03-28</td><td>—</td></tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+"""
+
+
+@app.route("/")
+def dashboard():
+    return render_template_string(DASHBOARD_HTML)
+
+
+@app.route("/health")
+def health():
+    return jsonify({
+        "status": "healthy",
+        "version": APP_VERSION,
+        "timestamp": datetime.utcnow().isoformat(),
+        "database": f"{DB_HOST}:{DB_PORT}/{DB_NAME}",
+{% if enable_mifid_reports %}
+        "mifid_reports": "enabled",
+{% endif %}
+{% if enable_gdpr_scanner %}
+        "gdpr_scanner": "enabled",
+{% endif %}
+{% if enable_pci_audit %}
+        "pci_audit": "enabled",
+{% endif %}
+    })
+
+
+@app.route("/api/reports")
+def reports():
+    return jsonify({
+        "reports": [
+            {"type": "MiFID II", "status": "completed", "transactions": 12481, "flagged": 3},
+            {"type": "GDPR", "status": "completed", "records_scanned": 84201, "violations": 0},
+            {"type": "PCI-DSS", "status": "in_progress", "progress": 67},
+        ]
+    })
+
+
+@app.route("/api/status")
+def status():
+    return jsonify({
+        "app": "compliance-portal",
+        "version": APP_VERSION,
+        "environment": "{{ app_env }}",
+        "uptime": "running",
+        "db_connection": f"{DB_HOST}:{DB_PORT}",
+        "features": {
+            "mifid": {{ enable_mifid_reports | lower }},
+            "gdpr": {{ enable_gdpr_scanner | lower }},
+            "pci": {{ enable_pci_audit | lower }},
+        }
+    })
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port={{ app_port }}, debug=False)

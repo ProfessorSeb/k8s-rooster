@@ -1,0 +1,9 @@
+---
+- name: Reload Systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Restart Compliance Portal
+  ansible.builtin.service:
+    name: compliance-portal
+    state: restarted

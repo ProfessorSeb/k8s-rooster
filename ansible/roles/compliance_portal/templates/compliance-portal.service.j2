@@ -1,0 +1,21 @@
+[Unit]
+Description=Compliance Portal — Bank Regulatory Reporting API
+After=network.target
+
+[Service]
+Type=simple
+User=compliance
+Group=compliance
+WorkingDirectory=/opt/compliance-portal
+ExecStart=/opt/compliance-portal/venv/bin/gunicorn \
+    --bind 0.0.0.0:{{ app_port }} \
+    --workers {{ app_workers }} \
+    --timeout 30 \
+    --access-logfile /var/log/compliance-portal/access.log \
+    --error-logfile /var/log/compliance-portal/error.log \
+    app:app
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

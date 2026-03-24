@@ -1,0 +1,18 @@
+---
+# Flask compliance portal configuration
+
+app_version: "1.0.0"
+app_port: 5000
+app_workers: 2
+
+# Database connection
+db_host: "{{ hostvars['compliance-db']['ansible_host'] }}"
+db_port: 5432
+db_name: compliance
+db_user: compliance_app
+db_password: "{{ vault_db_password | default('compliance-demo-2026') }}"
+
+# App feature flags
+enable_mifid_reports: true
+enable_gdpr_scanner: true
+enable_pci_audit: true

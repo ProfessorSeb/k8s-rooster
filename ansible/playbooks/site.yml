@@ -1,0 +1,26 @@
+---
+# Full stack deployment — Compliance Portal
+# Usage: ansible-playbook playbooks/site.yml
+#
+# Deploys: PostgreSQL → Flask API → Nginx reverse proxy
+# Requires: container IPs in inventory/group_vars/container_ips.yml
+
+- name: Apply common baseline to all hosts
+  hosts: webservers:appservers:dbservers
+  roles:
+    - common
+
+- name: Deploy PostgreSQL database
+  hosts: dbservers
+  roles:
+    - postgresql
+
+- name: Deploy Compliance Portal application
+  hosts: appservers
+  roles:
+    - compliance_portal
+
+- name: Deploy Nginx reverse proxy
+  hosts: webservers
+  roles:
+    - nginx

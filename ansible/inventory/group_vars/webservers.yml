@@ -1,0 +1,16 @@
+---
+# Nginx reverse proxy configuration
+
+nginx_worker_processes: 1
+nginx_worker_connections: 256
+
+# Upstream backend
+nginx_upstream_host: "{{ hostvars['compliance-app']['ansible_host'] }}"
+nginx_upstream_port: 5000
+
+# TLS (self-signed for demo)
+nginx_ssl_enabled: false
+
+# Access log
+nginx_access_log: /var/log/nginx/compliance-portal.access.log
+nginx_error_log: /var/log/nginx/compliance-portal.error.log

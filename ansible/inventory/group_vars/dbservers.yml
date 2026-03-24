@@ -1,0 +1,30 @@
+---
+# PostgreSQL configuration
+
+postgresql_version: 16
+postgresql_listen_addresses: "*"
+postgresql_port: 5432
+postgresql_max_connections: 50
+
+# Database setup
+postgresql_databases:
+  - name: compliance
+    encoding: UTF-8
+
+postgresql_users:
+  - name: compliance_app
+    password: "{{ vault_db_password | default('compliance-demo-2026') }}"
+    role_attr_flags: "NOSUPERUSER,NOCREATEDB"
+
+# pg_hba — allow app server connections
+postgresql_hba_entries:
+  - type: host
+    database: compliance
+    user: compliance_app
+    address: "172.16.10.0/24"
+    method: md5
+
+# Backup
+postgresql_backup_enabled: true
+postgresql_backup_schedule: "0 2 * * *"
+postgresql_backup_retention_days: 7

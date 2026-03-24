@@ -1,0 +1,11 @@
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: proxmox-mcp
+  namespace: kagent
+spec:
+  description: Proxmox VE API MCP server — manage VMs and LXC containers
+  url: http://proxmox-mcp-server.kagent:8080/mcp
+  protocol: STREAMABLE_HTTP
+  timeout: 30s
+  terminateOnClose: true

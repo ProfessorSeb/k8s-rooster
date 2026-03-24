@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: proxmox-mcp-server
+  namespace: kagent
+  labels:
+    app: proxmox-mcp-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: proxmox-mcp-server
+  template:
+    metadata:
+      labels:
+        app: proxmox-mcp-server
+    spec:
+      containers:
+      - name: proxmox-mcp
+        image: sebbycorp/proxmox-mcp-server:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PROXMOX_HOST
+          valueFrom:
+            secretKeyRef:
+              name: proxmox-credentials
+              key: host
+        - name: PROXMOX_USER
+          valueFrom:
+            secretKeyRef:
+              name: proxmox-credentials
+              key: username
+        - name: PROXMOX_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: proxmox-credentials
+              key: password
+        - name: PROXMOX_VERIFY_SSL
+          value: "false"
+        - name: TRANSPORT_HOST
+          value: "0.0.0.0"
+        - name: TRANSPORT_PORT
+          value: "8080"
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxmox-mcp-server
+  namespace: kagent
+  labels:
+    app: proxmox-mcp-server
+spec:
+  selector:
+    app: proxmox-mcp-server
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP

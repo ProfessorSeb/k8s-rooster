@@ -1,0 +1,82 @@
+---
+- name: Install Python dependencies
+  ansible.builtin.apt:
+    name:
+      - python3
+      - python3-pip
+      - python3-venv
+    state: present
+
+- name: Allow app port through firewall
+  community.general.ufw:
+    rule: allow
+    port: "{{ app_port | string }}"
+    proto: tcp
+    from_ip: 172.16.10.0/24
+  when: firewall_enabled | default(true)
+
+- name: Create app user
+  ansible.builtin.user:
+    name: compliance
+    system: true
+    shell: /usr/sbin/nologin
+    home: /opt/compliance-portal
+    create_home: true
+
+- name: Create app directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: compliance
+    group: compliance
+    mode: "0755"
+  loop:
+    - /opt/compliance-portal
+    - /opt/compliance-portal/static
+    - /opt/compliance-portal/templates
+    - /var/log/compliance-portal
+
+- name: Deploy Flask application
+  ansible.builtin.template:
+    src: app.py.j2
+    dest: /opt/compliance-portal/app.py
+    owner: compliance
+    group: compliance
+    mode: "0644"
+  notify: Restart Compliance Portal
+
+- name: Deploy requirements.txt
+  ansible.builtin.copy:
+    content: |
+      flask==3.1.0
+      gunicorn==23.0.0
+      psycopg2-binary==2.9.10
+    dest: /opt/compliance-portal/requirements.txt
+    owner: compliance
+    group: compliance
+    mode: "0644"
+
+- name: Create Python virtual environment
+  ansible.builtin.command:
+    cmd: python3 -m venv /opt/compliance-portal/venv
+    creates: /opt/compliance-portal/venv/bin/activate
+
+- name: Install Python packages
+  ansible.builtin.pip:
+    requirements: /opt/compliance-portal/requirements.txt
+    virtualenv: /opt/compliance-portal/venv
+
+- name: Deploy systemd service
+  ansible.builtin.template:
+    src: compliance-portal.service.j2
+    dest: /etc/systemd/system/compliance-portal.service
+    mode: "0644"
+  notify:
+    - Reload Systemd
+    - Restart Compliance Portal
+
+- name: Ensure service is running
+  ansible.builtin.service:
+    name: compliance-portal
+    state: started
+    enabled: true

@@ -1,0 +1,70 @@
+---
+# Run compliance checks against all hosts
+# Usage: ansible-playbook playbooks/compliance-scan.yml
+
+- name: CIS Benchmark Compliance Scan
+  hosts: webservers:appservers:dbservers
+  gather_facts: true
+  tasks:
+    - name: Check SSH root login configuration
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "^PermitRootLogin"
+        line: "PermitRootLogin {{ ssh_permit_root_login }}"
+        state: present
+      check_mode: true
+      register: ssh_root_check
+
+    - name: Check firewall status
+      ansible.builtin.command: ufw status
+      register: ufw_status
+      changed_when: false
+      failed_when: false
+
+    - name: Check for unattended upgrades
+      ansible.builtin.stat:
+        path: /etc/apt/apt.conf.d/20auto-upgrades
+      register: auto_upgrades
+
+    - name: Check open ports
+      ansible.builtin.command: ss -tlnp
+      register: open_ports
+      changed_when: false
+
+    - name: Check disk usage
+      ansible.builtin.command: df -h /
+      register: disk_usage
+      changed_when: false
+
+    - name: Check running services
+      ansible.builtin.command: systemctl list-units --type=service --state=running --no-pager
+      register: running_services
+      changed_when: false
+
+    - name: Generate compliance report
+      ansible.builtin.debug:
+        msg: |
+          === COMPLIANCE SCAN REPORT: {{ inventory_hostname }} ===
+          SSH Root Login: {{ 'COMPLIANT' if not ssh_root_check.changed else 'NON-COMPLIANT' }}
+          Firewall: {{ 'ACTIVE' if 'Status: active' in ufw_status.stdout else 'INACTIVE — NON-COMPLIANT' }}
+          Auto-Updates: {{ 'ENABLED' if auto_upgrades.stat.exists else 'DISABLED — NON-COMPLIANT' }}
+          Disk Usage: {{ disk_usage.stdout_lines[-1] | default('unknown') }}
+          Open Ports:
+          {{ open_ports.stdout }}
+
+- name: Database-specific compliance checks
+  hosts: dbservers
+  tasks:
+    - name: Check PostgreSQL pg_hba.conf for trust auth
+      ansible.builtin.command: grep -c "trust" /etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf
+      register: trust_auth
+      changed_when: false
+      failed_when: false
+
+    - name: Database compliance result
+      ansible.builtin.debug:
+        msg: |
+          === DB COMPLIANCE: {{ inventory_hostname }} ===
+          Trust Auth Entries: {{ trust_auth.stdout | default('0') }} {{ '— NON-COMPLIANT' if (trust_auth.stdout | default('0') | int) > 0 else '— COMPLIANT' }}
+          Listen Address: {{ postgresql_listen_addresses }}
+          Max Connections: {{ postgresql_max_connections }}

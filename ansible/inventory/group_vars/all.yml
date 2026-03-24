@@ -1,0 +1,24 @@
+---
+# Common variables for all compliance portal hosts
+
+# App metadata
+app_name: compliance-portal
+app_domain: compliance.rooster.maniak.com
+app_env: production
+
+# NTP
+ntp_servers:
+  - 0.pool.ntp.org
+  - 1.pool.ntp.org
+
+# DNS
+dns_servers:
+  - 8.8.8.8
+  - 8.8.4.4
+
+# SSH hardening
+ssh_permit_root_login: "yes"
+ssh_password_auth: "no"
+
+# Firewall (ufw)
+firewall_enabled: true

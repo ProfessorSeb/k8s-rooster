@@ -1,0 +1,17 @@
+---
+# Rolling app deployment only (skip DB and base config)
+# Usage: ansible-playbook playbooks/deploy-app.yml
+#        ansible-playbook playbooks/deploy-app.yml -e app_version=1.1.0
+
+- name: Deploy Compliance Portal application
+  hosts: appservers
+  serial: 1
+  roles:
+    - compliance_portal
+  post_tasks:
+    - name: Verify application health
+      ansible.builtin.uri:
+        url: "http://{{ ansible_host }}:{{ app_port }}/health"
+        status_code: 200
+      retries: 5
+      delay: 3

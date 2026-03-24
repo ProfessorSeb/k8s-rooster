@@ -102,6 +102,7 @@
           <div class="arch-box accent" style="border-color: var(--red);">fortigate-agent<br><span style="font-size:0.7rem;opacity:0.7;">xAI Grok &middot; HITL</span></div>
           <div class="arch-box accent">github-pr-agent<br><span style="font-size:0.7rem;opacity:0.7;">AgentGateway LLM</span></div>
           <div class="arch-box accent" style="border-color: var(--cyan);">vault-agent<br><span style="font-size:0.7rem;opacity:0.7;">Claude Sonnet 4.6 &middot; HITL</span></div>
+          <div class="arch-box accent" style="border-color: #a78bfa;">ansible-infra-agent<br><span style="font-size:0.7rem;opacity:0.7;">Claude Sonnet 4.6 &middot; GitOps</span></div>
         </div>
         <div class="arch-label" style="margin-top: 12px;">MCP Tool Servers</div>
         <div class="arch-row">
@@ -110,9 +111,11 @@
           <div class="arch-box green" style="border-color: var(--orange);">f5-bigip-mcp<br><span style="font-size:0.7rem;opacity:0.5;">iControl REST</span></div>
           <div class="arch-box green" style="border-color: var(--red);">fortigate-mcp<br><span style="font-size:0.7rem;opacity:0.5;">FortiOS REST</span></div>
           <div class="arch-box green" style="border-color: var(--cyan);">vault-mcp<br><span style="font-size:0.7rem;opacity:0.5;">Vault HTTP API</span></div>
+          <div class="arch-box green" style="border-color: #a78bfa;">proxmox-mcp<br><span style="font-size:0.7rem;opacity:0.5;">Proxmox VE API</span></div>
+          <div class="arch-box green" style="border-color: #a78bfa;">ansible-mcp<br><span style="font-size:0.7rem;opacity:0.5;">Semaphore API</span></div>
         </div>
         <div class="arch-arrow">&darr;</div>
-        <div class="arch-label">Kubernetes Cluster &middot; Istio Ambient Mesh &middot; Network Infrastructure</div>
+        <div class="arch-label">Kubernetes Cluster &middot; Istio Ambient Mesh &middot; Proxmox LXC &middot; Network Infrastructure</div>
         <div class="arch-row">
           <div class="arch-box">finance-payments</div>
           <div class="arch-box">risk-management</div>
@@ -551,6 +554,20 @@
           </div>
         </div>
 
+        <div class="feature" style="border-left: 3px solid #a78bfa;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 style="margin: 0;">ansible-infra-agent</h3>
+            <span class="tag tag-orange" style="background: rgba(167,139,250,0.12); color: #a78bfa;">Claude Sonnet 4.6</span>
+          </div>
+          <p>Ansible infrastructure automation &mdash; provisions Proxmox LXC containers, deploys the Compliance Portal stack (Nginx + Flask + PostgreSQL), runs compliance scans, and submits fixes as GitHub PRs.</p>
+          <div style="margin-top: 10px; font-size: 0.78rem; color: var(--text-muted);">
+            <strong style="color: var(--text);">Tools:</strong> proxmox-mcp + ansible-mcp<br>
+            <strong style="color: var(--text);">Skills:</strong> ansible-infrastructure-management<br>
+            <strong style="color: var(--text);">Delegates:</strong> github-pr-agent, github-issues-agent<br>
+            <strong style="color: var(--text);">Creds:</strong> Vault &rarr; proxmox-credentials
+          </div>
+        </div>
+
       </div>
 
       <!-- MCP Tool Servers -->
@@ -607,6 +624,18 @@
             <td>vault-agent</td>
             <td>HashiCorp Vault &mdash; KV secrets, mounts, PKI certificates</td>
           </tr>
+          <tr>
+            <td><code>proxmox-mcp</code></td>
+            <td>Remote (Streamable HTTP)</td>
+            <td>ansible-infra-agent</td>
+            <td>Proxmox VE &mdash; LXC containers, VMs, snapshots, status</td>
+          </tr>
+          <tr>
+            <td><code>ansible-mcp</code></td>
+            <td>Remote (Streamable HTTP)</td>
+            <td>ansible-infra-agent</td>
+            <td>Ansible via Semaphore &mdash; run playbooks, lint, job history, logs</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -644,7 +673,7 @@
           </tr>
           <tr>
             <td><code>kagent</code></td>
-            <td>bank-platform-agent, k8s-agent, compliance-incident-agent, github-issues-agent, github-pr-agent, f5-bigip-agent, fortigate-agent, vault-agent, khook, khook-auth-proxy, f5-wrapper, fortigate-mcp-server, vault-mcp-server</td>
+            <td>bank-platform-agent, k8s-agent, compliance-incident-agent, github-issues-agent, github-pr-agent, f5-bigip-agent, fortigate-agent, vault-agent, ansible-infra-agent, khook, khook-auth-proxy, f5-wrapper, fortigate-mcp-server, vault-mcp-server, proxmox-mcp-server, ansible-mcp-server</td>
             <td>AI agents + MCP tool servers + event watcher + auth proxy</td>
           </tr>
           <tr>

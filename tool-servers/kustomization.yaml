@@ -9,6 +9,10 @@ resources:
   - fortigate-mcp-deployment.yaml
   - vault-mcp.yaml
   - vault-mcp-deployment.yaml
+  - proxmox-mcp.yaml
+  - proxmox-mcp-deployment.yaml
+  - ansible-mcp.yaml
+  - ansible-mcp-deployment.yaml
 
 commonLabels:
   app.kubernetes.io/name: kagent-tool-servers

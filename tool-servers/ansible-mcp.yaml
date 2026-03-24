@@ -1,0 +1,11 @@
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: ansible-mcp
+  namespace: kagent
+spec:
+  description: Ansible operations MCP server — lint, validate, and run playbooks via Semaphore
+  url: http://ansible-mcp-server.kagent:8080/mcp
+  protocol: STREAMABLE_HTTP
+  timeout: 60s
+  terminateOnClose: true
