@@ -1,0 +1,66 @@
+name: ansible-deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "ansible/**"
+      - ".github/workflows/ansible-deploy.yml"
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Ansible --limit (e.g. webservers, appservers, dbservers, or blank for all)"
+        required: false
+        default: ""
+        type: string
+      playbook:
+        description: "Playbook to run"
+        required: true
+        default: "site.yml"
+        type: choice
+        options:
+          - site.yml
+          - deploy-app.yml
+          - compliance-scan.yml
+
+concurrency:
+  group: ansible-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: ansible deploy
+    runs-on: [self-hosted]
+    defaults:
+      run:
+        working-directory: ansible
+    env:
+      ANSIBLE_HOST_KEY_CHECKING: "false"
+      ANSIBLE_FORCE_COLOR: "true"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Ansible (if missing)
+        run: |
+          if ! command -v ansible-playbook &>/dev/null; then
+            pip3 install --user ansible
+          fi
+          ansible-playbook --version
+
+      - name: Install required collections
+        run: |
+          ansible-galaxy collection install community.general community.postgresql --force
+
+      - name: Run playbook
+        run: |
+          PLAYBOOK="${{ inputs.playbook || 'site.yml' }}"
+          LIMIT="${{ inputs.limit }}"
+
+          ARGS="-i inventory/hosts.yml ${PLAYBOOK}"
+          if [ -n "$LIMIT" ]; then
+            ARGS="${ARGS} --limit ${LIMIT}"
+          fi
+
+          echo "Running: ansible-playbook ${ARGS}"
+          ansible-playbook ${ARGS}
