@@ -128,17 +128,6 @@ spec:
         - text
         tags: ["ansible", "proxmox", "infrastructure", "compliance"]
     tools:
-    - type: McpServer
-      mcpServer:
-        name: github-mcp-remote
-        kind: RemoteMCPServer
-        toolNames:
-        - get_file_contents
-        - create_or_update_file
-        - search_repositories
-        - list_commits
-        - list_branches
-        - push_files
     - type: Agent
       agent:
         name: github-pr-agent
