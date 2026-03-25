@@ -1,11 +1,6 @@
 ---
-# Webserver variables
 
-nginx_server_name: "_"
-
-# Upstream backend — references container_ips.yml (compliance_app_ip: 172.16.10.187)
-nginx_upstream_host: "{{ compliance_app_ip }}"
-nginx_upstream_port: 5000
-
-# Optional hardening / headers
-nginx_client_max_body_size: "10m"
+# Nginx compliance portal upstream
+# Fix for 502s: point nginx at compliance-app directly.
+nginx_compliance_upstream_host: "172.16.10.187"
+nginx_compliance_upstream_port: 5000

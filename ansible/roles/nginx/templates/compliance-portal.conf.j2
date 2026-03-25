@@ -1,21 +1,25 @@
+# Compliance Portal
+# Managed by Ansible
+
 server {
     listen 80;
-    server_name _;
+    server_name compliance-portal;
+
+    # Default upstream can be overridden via group/host vars.
+    # Examples:
+    #   nginx_compliance_upstream_host: 172.16.10.187
+    #   nginx_compliance_upstream_port: 5000
 
     location / {
-        proxy_pass http://{{ app_host }}:{{ app_port }};
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-    }
 
-    location /static/ {
-        alias /var/www/compliance-portal/static/;
-        expires 30d;
-        add_header Cache-Control "public";
-    }
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
 
-    access_log /var/log/nginx/compliance-portal.access.log;
-    error_log /var/log/nginx/compliance-portal.error.log;
+        proxy_pass http://{{ nginx_compliance_upstream_host }}:{{ nginx_compliance_upstream_port }};
+    }
 }
