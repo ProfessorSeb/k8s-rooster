@@ -127,3 +127,10 @@ spec:
         outputModes:
         - text
         tags: ["ansible", "proxmox", "infrastructure", "compliance"]
+    tools:
+    - type: Agent
+      agent:
+        name: github-pr-agent
+    - type: Agent
+      agent:
+        name: github-issues-agent
