@@ -12,7 +12,7 @@ data:
             endpoint: 0.0.0.0:4317
     exporters:
       otlphttp/solo:
-        endpoint: grpc://solo-enterprise-telemetry-collector.agentgateway-system.svc.cluster.local:4317
+        endpoint: grpc://solo-enterprise-telemetry-collector.kagent.svc.cluster.local:4317
       otlphttp/langfuse:
         endpoint: http://172.16.10.176:3000/api/public/otel
         headers:
