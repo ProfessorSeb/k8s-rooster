@@ -83,7 +83,31 @@ The payment-service in finance-payments isn't receiving any traffic through the 
 
 ---
 
-## Scenario 5 — Extensibility Teaser (2 min)
+## Scenario 5 — Namespace Migration (3 min)
+
+> Use the **k8s-agent** for this scenario
+
+**Setup:**
+```bash
+./chaos.sh migrate
+```
+This deploys `fruit-app` (Deployment + Service + ConfigMap) in namespace `apples`. Namespace `oranges` is empty.
+
+**Prompt:**
+```
+Migrate the fruit-app and all its resources from namespace apples to namespace oranges. Make sure it's running in oranges, then clean up apples.
+```
+
+**What kagent does:** Gets resources in apples → exports YAML for Deployment, Service, ConfigMap → applies them in oranges → verifies pods are running → deletes resources in apples
+
+**Follow-up (if time):**
+```
+Can you verify the fruit-app is healthy in the oranges namespace and the apples namespace is fully cleaned up?
+```
+
+---
+
+## Scenario 6 — Extensibility Teaser (2 min)
 
 > Narrate while showing kagent agent config screen. No live demo needed.
 
@@ -103,7 +127,8 @@ The payment-service in finance-payments isn't receiving any traffic through the 
 | `./setup.sh status` | Check all pods/agents/tools |
 | `./chaos.sh crash` | Break payment-service (Java OOM) |
 | `./chaos.sh istio` | Break VirtualService routing |
-| `./chaos.sh all` | Both at once |
+| `./chaos.sh migrate` | Set up namespace migration (fruit-app: apples → oranges) |
+| `./chaos.sh all` | All chaos at once |
 | `./chaos.sh reset` | Restore healthy state |
 | `./setup.sh delete` | Tear down everything |
 

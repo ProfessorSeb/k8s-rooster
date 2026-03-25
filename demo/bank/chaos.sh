@@ -9,6 +9,7 @@
 #   ./chaos.sh istio        # Scenario 4: Broken VirtualService
 #   ./chaos.sh khook        # Scenario 6: Break compliance-report-generator (khook auto-responds)
 #   ./chaos.sh mesh         # Scenario 7: Break ambient mesh — STRICT mTLS + deny-all AuthorizationPolicy
+#   ./chaos.sh migrate      # Scenario 8: Set up namespace migration (fruit-app in apples → oranges)
 #   ./chaos.sh all          # All chaos at once
 #   ./chaos.sh reset        # Restore everything to healthy
 
@@ -240,6 +241,92 @@ test_connectivity() {
     echo ""
 }
 
+setup_migrate() {
+    info "Setting up namespace migration scenario..."
+
+    # Create namespaces
+    kubectl create namespace apples 2>/dev/null || true
+    kubectl create namespace oranges 2>/dev/null || true
+
+    # Deploy fruit-app in apples namespace
+    kubectl apply -n apples -f - <<'YAML'
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fruit-app-config
+  namespace: apples
+data:
+  APP_ENV: "production"
+  APP_COLOR: "green"
+  APP_MESSAGE: "Hello from the Fruit App!"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fruit-app
+  namespace: apples
+  labels:
+    app: fruit-app
+    tier: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fruit-app
+  template:
+    metadata:
+      labels:
+        app: fruit-app
+        tier: frontend
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.27-alpine
+        ports:
+        - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: fruit-app-config
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fruit-app
+  namespace: apples
+  labels:
+    app: fruit-app
+spec:
+  selector:
+    app: fruit-app
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
+YAML
+
+    # Wait for pods
+    kubectl rollout status deployment/fruit-app -n apples --timeout=60s
+
+    info "fruit-app running in namespace 'apples' (2 replicas + service + configmap)"
+    info "namespace 'oranges' is empty — ready for migration"
+    echo ""
+    prompt "Ask k8s-agent: \"Migrate the fruit-app and all its resources from namespace apples to namespace oranges. Make sure it's running in oranges, then clean up apples.\""
+}
+
+cleanup_migrate() {
+    info "Cleaning up migration scenario..."
+    kubectl delete namespace apples 2>/dev/null || true
+    kubectl delete namespace oranges 2>/dev/null || true
+    info "Namespaces apples and oranges deleted"
+}
+
 reset_all() {
     info "Restoring healthy state..."
 
@@ -258,6 +345,9 @@ reset_all() {
     kubectl delete peerauthentication chaos-strict-mtls -n finance-payments 2>/dev/null || true
     kubectl delete authorizationpolicy chaos-deny-all -n finance-payments 2>/dev/null || true
 
+    # Clean up migration scenario
+    cleanup_migrate
+
     info "All workloads restored to healthy state"
 }
 
@@ -273,6 +363,9 @@ case "${ACTION}" in
         ;;
     mesh)
         inject_mesh
+        ;;
+    migrate)
+        setup_migrate
         ;;
     test)
         test_connectivity
@@ -290,15 +383,16 @@ case "${ACTION}" in
         reset_all
         ;;
     *)
-        echo "Usage: $0 {crash|istio|khook|mesh|all|reset|test}"
+        echo "Usage: $0 {crash|istio|khook|mesh|migrate|all|reset|test}"
         echo ""
-        echo "  crash   Inject Java OOM crashloop into payment-service"
-        echo "  istio   Break VirtualService routing to non-existent service"
-        echo "  khook   Break compliance-report-generator (khook auto-responds)"
-        echo "  mesh    Break ambient mesh — STRICT mTLS + deny-all policy"
-        echo "  all     Inject all chaos at once"
-        echo "  reset   Restore everything to healthy"
-        echo "  test    Test connectivity to payment-service (visual pass/fail)"
+        echo "  crash    Inject Java OOM crashloop into payment-service"
+        echo "  istio    Break VirtualService routing to non-existent service"
+        echo "  khook    Break compliance-report-generator (khook auto-responds)"
+        echo "  mesh     Break ambient mesh — STRICT mTLS + deny-all policy"
+        echo "  migrate  Set up namespace migration (fruit-app: apples → oranges)"
+        echo "  all      Inject all chaos at once"
+        echo "  reset    Restore everything to healthy"
+        echo "  test     Test connectivity to payment-service (visual pass/fail)"
         exit 1
         ;;
 esac
