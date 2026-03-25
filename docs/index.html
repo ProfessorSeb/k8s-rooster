@@ -143,7 +143,7 @@
   <section>
     <div class="container">
       <h2>Demo <span>Scenarios</span></h2>
-      <p>Eight scenarios that show kagent solving real platform engineering problems. Chaos is injected on demand — everything starts healthy.</p>
+      <p>Ten scenarios that show kagent solving real platform engineering problems. Chaos is injected on demand — everything starts healthy.</p>
 
       <div class="scenarios">
 
@@ -250,6 +250,79 @@
               <span class="tag" style="background: rgba(167,139,250,0.12); color: #a78bfa;">ansible</span>
               <span class="tag tag-cyan">GitOps</span>
               <span class="tag tag-green">A2A delegation</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario">
+          <div class="scenario-num">9</div>
+          <div class="scenario-body">
+            <h3>Namespace Migration &nbsp;<span class="tag tag-cyan">chaos.sh migrate</span></h3>
+            <p>A <code>fruit-app</code> deployment (2 replicas + Service + ConfigMap) runs in namespace <code>apples</code>. The <strong>k8s-agent</strong> exports all resources, recreates them in namespace <code>oranges</code>, verifies the app is healthy, and cleans up the source namespace &mdash; a full live migration with human-in-the-loop approval at each step.</p>
+            <div class="code-block">
+              <span class="prompt">&gt;</span> <span class="cmd">Migrate the fruit-app and all its resources from namespace apples to namespace oranges. Make sure it's running in oranges, then clean up apples.</span>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 10px; font-size: 0.8rem;">
+              <span class="tag tag-cyan">k8s-agent</span>
+              <span class="tag tag-green">HITL</span>
+              <span class="tag tag-yellow">namespace migration</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario">
+          <div class="scenario-num">10</div>
+          <div class="scenario-body">
+            <h3>F5 BIG-IP Load Balancer Management &nbsp;<span class="tag tag-orange" style="background: rgba(249,115,22,0.12); color: #f97316;">f5-bigip-agent</span></h3>
+            <p>The <strong>f5-bigip-agent</strong> manages an F5 BIG-IP appliance via iControl REST. It can list and inspect pools, virtual servers, nodes, and health monitors. With human approval, it creates pools, adds/removes pool members, configures VIPs, and enables/disables nodes for maintenance &mdash; all through natural language.</p>
+            <div class="code-block">
+              <span class="prompt">&gt;</span> <span class="cmd">List all pools on the BIG-IP and show me which ones have unhealthy members.</span>
+            </div>
+            <div class="code-block" style="margin-top: 8px;">
+              <span class="prompt">&gt;</span> <span class="cmd">Disable node 172.16.20.50 for maintenance and verify it's been removed from the active pool.</span>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 10px; font-size: 0.8rem;">
+              <span class="tag tag-orange" style="background: rgba(249,115,22,0.12); color: #f97316;">F5 BIG-IP</span>
+              <span class="tag tag-green">HITL</span>
+              <span class="tag tag-yellow">iControl REST</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario">
+          <div class="scenario-num">11</div>
+          <div class="scenario-body">
+            <h3>FortiGate Firewall Policy Audit &nbsp;<span class="tag tag-red">fortigate-agent</span></h3>
+            <p>The <strong>fortigate-agent</strong> manages a FortiGate firewall via FortiOS REST. It audits firewall policies, inspects VIP/DNAT rules, reviews address objects and interface assignments. With human approval, it can create policies, configure port forwarding (VIPs), and manage address objects &mdash; enforcing deny-by-default best practices.</p>
+            <div class="code-block">
+              <span class="prompt">&gt;</span> <span class="cmd">Audit all firewall policies and flag any that use srcaddr "all" with action "accept" — those are overly permissive.</span>
+            </div>
+            <div class="code-block" style="margin-top: 8px;">
+              <span class="prompt">&gt;</span> <span class="cmd">Create a DNAT rule to forward external port 8443 to internal host 172.16.10.186 port 443.</span>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 10px; font-size: 0.8rem;">
+              <span class="tag tag-red">FortiGate</span>
+              <span class="tag tag-green">HITL</span>
+              <span class="tag tag-yellow">FortiOS REST</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario">
+          <div class="scenario-num">12</div>
+          <div class="scenario-body">
+            <h3>Kubernetes Operations &nbsp;<span class="tag tag-cyan">k8s-agent</span></h3>
+            <p>The <strong>k8s-agent</strong> is the general-purpose Kubernetes expert. It handles cluster diagnostics, resource management, and security audits. It can describe pods, read logs, check events, inspect YAML, verify service connectivity, and with human approval &mdash; apply manifests, patch resources, scale deployments, and manage labels/annotations.</p>
+            <div class="code-block">
+              <span class="prompt">&gt;</span> <span class="cmd">Check all pods across the cluster and tell me which ones are in a bad state. Show me the root cause for each.</span>
+            </div>
+            <div class="code-block" style="margin-top: 8px;">
+              <span class="prompt">&gt;</span> <span class="cmd">Scale the risk-api deployment in risk-management to 5 replicas and verify all pods are ready.</span>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 10px; font-size: 0.8rem;">
+              <span class="tag tag-cyan">Claude Sonnet 4.6</span>
+              <span class="tag tag-green">HITL</span>
+              <span class="tag tag-yellow">18 k8s tools</span>
             </div>
           </div>
         </div>
@@ -426,6 +499,9 @@
 <div class="line"><span class="muted"># Inject chaos for Scenario 7 (break ambient mesh)</span></div>
 <div class="line"><span class="red">$</span> ./chaos.sh mesh</div>
 <div class="line"></div>
+<div class="line"><span class="muted"># Set up namespace migration scenario (Scenario 9)</span></div>
+<div class="line"><span class="cyan">$</span> ./chaos.sh migrate</div>
+<div class="line"></div>
 <div class="line"><span class="muted"># Inject all chaos at once</span></div>
 <div class="line"><span class="red">$</span> ./chaos.sh all</div>
 <div class="line"></div>
@@ -468,6 +544,10 @@
           <tr>
             <td><code>./chaos.sh mesh</code></td>
             <td>Inject STRICT mTLS + deny-all AuthorizationPolicy — blocks mesh traffic</td>
+          </tr>
+          <tr>
+            <td><code>./chaos.sh migrate</code></td>
+            <td>Deploy fruit-app in <code>apples</code> namespace, create empty <code>oranges</code> for migration</td>
           </tr>
           <tr>
             <td><code>./chaos.sh all</code></td>
