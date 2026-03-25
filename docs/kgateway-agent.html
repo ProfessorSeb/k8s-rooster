@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>kgateway Agent — Documentation</title>
+  <link rel="stylesheet" href="paper-theme.css">
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-title"><span>kagent</span> Demo Platform</div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="architecture.html">bank-platform-agent</a>
+      <a href="k8s-agent.html">k8s-agent</a>
+      <a href="istio-agent.html">Istio</a>
+      <a href="f5-bigip-agent.html">F5 BIG-IP</a>
+      <a href="fortigate-agent.html">FortiGate</a>
+      <a href="vault-agent.html">Vault</a>
+      <a href="cilium-crd-agent.html">Cilium</a>
+      <a href="slackbot-agent.html">Slack Bot</a>
+      <a href="kgateway-agent.html" class="active">kgateway</a>
+      <a href="github-pr-agent.html">GitHub PR</a>
+      <a href="github-issues-agent.html">GitHub Issues</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">CNCF Project &middot; Envoy Proxy &middot; Gateway API</div>
+    <h1><span>kgateway</span> Agent</h1>
+    <p>Kubernetes Gateway API expert &mdash; installs, configures, and troubleshoots kgateway, the cloud-native API gateway built on Envoy proxy and the Kubernetes Gateway API.</p>
+  </div>
+
+  <!-- Overview -->
+  <section>
+    <div class="container">
+      <h2>Agent <span>Overview</span></h2>
+      <table class="flow-table">
+        <tbody>
+          <tr><td><strong>Name</strong></td><td><code>kgateway-agent</code></td></tr>
+          <tr><td><strong>Namespace</strong></td><td><code>kagent</code></td></tr>
+          <tr><td><strong>Model</strong></td><td>default-model-config</td></tr>
+          <tr><td><strong>Type</strong></td><td>Declarative</td></tr>
+          <tr><td><strong>Installed via</strong></td><td>Helm (kgateway-agent chart v0.3.11)</td></tr>
+          <tr><td><strong>Status</strong></td><td>Accepted &middot; Deployment Ready</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- A2A Skills -->
+  <section>
+    <div class="container">
+      <h2>A2A <span>Skills</span></h2>
+      <p>Four specialized skills exposed via the Agent-to-Agent protocol, enabling other agents to delegate Gateway API tasks.</p>
+
+      <div class="features">
+        <div class="feature" style="border-left: 3px solid var(--accent-light);">
+          <h3>Installation &amp; Management</h3>
+          <p>Install, upgrade, and manage kgateway and its CRDs using Helm. Verify controller pods, GatewayClass status, and Helm releases.</p>
+          <div style="margin-top: 10px; font-size: 0.78rem; color: var(--text-muted);">
+            <strong style="color: var(--text);">ID:</strong> <code>kgateway-installation-management</code>
+          </div>
+        </div>
+
+        <div class="feature" style="border-left: 3px solid var(--cyan);">
+          <h3>Gateway API Configuration</h3>
+          <p>Define, apply, and manage Gateway and HTTPRoute resources. Generate YAML for path-based routing, hostname matching, and TLS configuration.</p>
+          <div style="margin-top: 10px; font-size: 0.78rem; color: var(--text-muted);">
+            <strong style="color: var(--text);">ID:</strong> <code>kgateway-gateway-api-configuration</code>
+          </div>
+        </div>
+
+        <div class="feature" style="border-left: 3px solid var(--orange);">
+          <h3>Troubleshooting &amp; Diagnostics</h3>
+          <p>Diagnose routing issues by inspecting logs, resource statuses, and configurations. Debug HTTPRoute reconciliation errors and Gateway conditions.</p>
+          <div style="margin-top: 10px; font-size: 0.78rem; color: var(--text-muted);">
+            <strong style="color: var(--text);">ID:</strong> <code>kgateway-troubleshooting-diagnostics</code>
+          </div>
+        </div>
+
+        <div class="feature" style="border-left: 3px solid var(--green);">
+          <h3>Feature Guidance &amp; Documentation</h3>
+          <p>Explain kgateway features (AI Gateway, TCPRoute, security policies), discuss integrations, and retrieve information from official documentation.</p>
+          <div style="margin-top: 10px; font-size: 0.78rem; color: var(--text-muted);">
+            <strong style="color: var(--text);">ID:</strong> <code>kgateway-feature-guidance-documentation</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools -->
+  <section>
+    <div class="container">
+      <h2>Available <span>Tools</span></h2>
+      <p>15 tools from <code>kagent-tool-server</code> &mdash; 9 Kubernetes management tools and 6 Helm tools.</p>
+
+      <h3 style="margin-top: 28px; font-size: 1rem;">Kubernetes Tools</h3>
+      <table class="flow-table" style="margin-top: 12px;">
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>k8s_check_service_connectivity</code></td><td>Test connectivity to a Kubernetes service</td></tr>
+          <tr><td><code>k8s_patch_resource</code></td><td>Patch a Kubernetes resource with strategic merge or JSON patch</td></tr>
+          <tr><td><code>k8s_create_resource</code></td><td>Create a Kubernetes resource from YAML</td></tr>
+          <tr><td><code>k8s_create_resource_from_url</code></td><td>Create resources from a remote URL (e.g. Gateway API CRDs)</td></tr>
+          <tr><td><code>k8s_delete_resource</code></td><td>Delete a Kubernetes resource</td></tr>
+          <tr><td><code>k8s_get_resource_yaml</code></td><td>Get YAML representation of a resource</td></tr>
+          <tr><td><code>k8s_apply_manifest</code></td><td>Apply a YAML manifest (create or update)</td></tr>
+          <tr><td><code>k8s_get_resources</code></td><td>List resources by type, namespace, and label selectors</td></tr>
+          <tr><td><code>k8s_get_pod_logs</code></td><td>Retrieve pod logs for debugging</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top: 28px; font-size: 1rem;">Helm Tools</h3>
+      <table class="flow-table" style="margin-top: 12px;">
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>helm_list_releases</code></td><td>List all Helm releases in a namespace or cluster-wide</td></tr>
+          <tr><td><code>helm_get_release</code></td><td>Get details of a specific Helm release</td></tr>
+          <tr><td><code>helm_upgrade</code></td><td>Install or upgrade a Helm chart (used for kgateway installation)</td></tr>
+          <tr><td><code>helm_uninstall</code></td><td>Uninstall a Helm release</td></tr>
+          <tr><td><code>helm_repo_add</code></td><td>Add a Helm chart repository</td></tr>
+          <tr><td><code>helm_repo_update</code></td><td>Update Helm chart repository index</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Key Concepts -->
+  <section>
+    <div class="container">
+      <h2>Key <span>Concepts</span></h2>
+
+      <div class="features">
+        <div class="feature" style="border-left: 3px solid var(--accent-light);">
+          <h3>Gateway API Resources</h3>
+          <p>Standard Kubernetes resources that kgateway implements:</p>
+          <ul style="margin-top: 8px; font-size: 0.88rem; color: var(--text-muted);">
+            <li><strong>GatewayClass</strong> &mdash; Defines the controller (kgateway)</li>
+            <li><strong>Gateway</strong> &mdash; Configures listeners (ports, hostnames, TLS)</li>
+            <li><strong>HTTPRoute</strong> &mdash; Routes HTTP traffic to backend services</li>
+            <li><strong>TCPRoute</strong> &mdash; Routes TCP traffic (experimental)</li>
+          </ul>
+        </div>
+
+        <div class="feature" style="border-left: 3px solid var(--cyan);">
+          <h3>AI Gateway</h3>
+          <p>Specialized protection for AI workloads and LLMs &mdash; rate limiting, access control, anomaly detection, and prompt/response filtering for large language models.</p>
+        </div>
+
+        <div class="feature" style="border-left: 3px solid var(--green);">
+          <h3>Envoy Data Plane</h3>
+          <p>kgateway uses Envoy proxy as its data plane, inheriting dynamic configuration, telemetry, load balancing strategies, circuit breaking, and plugin extensibility.</p>
+        </div>
+
+        <div class="feature" style="border-left: 3px solid var(--orange);">
+          <h3>Multi-Tenancy</h3>
+          <p>Advanced support for multi-tenant environments through namespace isolation, policy scoping, resource quota enforcement, and per-gateway security boundaries.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Example Workflows -->
+  <section>
+    <div class="container">
+      <h2>Example <span>Workflows</span></h2>
+
+      <div class="scenarios">
+        <div class="scenario">
+          <div class="scenario-num">1</div>
+          <div class="scenario-body">
+            <h3>Install kgateway</h3>
+            <div class="code-block">
+              <span class="prompt">&gt;</span> <span class="cmd">Install kgateway v2.0.1 into the kgateway-system namespace with the Gateway API CRDs.</span>
+            </div>
+            <p style="margin-top: 12px; font-size: 0.88rem; color: var(--text-muted);">The agent applies Gateway API CRDs from the official URL, installs kgateway-crds and kgateway Helm charts, verifies pods are running, and confirms the GatewayClass is ready.</p>
+          </div>
+        </div>
+
+        <div class="scenario">
+          <div class="scenario-num">2</div>
+          <div class="scenario-body">
+            <h3>Expose a Service via HTTPRoute</h3>
+            <div class="code-block">
+              <span class="prompt">&gt;</span> <span class="cmd">Create a Gateway on port 8080 for api.prod.com and route /users to user-service and /orders to order-service.</span>
+            </div>
+            <p style="margin-top: 12px; font-size: 0.88rem; color: var(--text-muted);">Generates Gateway + HTTPRoute YAML with path-based routing, applies it, and verifies the routes are programmed by checking Gateway and HTTPRoute status conditions.</p>
+          </div>
+        </div>
+
+        <div class="scenario">
+          <div class="scenario-num">3</div>
+          <div class="scenario-body">
+            <h3>Troubleshoot Broken Routing</h3>
+            <div class="code-block">
+              <span class="prompt">&gt;</span> <span class="cmd">My HTTPRoute for billing-service isn't routing traffic. What could be wrong?</span>
+            </div>
+            <p style="margin-top: 12px; font-size: 0.88rem; color: var(--text-muted);">Inspects the HTTPRoute status, checks parentRef binding to the Gateway, verifies the backend service exists, reads kgateway controller logs, and identifies the root cause.</p>
+          </div>
+        </div>
+
+        <div class="scenario">
+          <div class="scenario-num">4</div>
+          <div class="scenario-body">
+            <h3>Configure TLS Termination</h3>
+            <div class="code-block">
+              <span class="prompt">&gt;</span> <span class="cmd">Set up TLS termination on the edge-gateway for *.example.com using the wildcard-cert secret.</span>
+            </div>
+            <p style="margin-top: 12px; font-size: 0.88rem; color: var(--text-muted);">Updates the Gateway listener to use HTTPS with the TLS secret reference, configures certificate rotation, and verifies the listener is accepting connections.</p>
+          </div>
+        </div>
+
+        <div class="scenario">
+          <div class="scenario-num">5</div>
+          <div class="scenario-body">
+            <h3>AI Gateway for LLM Protection</h3>
+            <div class="code-block">
+              <span class="prompt">&gt;</span> <span class="cmd">Explain the AI Gateway capabilities and how to protect my LLM endpoint with rate limiting and access control.</span>
+            </div>
+            <p style="margin-top: 12px; font-size: 0.88rem; color: var(--text-muted);">Retrieves official documentation on AI Gateway features, explains configuration options for rate limiting, prompt filtering, and token-based access control for LLM endpoints.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sample YAML -->
+  <section>
+    <div class="container">
+      <h2>Sample <span>Configuration</span></h2>
+      <p>Gateway + HTTPRoute to expose a service through kgateway:</p>
+
+      <div class="terminal" style="margin-top: 20px;">
+        <div class="terminal-header">
+          <div class="terminal-dot r"></div>
+          <div class="terminal-dot y"></div>
+          <div class="terminal-dot g"></div>
+          <span class="terminal-title">gateway + httproute</span>
+        </div>
+        <div class="terminal-body">
+<div class="line"><span class="muted"># Gateway resource</span></div>
+<div class="line"><span class="cyan">apiVersion:</span> gateway.networking.k8s.io/v1</div>
+<div class="line"><span class="cyan">kind:</span> Gateway</div>
+<div class="line"><span class="cyan">metadata:</span></div>
+<div class="line">  <span class="cyan">name:</span> my-http-gateway</div>
+<div class="line">  <span class="cyan">namespace:</span> kgateway-system</div>
+<div class="line"><span class="cyan">spec:</span></div>
+<div class="line">  <span class="cyan">gatewayClassName:</span> kgateway</div>
+<div class="line">  <span class="cyan">listeners:</span></div>
+<div class="line">  - <span class="cyan">protocol:</span> HTTP</div>
+<div class="line">    <span class="cyan">port:</span> <span class="yellow">8080</span></div>
+<div class="line">    <span class="cyan">hostname:</span> mydomain.com</div>
+<div class="line">    <span class="cyan">name:</span> http</div>
+<div class="line">    <span class="cyan">allowedRoutes:</span></div>
+<div class="line">      <span class="cyan">namespaces:</span></div>
+<div class="line">        <span class="cyan">from:</span> All</div>
+<div class="line"><span class="muted">---</span></div>
+<div class="line"><span class="muted"># HTTPRoute resource</span></div>
+<div class="line"><span class="cyan">apiVersion:</span> gateway.networking.k8s.io/v1</div>
+<div class="line"><span class="cyan">kind:</span> HTTPRoute</div>
+<div class="line"><span class="cyan">metadata:</span></div>
+<div class="line">  <span class="cyan">name:</span> example-route</div>
+<div class="line">  <span class="cyan">namespace:</span> example-namespace</div>
+<div class="line"><span class="cyan">spec:</span></div>
+<div class="line">  <span class="cyan">parentRefs:</span></div>
+<div class="line">  - <span class="cyan">name:</span> my-http-gateway</div>
+<div class="line">    <span class="cyan">namespace:</span> kgateway-system</div>
+<div class="line">  <span class="cyan">hostnames:</span></div>
+<div class="line">  - mydomain.com</div>
+<div class="line">  <span class="cyan">rules:</span></div>
+<div class="line">  - <span class="cyan">backendRefs:</span></div>
+<div class="line">    - <span class="cyan">name:</span> example-service</div>
+<div class="line">      <span class="cyan">port:</span> <span class="yellow">80</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Installation Commands -->
+  <section>
+    <div class="container">
+      <h2>Installation <span>Commands</span></h2>
+      <div class="terminal" style="margin-top: 20px;">
+        <div class="terminal-header">
+          <div class="terminal-dot r"></div>
+          <div class="terminal-dot y"></div>
+          <div class="terminal-dot g"></div>
+          <span class="terminal-title">kgateway install</span>
+        </div>
+        <div class="terminal-body">
+<div class="line"><span class="muted"># 1. Install Gateway API CRDs</span></div>
+<div class="line"><span class="green">$</span> kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml</div>
+<div class="line"></div>
+<div class="line"><span class="muted"># 2. Install kgateway CRDs</span></div>
+<div class="line"><span class="green">$</span> helm upgrade -i --create-namespace --namespace kgateway-system \</div>
+<div class="line">    --version v2.0.1 kgateway-crds \</div>
+<div class="line">    oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds</div>
+<div class="line"></div>
+<div class="line"><span class="muted"># 3. Install kgateway</span></div>
+<div class="line"><span class="green">$</span> helm upgrade -i --namespace kgateway-system \</div>
+<div class="line">    --version v2.0.1 kgateway \</div>
+<div class="line">    oci://cr.kgateway.dev/kgateway-dev/charts/kgateway</div>
+<div class="line"></div>
+<div class="line"><span class="muted"># 4. Verify installation</span></div>
+<div class="line"><span class="green">$</span> kubectl get pods -n kgateway-system</div>
+<div class="line"><span class="green">$</span> kubectl get gatewayclass kgateway</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Troubleshooting -->
+  <section>
+    <div class="container">
+      <h2>Troubleshooting <span>Guide</span></h2>
+
+      <table class="flow-table" style="margin-top: 16px;">
+        <thead>
+          <tr>
+            <th>Symptom</th>
+            <th>Check</th>
+            <th>Fix</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>HTTPRoute not routing traffic</td>
+            <td>Check <code>status.parents</code> on the HTTPRoute &mdash; ensure parentRef matches the Gateway</td>
+            <td>Verify Gateway name/namespace in <code>parentRefs</code>, ensure backend service exists</td>
+          </tr>
+          <tr>
+            <td>Gateway not accepting listeners</td>
+            <td>Check <code>status.conditions</code> on the Gateway resource</td>
+            <td>Verify GatewayClass exists, check kgateway controller logs for reconciliation errors</td>
+          </tr>
+          <tr>
+            <td>kgateway pods not starting</td>
+            <td>Check pod events and logs in <code>kgateway-system</code></td>
+            <td>Verify Helm chart version compatibility, check resource limits, ensure CRDs are installed</td>
+          </tr>
+          <tr>
+            <td>TLS not terminating</td>
+            <td>Verify the TLS secret exists in the Gateway's namespace</td>
+            <td>Ensure the secret type is <code>kubernetes.io/tls</code> with valid <code>tls.crt</code> and <code>tls.key</code></td>
+          </tr>
+          <tr>
+            <td>Multiple kgateway installs conflicting</td>
+            <td>Check for multiple GatewayClass resources</td>
+            <td>Only one kgateway install per cluster &mdash; uninstall duplicates</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Important Notes -->
+  <section>
+    <div class="container">
+      <h2>Important <span>Notes</span></h2>
+      <div class="features" style="grid-template-columns: 1fr;">
+        <div class="feature" style="border-left: 3px solid var(--yellow);">
+          <h3>Single Install Per Cluster</h3>
+          <p>kgateway should only be installed once per cluster. Multiple installations will conflict on GatewayClass reconciliation.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--cyan);">
+          <h3>Formerly Gloo Gateway</h3>
+          <p>kgateway was formerly known as Gloo Gateway and is now a CNCF project. Documentation may reference the old name in some places.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--green);">
+          <h3>GitOps Compatible</h3>
+          <p>All Gateway API resources are declarative Kubernetes CRDs, making them fully compatible with ArgoCD, Flux, and other GitOps workflows.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

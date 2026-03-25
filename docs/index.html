@@ -25,6 +25,7 @@
       <a href="vault-agent.html">Vault</a>
       <a href="cilium-crd-agent.html">Cilium</a>
       <a href="slackbot-agent.html">Slack Bot</a>
+      <a href="kgateway-agent.html">kgateway</a>
       <a href="github-pr-agent.html">GitHub PR</a>
       <a href="github-issues-agent.html">GitHub Issues</a>
     </div>
@@ -83,6 +84,98 @@
     </div>
   </section>
 
+  <!-- Use Cases -->
+  <section>
+    <div class="container">
+      <h2>What Can These <span>Agents Do</span>?</h2>
+      <p>Real-world platform engineering use cases powered by AI agents. Each use case combines one or more agents working together.</p>
+
+      <div class="features" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+
+        <div class="feature" style="border-left: 3px solid var(--accent-light);">
+          <h3>Automated Incident Response</h3>
+          <p>A pod crashes at 3 AM. <strong>khook</strong> detects the restart, triggers <strong>compliance-incident-agent</strong> which reads logs, identifies the root cause (e.g. database connection timeout), and delegates to <strong>github-issues-agent</strong> to file a detailed incident report — all without a human touching a keyboard.</p>
+          <div style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
+            <strong>Agents:</strong> khook &rarr; compliance-incident-agent &rarr; github-issues-agent
+          </div>
+        </div>
+
+        <div class="feature" style="border-left: 3px solid var(--cyan);">
+          <h3>Live Namespace Migration</h3>
+          <p>Move a running application from one namespace to another with zero downtime. <strong>k8s-agent</strong> exports all resources (Deployments, Services, ConfigMaps), recreates them in the target namespace, verifies health, and cleans up the source — with human approval at each step.</p>
+          <div style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
+            <strong>Agents:</strong> k8s-agent (HITL)
+          </div>
+        </div>
+
+        <div class="feature" style="border-left: 3px solid var(--orange);">
+          <h3>End-to-End Service Exposure</h3>
+          <p>Deploy a new service and expose it through the F5 load balancer in one conversation. <strong>k8s-f5-agent</strong> checks the K8s deployment is healthy, grabs the NodePort, creates an F5 pool with health monitors, and binds a virtual server — full stack from pod to public VIP.</p>
+          <div style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
+            <strong>Agents:</strong> k8s-f5-agent (HITL)
+          </div>
+        </div>
+
+        <div class="feature" style="border-left: 3px solid var(--red);">
+          <h3>Firewall Policy Audit</h3>
+          <p>Ask <strong>fortigate-agent</strong> to audit all firewall policies and flag overly permissive rules (e.g. <code>srcaddr: all</code> with <code>action: accept</code>). It lists every policy, identifies violations of deny-by-default best practices, and can tighten rules with your approval.</p>
+          <div style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
+            <strong>Agents:</strong> fortigate-agent (HITL)
+          </div>
+        </div>
+
+        <div class="feature" style="border-left: 3px solid var(--green);">
+          <h3>Zero-Trust Network Policy from English</h3>
+          <p>Describe your security intent: <em>"Only frontend pods should reach the API on port 8080"</em>. <strong>cilium-crd-agent</strong> generates valid CiliumNetworkPolicy YAML with the correct selectors, ports, and L7 rules, then applies it after you review.</p>
+          <div style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
+            <strong>Agents:</strong> cilium-crd-agent (HITL)
+          </div>
+        </div>
+
+        <div class="feature" style="border-left: 3px solid #a78bfa;">
+          <h3>Infrastructure Fix via GitOps</h3>
+          <p>The Compliance Portal is returning 502. <strong>ansible-infra-agent</strong> reads the Ansible inventory from GitHub, spots the misconfigured upstream IP, and submits a PR via <strong>github-pr-agent</strong> to fix it — infrastructure-as-code with AI-driven remediation.</p>
+          <div style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
+            <strong>Agents:</strong> ansible-infra-agent &rarr; github-pr-agent
+          </div>
+        </div>
+
+        <div class="feature" style="border-left: 3px solid var(--yellow);">
+          <h3>Secrets &amp; Certificate Management</h3>
+          <p>Set up a full PKI chain in HashiCorp Vault: create a root CA, an intermediate CA, configure roles, and issue leaf certificates with proper SANs and TTLs. <strong>vault-agent</strong> masks all secret values and requires approval for every write.</p>
+          <div style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
+            <strong>Agents:</strong> vault-agent (HITL)
+          </div>
+        </div>
+
+        <div class="feature" style="border-left: 3px solid var(--accent-light);">
+          <h3>Istio Traffic Splitting &amp; Canary</h3>
+          <p>Route 10% of traffic to a new version of your service for canary testing. <strong>istio-agent</strong> creates VirtualService and DestinationRule resources, monitors proxy status, and can roll back instantly if errors spike.</p>
+          <div style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
+            <strong>Agents:</strong> istio-agent (HITL)
+          </div>
+        </div>
+
+        <div class="feature" style="border-left: 3px solid var(--cyan);">
+          <h3>Slack-Driven Cluster Ops</h3>
+          <p>Ask questions in Slack and get instant answers: <em>"Which pods are unhealthy?"</em> or <em>"What Helm releases are failing?"</em>. <strong>slackbot-k8s-agent</strong> queries the cluster and posts formatted reports directly to your channel.</p>
+          <div style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
+            <strong>Agents:</strong> slackbot-k8s-agent &rarr; Slack
+          </div>
+        </div>
+
+        <div class="feature" style="border-left: 3px solid var(--green);">
+          <h3>Gateway API Configuration</h3>
+          <p>Expose services through Kubernetes Gateway API with <strong>kgateway-agent</strong>. Create Gateway resources, configure HTTPRoutes with path-based routing, set up TLS, and manage traffic policies — all from natural language.</p>
+          <div style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
+            <strong>Agents:</strong> kgateway-agent (HITL)
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
   <!-- Architecture -->
   <section>
     <div class="container">
@@ -111,6 +204,7 @@
           <div class="arch-box accent" style="border-color: var(--cyan);">vault-agent<br><span style="font-size:0.7rem;opacity:0.7;">Claude Sonnet 4.6 &middot; HITL</span></div>
           <div class="arch-box accent" style="border-color: #a78bfa;">ansible-infra-agent<br><span style="font-size:0.7rem;opacity:0.7;">Claude Sonnet 4.6 &middot; GitOps</span></div>
           <div class="arch-box accent" style="border-color: var(--green);">cilium-crd-agent<br><span style="font-size:0.7rem;opacity:0.7;">Claude Sonnet 4.6 &middot; HITL</span></div>
+          <div class="arch-box accent" style="border-color: var(--cyan);">kgateway-agent<br><span style="font-size:0.7rem;opacity:0.7;">default-model &middot; Gateway API</span></div>
         </div>
         <div class="arch-label" style="margin-top: 12px;">MCP Tool Servers</div>
         <div class="arch-row">
@@ -578,7 +672,7 @@
   <section>
     <div class="container">
       <h2>Deployed <span>Agents</span></h2>
-      <p>Eleven AI agents in the kagent namespace, each with specialized tools and A2A skills. Three LLM backends: Claude Sonnet 4.6, xAI Grok, and OpenAI via AgentGateway. Agents manage both Kubernetes workloads and Proxmox LXC infrastructure.</p>
+      <p>Twelve AI agents in the kagent namespace, each with specialized tools and A2A skills. Three LLM backends: Claude Sonnet 4.6, xAI Grok, and OpenAI via AgentGateway. Agents manage both Kubernetes workloads and Proxmox LXC infrastructure.</p>
 
       <div class="features" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
 
@@ -705,6 +799,18 @@
           <div style="margin-top: 10px; font-size: 0.78rem; color: var(--text-muted);">
             <strong style="color: var(--text);">Tools:</strong> kagent-tool-server (6 tools)<br>
             <strong style="color: var(--text);">Skills:</strong> cilium-network-policy
+          </div>
+        </div>
+
+        <div class="feature" style="border-left: 3px solid var(--cyan);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 style="margin: 0;"><a href="kgateway-agent.html" style="color: inherit; text-decoration: none;">kgateway-agent</a></h3>
+            <span class="tag tag-cyan">default-model-config</span>
+          </div>
+          <p>Kubernetes Gateway API expert &mdash; installs kgateway via Helm, configures Gateway and HTTPRoute resources, troubleshoots traffic routing, and manages TLS. Built on Envoy proxy.</p>
+          <div style="margin-top: 10px; font-size: 0.78rem; color: var(--text-muted);">
+            <strong style="color: var(--text);">Tools:</strong> kagent-tool-server (15 tools &mdash; 9 K8s + 6 Helm)<br>
+            <strong style="color: var(--text);">Skills:</strong> installation, gateway-api-config, troubleshooting, feature-guidance
           </div>
         </div>
 
