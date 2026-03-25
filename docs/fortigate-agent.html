@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FortiGate Agent — Documentation</title>
+  <link rel="stylesheet" href="paper-theme.css">
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-title"><span>kagent</span> Demo Platform</div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="k8s-agent.html">k8s-agent</a>
+      <a href="f5-bigip-agent.html">F5 BIG-IP</a>
+      <a href="fortigate-agent.html" class="active">FortiGate</a>
+      <a href="vault-agent.html">Vault</a>
+      <a href="cilium-crd-agent.html">Cilium</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">xAI Grok &middot; Human-in-the-Loop</div>
+    <h1><span>FortiGate</span> Agent</h1>
+    <p>Firewall management agent for FortiGate appliances &mdash; manages policies, VIPs, addresses, and interfaces via FortiOS REST API.</p>
+  </div>
+
+  <!-- Overview -->
+  <section>
+    <div class="container">
+      <h2>Agent <span>Overview</span></h2>
+
+      <div class="ps-grid">
+        <div class="ps-card" style="border-left: 3px solid var(--red);">
+          <h3>Identity</h3>
+          <table class="flow-table" style="margin: 0;">
+            <tbody>
+              <tr><td><strong>Name</strong></td><td><code>fortigate-agent</code></td></tr>
+              <tr><td><strong>Namespace</strong></td><td><code>kagent</code></td></tr>
+              <tr><td><strong>Model</strong></td><td>xAI Grok (<code>xai-grok-config</code>)</td></tr>
+              <tr><td><strong>Type</strong></td><td>Declarative</td></tr>
+              <tr><td><strong>Tool Server</strong></td><td><code>fortigate-mcp</code> (16 tools)</td></tr>
+              <tr><td><strong>Credentials</strong></td><td>Vault &rarr; <code>fortigate-credentials</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="ps-card" style="border-left: 3px solid var(--green);">
+          <h3>A2A Skills</h3>
+          <ul>
+            <li><strong>FortiGate Firewall Management</strong> &mdash; manage policies, VIPs, addresses, and interfaces</li>
+          </ul>
+          <h3 style="margin-top: 16px;">Tags</h3>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <span class="tag tag-red">fortigate</span>
+            <span class="tag tag-red">firewall</span>
+            <span class="tag tag-yellow">security</span>
+            <span class="tag tag-cyan">network</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Capabilities -->
+  <section>
+    <div class="container">
+      <h2>Core <span>Capabilities</span></h2>
+
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon" style="background: rgba(239, 68, 68, 0.12); color: var(--red);">&#x1f6e1;</div>
+          <h3>Firewall Policy Management</h3>
+          <p>Create, list, inspect, update, and delete firewall policies. Understands top-down evaluation order and deny-by-default best practices.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon" style="background: rgba(99, 102, 241, 0.12); color: var(--accent-light);">&#x1f504;</div>
+          <h3>VIP / DNAT Management</h3>
+          <p>Configure virtual IPs for destination NAT (port forwarding). Map external IPs/ports to internal hosts.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon" style="background: rgba(16, 185, 129, 0.12); color: var(--green);">&#x1f4cb;</div>
+          <h3>Address Object Management</h3>
+          <p>Manage address objects and address groups. Use named objects instead of raw IPs in policies for cleaner rule sets.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon" style="background: rgba(6, 182, 212, 0.12); color: var(--cyan);">&#x1f50c;</div>
+          <h3>Interface Management</h3>
+          <p>View and understand network interfaces. Verify policies reference the correct source and destination interfaces.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools -->
+  <section>
+    <div class="container">
+      <h2>Available <span>Tools</span></h2>
+      <p>16 tools from <code>fortigate-mcp</code> via FortiOS REST API.</p>
+
+      <h3 style="margin-top: 24px; color: var(--green);">Read-Only Tools (no approval needed)</h3>
+      <table class="flow-table" style="margin-top: 12px;">
+        <thead>
+          <tr><th>Tool</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>list_policies</code></td><td>List all firewall policies</td></tr>
+          <tr><td><code>get_policy</code></td><td>Get details of a specific policy by ID</td></tr>
+          <tr><td><code>list_vips</code></td><td>List all virtual IP (DNAT) configurations</td></tr>
+          <tr><td><code>get_vip</code></td><td>Get details of a specific VIP</td></tr>
+          <tr><td><code>list_addresses</code></td><td>List all address objects</td></tr>
+          <tr><td><code>get_address</code></td><td>Get details of a specific address object</td></tr>
+          <tr><td><code>list_address_groups</code></td><td>List all address groups</td></tr>
+          <tr><td><code>list_interfaces</code></td><td>List all network interfaces</td></tr>
+          <tr><td><code>get_interface</code></td><td>Get details of a specific interface</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top: 32px; color: var(--red);">Modification Tools (approval required)</h3>
+      <table class="flow-table" style="margin-top: 12px;">
+        <thead>
+          <tr><th>Tool</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>create_policy</code></td><td>Create a new firewall policy</td></tr>
+          <tr><td><code>update_policy</code></td><td>Update an existing firewall policy</td></tr>
+          <tr><td><code>delete_policy</code></td><td>Delete a firewall policy</td></tr>
+          <tr><td><code>create_vip</code></td><td>Create a virtual IP (DNAT rule)</td></tr>
+          <tr><td><code>delete_vip</code></td><td>Delete a virtual IP</td></tr>
+          <tr><td><code>create_address</code></td><td>Create an address object</td></tr>
+          <tr><td><code>delete_address</code></td><td>Delete an address object</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Security Best Practices -->
+  <section>
+    <div class="container">
+      <h2>Security <span>Best Practices</span></h2>
+      <p>The agent enforces these security principles when managing firewall rules.</p>
+
+      <div class="features" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+        <div class="feature" style="border-left: 3px solid var(--red);">
+          <h3>Deny by Default</h3>
+          <p>Never create policies with <code>srcaddr: all</code> + <code>dstaddr: all</code> + <code>action: accept</code>. Only open what's needed.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--yellow);">
+          <h3>Specific Address Objects</h3>
+          <p>Always use named address objects rather than "all" where possible. Group related addresses for cleaner policy sets.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--cyan);">
+          <h3>Logging &amp; Audit</h3>
+          <p>Log all policy hits for audit trails. Enable logging on both accept and deny actions for full visibility.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--green);">
+          <h3>Policy Ordering</h3>
+          <p>FortiGate evaluates policies top-down. Place more specific rules before general ones. Order matters.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Example Prompts -->
+  <section>
+    <div class="container">
+      <h2>Example <span>Prompts</span></h2>
+
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">Audit all firewall policies and flag any that use srcaddr "all" with action "accept" — those are overly permissive.</span>
+      </div>
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">Create a DNAT rule to forward external port 8443 to internal host 172.16.10.186 port 443.</span>
+      </div>
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">List all VIPs and show me which internal hosts they map to.</span>
+      </div>
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">Show me all firewall policies that reference the "internal" interface as the source.</span>
+      </div>
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">Create an address group called "compliance-servers" containing the three compliance portal IPs, then create a policy allowing HTTPS traffic to them.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Troubleshooting -->
+  <section>
+    <div class="container">
+      <h2>Troubleshooting <span>Guidelines</span></h2>
+
+      <div class="features" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+        <div class="feature" style="border-left: 3px solid var(--accent-light);">
+          <h3>1. List Policies</h3>
+          <p>Start by listing all policies, VIPs, and interfaces. Get the lay of the land.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--yellow);">
+          <h3>2. Check Ordering</h3>
+          <p>FortiGate evaluates top-down. A broad deny above a specific allow will block traffic.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--cyan);">
+          <h3>3. Verify Addresses</h3>
+          <p>Ensure source/destination address objects exist before referencing them in policies.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--green);">
+          <h3>4. Check VIP Mappings</h3>
+          <p>Verify external IP/port maps to the correct internal IP/port. Mismatched mappings are a common issue.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>FortiGate Agent &mdash; Part of the <a href="index.html">kagent Demo Platform</a></p>
+  </footer>
+
+</body>
+</html>

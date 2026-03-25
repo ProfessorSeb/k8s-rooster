@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vault Agent — Documentation</title>
+  <link rel="stylesheet" href="paper-theme.css">
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-title"><span>kagent</span> Demo Platform</div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="k8s-agent.html">k8s-agent</a>
+      <a href="f5-bigip-agent.html">F5 BIG-IP</a>
+      <a href="fortigate-agent.html">FortiGate</a>
+      <a href="vault-agent.html" class="active">Vault</a>
+      <a href="cilium-crd-agent.html">Cilium</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">Claude Sonnet 4.6 &middot; Human-in-the-Loop</div>
+    <h1><span>Vault</span> Agent</h1>
+    <p>HashiCorp Vault management agent &mdash; KV secrets, secret engine mounts, and PKI certificate operations via Vault HTTP API.</p>
+  </div>
+
+  <!-- Overview -->
+  <section>
+    <div class="container">
+      <h2>Agent <span>Overview</span></h2>
+
+      <div class="ps-grid">
+        <div class="ps-card" style="border-left: 3px solid var(--cyan);">
+          <h3>Identity</h3>
+          <table class="flow-table" style="margin: 0;">
+            <tbody>
+              <tr><td><strong>Name</strong></td><td><code>vault-agent</code></td></tr>
+              <tr><td><strong>Namespace</strong></td><td><code>kagent</code></td></tr>
+              <tr><td><strong>Model</strong></td><td>Claude Sonnet 4.6 (<code>claude-model-config</code>)</td></tr>
+              <tr><td><strong>Type</strong></td><td>Declarative</td></tr>
+              <tr><td><strong>Tool Server</strong></td><td><code>vault-mcp</code> (17 tools)</td></tr>
+              <tr><td><strong>Credentials</strong></td><td>Vault &rarr; <code>vault-mcp-credentials</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="ps-card" style="border-left: 3px solid var(--green);">
+          <h3>A2A Skills</h3>
+          <ul>
+            <li><strong>HashiCorp Vault Management</strong> &mdash; manage secrets, mounts, and PKI certificates</li>
+          </ul>
+          <h3 style="margin-top: 16px;">Tags</h3>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <span class="tag tag-cyan">vault</span>
+            <span class="tag tag-cyan">secrets</span>
+            <span class="tag tag-yellow">pki</span>
+            <span class="tag tag-yellow">certificates</span>
+            <span class="tag tag-green">hashicorp</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Capabilities -->
+  <section>
+    <div class="container">
+      <h2>Core <span>Capabilities</span></h2>
+
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon" style="background: rgba(6, 182, 212, 0.12); color: var(--cyan);">&#x1f5c4;</div>
+          <h3>Mount Management</h3>
+          <p>Create, list, and delete secret engine mounts. Supports KV v1, KV v2, and PKI engines.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon" style="background: rgba(99, 102, 241, 0.12); color: var(--accent-light);">&#x1f511;</div>
+          <h3>KV Secret Operations</h3>
+          <p>Read, write, list, and delete secrets in KV v1 and v2 engines. Transparently handles the <code>data/</code> path translation for KV v2.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon" style="background: rgba(16, 185, 129, 0.12); color: var(--green);">&#x1f4dc;</div>
+          <h3>PKI Certificate Management</h3>
+          <p>Enable PKI engines, create root and intermediate CAs, manage roles, and issue leaf certificates with proper SANs and TTLs.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon" style="background: rgba(239, 68, 68, 0.12); color: var(--red);">&#x1f6e1;</div>
+          <h3>Security-First Output</h3>
+          <p>Secret values are never displayed in full. Key names are shown first, values masked (first 4 chars + <code>***</code>). Follows principle of least privilege.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools -->
+  <section>
+    <div class="container">
+      <h2>Available <span>Tools</span></h2>
+      <p>17 tools from <code>vault-mcp</code> via Vault HTTP API.</p>
+
+      <h3 style="margin-top: 24px; color: var(--green);">Read-Only Tools (no approval needed)</h3>
+      <table class="flow-table" style="margin-top: 12px;">
+        <thead>
+          <tr><th>Tool</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>list_mounts</code></td><td>List all secret engine mounts</td></tr>
+          <tr><td><code>read_secret</code></td><td>Read a secret at a given path</td></tr>
+          <tr><td><code>list_secrets</code></td><td>List secrets at a given path</td></tr>
+          <tr><td><code>list_pki_issuers</code></td><td>List PKI certificate issuers</td></tr>
+          <tr><td><code>read_pki_issuer</code></td><td>Read details of a PKI issuer</td></tr>
+          <tr><td><code>list_pki_roles</code></td><td>List PKI roles</td></tr>
+          <tr><td><code>read_pki_role</code></td><td>Read details of a PKI role</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top: 32px; color: var(--red);">Modification Tools (approval required)</h3>
+      <table class="flow-table" style="margin-top: 12px;">
+        <thead>
+          <tr><th>Tool</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>create_mount</code></td><td>Create a new secret engine mount</td></tr>
+          <tr><td><code>delete_mount</code></td><td>Delete a secret engine mount</td></tr>
+          <tr><td><code>write_secret</code></td><td>Write a secret to a path</td></tr>
+          <tr><td><code>delete_secret</code></td><td>Delete a secret at a path</td></tr>
+          <tr><td><code>enable_pki</code></td><td>Enable a PKI secret engine</td></tr>
+          <tr><td><code>create_pki_issuer</code></td><td>Create a PKI certificate issuer (root or intermediate CA)</td></tr>
+          <tr><td><code>create_pki_role</code></td><td>Create a PKI role for issuing certificates</td></tr>
+          <tr><td><code>delete_pki_role</code></td><td>Delete a PKI role</td></tr>
+          <tr><td><code>issue_pki_certificate</code></td><td>Issue a certificate from a configured PKI role</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- PKI Best Practices -->
+  <section>
+    <div class="container">
+      <h2>PKI <span>Best Practices</span></h2>
+      <p>The agent enforces these PKI principles when managing certificates.</p>
+
+      <div class="features" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+        <div class="feature" style="border-left: 3px solid var(--cyan);">
+          <h3>Use Intermediate CAs</h3>
+          <p>Issue leaf certificates from intermediate CAs, never from root CAs directly. This limits blast radius if a CA is compromised.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--yellow);">
+          <h3>Appropriate TTLs</h3>
+          <p>Root CA: 10 years. Intermediate CA: 3 years. Leaf certificates: 90 days. Shorter lifetimes reduce exposure from compromised keys.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--red);">
+          <h3>Expiry Warnings</h3>
+          <p>Warn about certificates expiring within 30 days. Proactive renewal prevents outages from expired certificates.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--green);">
+          <h3>Always Include SANs</h3>
+          <p>Subject Alternative Names are required for modern TLS. Include DNS names and IP addresses as needed.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Example Prompts -->
+  <section>
+    <div class="container">
+      <h2>Example <span>Prompts</span></h2>
+
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">List all secret engine mounts and tell me which ones are KV v2.</span>
+      </div>
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">Create a KV v2 secret at secret/myapp/database with username and password fields.</span>
+      </div>
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">Set up a PKI engine, create a root CA for rooster.maniak.io, then issue a certificate for api.rooster.maniak.io.</span>
+      </div>
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">List all secrets under the path secret/compliance/ and show me the key names.</span>
+      </div>
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">Check if any PKI certificates are expiring within the next 30 days.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Troubleshooting -->
+  <section>
+    <div class="container">
+      <h2>Troubleshooting <span>Guidelines</span></h2>
+
+      <div class="features" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+        <div class="feature" style="border-left: 3px solid var(--accent-light);">
+          <h3>1. List Mounts</h3>
+          <p>Start by listing all mounts to understand what engines are available and their paths.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--yellow);">
+          <h3>2. Check Permissions</h3>
+          <p>403 errors mean the token lacks permission. Check which policy is needed for the operation.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--cyan);">
+          <h3>3. Verify Paths</h3>
+          <p>404 errors usually mean a typo or missing mount. KV v2 paths use <code>secret/data/</code> internally.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--green);">
+          <h3>4. Check PKI Chain</h3>
+          <p>Verify issuer exists, role is configured, and TTLs are within the issuer's max TTL.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Vault Agent &mdash; Part of the <a href="index.html">kagent Demo Platform</a></p>
+  </footer>
+
+</body>
+</html>

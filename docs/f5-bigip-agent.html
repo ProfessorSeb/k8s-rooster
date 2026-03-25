@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>F5 BIG-IP Agent — Documentation</title>
+  <link rel="stylesheet" href="paper-theme.css">
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-title"><span>kagent</span> Demo Platform</div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="k8s-agent.html">k8s-agent</a>
+      <a href="f5-bigip-agent.html" class="active">F5 BIG-IP</a>
+      <a href="fortigate-agent.html">FortiGate</a>
+      <a href="vault-agent.html">Vault</a>
+      <a href="cilium-crd-agent.html">Cilium</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">xAI Grok &middot; Human-in-the-Loop</div>
+    <h1><span>F5 BIG-IP</span> Agent</h1>
+    <p>Network infrastructure agent for F5 BIG-IP appliances &mdash; manages pools, virtual servers, nodes, and health monitors via iControl REST API.</p>
+  </div>
+
+  <!-- Overview -->
+  <section>
+    <div class="container">
+      <h2>Agent <span>Overview</span></h2>
+
+      <div class="ps-grid">
+        <div class="ps-card" style="border-left: 3px solid var(--orange);">
+          <h3>Identity</h3>
+          <table class="flow-table" style="margin: 0;">
+            <tbody>
+              <tr><td><strong>Name</strong></td><td><code>f5-bigip-agent</code></td></tr>
+              <tr><td><strong>Namespace</strong></td><td><code>kagent</code></td></tr>
+              <tr><td><strong>Model</strong></td><td>xAI Grok (<code>xai-grok-config</code>)</td></tr>
+              <tr><td><strong>Type</strong></td><td>Declarative</td></tr>
+              <tr><td><strong>Tool Server</strong></td><td><code>f5-bigip-mcp</code> (17 tools)</td></tr>
+              <tr><td><strong>Credentials</strong></td><td>Vault &rarr; <code>f5-bigip-credentials</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="ps-card" style="border-left: 3px solid var(--green);">
+          <h3>A2A Skills</h3>
+          <ul>
+            <li><strong>F5 BIG-IP Management</strong> &mdash; manage pools, virtual servers, nodes, and health monitors</li>
+          </ul>
+          <h3 style="margin-top: 16px;">Tags</h3>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <span class="tag tag-orange" style="background: rgba(249,115,22,0.12); color: #f97316;">f5</span>
+            <span class="tag tag-orange" style="background: rgba(249,115,22,0.12); color: #f97316;">bigip</span>
+            <span class="tag tag-yellow">load-balancer</span>
+            <span class="tag tag-cyan">network</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Capabilities -->
+  <section>
+    <div class="container">
+      <h2>Core <span>Capabilities</span></h2>
+
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon" style="background: rgba(249, 115, 22, 0.12); color: #f97316;">&#x2696;</div>
+          <h3>Pool Management</h3>
+          <p>Create, list, and inspect server pools and their members. Add or remove pool members for scaling and maintenance.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon" style="background: rgba(99, 102, 241, 0.12); color: var(--accent-light);">&#x1f310;</div>
+          <h3>Virtual Server Management</h3>
+          <p>Configure and troubleshoot virtual servers (VIPs). Bind VIPs to pools and manage traffic routing.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon" style="background: rgba(16, 185, 129, 0.12); color: var(--green);">&#x1f5a5;</div>
+          <h3>Node Management</h3>
+          <p>Add, remove, enable, and disable backend nodes. Manage nodes for rolling maintenance windows.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon" style="background: rgba(6, 182, 212, 0.12); color: var(--cyan);">&#x1f4a1;</div>
+          <h3>Health Monitoring</h3>
+          <p>Configure and check health monitors for pools and nodes. Diagnose why members are marked down.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools -->
+  <section>
+    <div class="container">
+      <h2>Available <span>Tools</span></h2>
+      <p>17 tools from <code>f5-bigip-mcp</code> via iControl REST API.</p>
+
+      <h3 style="margin-top: 24px; color: var(--green);">Read-Only Tools (no approval needed)</h3>
+      <table class="flow-table" style="margin-top: 12px;">
+        <thead>
+          <tr><th>Tool</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>list_pools</code></td><td>List all pools on the BIG-IP</td></tr>
+          <tr><td><code>get_pool</code></td><td>Get detailed info about a specific pool</td></tr>
+          <tr><td><code>list_pool_members</code></td><td>List members of a pool</td></tr>
+          <tr><td><code>list_virtual_servers</code></td><td>List all virtual servers</td></tr>
+          <tr><td><code>get_virtual_server</code></td><td>Get details of a specific virtual server</td></tr>
+          <tr><td><code>list_nodes</code></td><td>List all nodes</td></tr>
+          <tr><td><code>get_node</code></td><td>Get details of a specific node</td></tr>
+          <tr><td><code>list_monitors</code></td><td>List all health monitors</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top: 32px; color: var(--red);">Modification Tools (approval required)</h3>
+      <table class="flow-table" style="margin-top: 12px;">
+        <thead>
+          <tr><th>Tool</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>create_pool</code></td><td>Create a new server pool</td></tr>
+          <tr><td><code>add_pool_member</code></td><td>Add a member to a pool</td></tr>
+          <tr><td><code>remove_pool_member</code></td><td>Remove a member from a pool</td></tr>
+          <tr><td><code>create_virtual_server</code></td><td>Create a new virtual server (VIP)</td></tr>
+          <tr><td><code>create_node</code></td><td>Create a new backend node</td></tr>
+          <tr><td><code>delete_node</code></td><td>Delete a node</td></tr>
+          <tr><td><code>enable_node</code></td><td>Enable a disabled node</td></tr>
+          <tr><td><code>disable_node</code></td><td>Disable a node for maintenance</td></tr>
+          <tr><td><code>create_monitor</code></td><td>Create a health monitor</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Traffic Flow -->
+  <section>
+    <div class="container">
+      <h2>Traffic <span>Flow</span></h2>
+      <p>Understanding the BIG-IP traffic path is key to troubleshooting.</p>
+
+      <div class="arch-diagram">
+        <div class="arch-label">Client Request</div>
+        <div class="arch-row">
+          <div class="arch-box">Client / Browser</div>
+        </div>
+        <div class="arch-arrow">&darr;</div>
+        <div class="arch-label">F5 BIG-IP</div>
+        <div class="arch-row">
+          <div class="arch-box accent" style="border-color: var(--orange);">Virtual Server (VIP)<br><span style="font-size:0.7rem;opacity:0.7;">172.16.20.x:443</span></div>
+        </div>
+        <div class="arch-arrow">&darr;</div>
+        <div class="arch-row">
+          <div class="arch-box accent" style="border-color: var(--orange);">Pool<br><span style="font-size:0.7rem;opacity:0.7;">Load balancing algorithm</span></div>
+        </div>
+        <div class="arch-arrow">&darr;</div>
+        <div class="arch-label">Backend Nodes</div>
+        <div class="arch-row">
+          <div class="arch-box green">Node 1<br><span style="font-size:0.7rem;opacity:0.5;">Health: UP</span></div>
+          <div class="arch-box green">Node 2<br><span style="font-size:0.7rem;opacity:0.5;">Health: UP</span></div>
+          <div class="arch-box" style="border-color: var(--red);">Node 3<br><span style="font-size:0.7rem;opacity:0.5;color:var(--red);">Health: DOWN</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Example Prompts -->
+  <section>
+    <div class="container">
+      <h2>Example <span>Prompts</span></h2>
+
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">List all pools on the BIG-IP and show me which ones have unhealthy members.</span>
+      </div>
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">Disable node 172.16.20.50 for maintenance and verify it's been removed from the active pool.</span>
+      </div>
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">Create a new pool called "web-servers" with members 172.16.10.186:80 and 172.16.10.187:80, and add an HTTP health monitor.</span>
+      </div>
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">What virtual servers are configured and which pools are they bound to?</span>
+      </div>
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">A virtual server is returning 503 errors. Can you check the pool members and health monitors to find the issue?</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Troubleshooting -->
+  <section>
+    <div class="container">
+      <h2>Troubleshooting <span>Guidelines</span></h2>
+
+      <div class="features" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+        <div class="feature" style="border-left: 3px solid var(--accent-light);">
+          <h3>1. List Resources</h3>
+          <p>Start with read-only operations &mdash; list pools, virtual servers, and nodes first.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--cyan);">
+          <h3>2. Check Monitors</h3>
+          <p>Verify health monitors are correctly configured and passing for all pool members.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--yellow);">
+          <h3>3. Verify Members</h3>
+          <p>Check if pool members are up, down, or disabled. Look at member-level status.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--green);">
+          <h3>4. Check Bindings</h3>
+          <p>Ensure virtual servers are bound to the correct pools and traffic flows end-to-end.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>F5 BIG-IP Agent &mdash; Part of the <a href="index.html">kagent Demo Platform</a></p>
+  </footer>
+
+</body>
+</html>

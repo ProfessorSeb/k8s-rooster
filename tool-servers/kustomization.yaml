@@ -8,6 +8,8 @@ resources:
   - fortigate-mcp.yaml
   - fortigate-mcp-deployment.yaml
   - enterprise-agentgateway-bridge.yaml
+  - vault-mcp.yaml
+  - vault-mcp-deployment.yaml
 
 commonLabels:
   app.kubernetes.io/name: kagent-tool-servers

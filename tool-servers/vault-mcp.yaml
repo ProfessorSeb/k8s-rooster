@@ -1,0 +1,14 @@
+apiVersion: kagent.dev/v1alpha2
+kind: RemoteMCPServer
+metadata:
+  name: vault-mcp
+  namespace: kagent
+  labels:
+    app.kubernetes.io/component: remote-mcp
+    app.kubernetes.io/name: kagent-tool-servers
+spec:
+  description: HashiCorp Vault MCP server — KV secrets, mounts, and PKI operations
+  protocol: STREAMABLE_HTTP
+  terminateOnClose: true
+  timeout: 10s
+  url: http://vault-mcp-server.kagent:8080/mcp

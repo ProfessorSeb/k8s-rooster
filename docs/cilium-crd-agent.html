@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cilium CRD Agent — Documentation</title>
+  <link rel="stylesheet" href="paper-theme.css">
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-title"><span>kagent</span> Demo Platform</div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="k8s-agent.html">k8s-agent</a>
+      <a href="f5-bigip-agent.html">F5 BIG-IP</a>
+      <a href="fortigate-agent.html">FortiGate</a>
+      <a href="vault-agent.html">Vault</a>
+      <a href="cilium-crd-agent.html" class="active">Cilium</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">Claude Sonnet 4.6 &middot; Human-in-the-Loop</div>
+    <h1><span>Cilium CRD</span> Agent</h1>
+    <p>Network policy expert &mdash; generates valid CiliumNetworkPolicy and CiliumClusterwideNetworkPolicy YAML from natural language descriptions.</p>
+  </div>
+
+  <!-- Overview -->
+  <section>
+    <div class="container">
+      <h2>Agent <span>Overview</span></h2>
+
+      <div class="ps-grid">
+        <div class="ps-card" style="border-left: 3px solid var(--green);">
+          <h3>Identity</h3>
+          <table class="flow-table" style="margin: 0;">
+            <tbody>
+              <tr><td><strong>Name</strong></td><td><code>cilium-crd-agent</code></td></tr>
+              <tr><td><strong>Namespace</strong></td><td><code>kagent</code></td></tr>
+              <tr><td><strong>Model</strong></td><td>Claude Sonnet 4.6 (<code>claude-model-config</code>)</td></tr>
+              <tr><td><strong>Type</strong></td><td>Declarative</td></tr>
+              <tr><td><strong>Tool Server</strong></td><td><code>kagent-tool-server</code> (6 tools)</td></tr>
+              <tr><td><strong>Source</strong></td><td><a href="https://kagent.dev/agents/cilium-crd-agent" style="color: var(--green);">kagent.dev</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="ps-card" style="border-left: 3px solid var(--cyan);">
+          <h3>A2A Skills</h3>
+          <ul>
+            <li><strong>Cilium Network Policy Management</strong> &mdash; create CNP and CCNP resources from natural language</li>
+          </ul>
+          <h3 style="margin-top: 16px;">Tags</h3>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <span class="tag tag-green">cilium</span>
+            <span class="tag tag-green">network-policy</span>
+            <span class="tag tag-yellow">security</span>
+            <span class="tag tag-cyan">kubernetes</span>
+            <span class="tag tag-cyan">cnp</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Capabilities -->
+  <section>
+    <div class="container">
+      <h2>Core <span>Capabilities</span></h2>
+
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon" style="background: rgba(16, 185, 129, 0.12); color: var(--green);">&#x1f6e1;</div>
+          <h3>CiliumNetworkPolicy</h3>
+          <p>Create namespaced network policies that control L3/L4/L7 traffic between pods using endpoint selectors, CIDR rules, and service-based matching.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon" style="background: rgba(99, 102, 241, 0.12); color: var(--accent-light);">&#x1f310;</div>
+          <h3>CiliumClusterwideNetworkPolicy</h3>
+          <p>Create cluster-scoped policies for host firewall rules, node-level controls, and cross-namespace security enforcement.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon" style="background: rgba(6, 182, 212, 0.12); color: var(--cyan);">&#x1f4dd;</div>
+          <h3>Natural Language to YAML</h3>
+          <p>Describe your security intent in plain English. The agent generates valid, production-ready Cilium policy YAML with correct API versions and selectors.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon" style="background: rgba(245, 158, 11, 0.12); color: var(--yellow);">&#x1f50d;</div>
+          <h3>L7 Application Rules</h3>
+          <p>Supports HTTP method/path filtering, Kafka topic ACLs, DNS-based egress rules, and TLS SNI matching through Envoy proxy.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools -->
+  <section>
+    <div class="container">
+      <h2>Available <span>Tools</span></h2>
+      <p>6 tools from <code>kagent-tool-server</code> for applying and inspecting policies.</p>
+
+      <h3 style="margin-top: 24px; color: var(--green);">Read-Only Tools (no approval needed)</h3>
+      <table class="flow-table" style="margin-top: 12px;">
+        <thead>
+          <tr><th>Tool</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>k8s_get_resources</code></td><td>List CiliumNetworkPolicy / CiliumClusterwideNetworkPolicy resources</td></tr>
+          <tr><td><code>k8s_get_resource_yaml</code></td><td>Get YAML of an existing policy</td></tr>
+          <tr><td><code>k8s_describe_resource</code></td><td>Describe a policy for status and events</td></tr>
+          <tr><td><code>k8s_get_available_api_resources</code></td><td>Check if Cilium CRDs are installed</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top: 32px; color: var(--red);">Modification Tools (approval required)</h3>
+      <table class="flow-table" style="margin-top: 12px;">
+        <thead>
+          <tr><th>Tool</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>k8s_apply_manifest</code></td><td>Apply a generated CiliumNetworkPolicy to the cluster</td></tr>
+          <tr><td><code>k8s_delete_resource</code></td><td>Delete an existing network policy</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Supported Policy Types -->
+  <section>
+    <div class="container">
+      <h2>Policy <span>Types</span></h2>
+      <p>The agent understands the full Cilium policy specification.</p>
+
+      <div class="features" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+        <div class="feature" style="border-left: 3px solid var(--green);">
+          <h3>L3 &mdash; Endpoint / CIDR / Entity</h3>
+          <p>Control traffic by pod labels (<code>fromEndpoints</code>), IP ranges (<code>fromCIDR</code>), or Cilium entities (<code>world</code>, <code>cluster</code>, <code>host</code>, <code>kube-apiserver</code>).</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--cyan);">
+          <h3>L4 &mdash; Ports / ICMP</h3>
+          <p>Restrict by port and protocol (TCP/UDP/SCTP). Supports port ranges via <code>endPort</code> and ICMP type/family filtering.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--yellow);">
+          <h3>L7 &mdash; HTTP / Kafka / DNS</h3>
+          <p>HTTP method+path+header filtering, Kafka topic-level ACLs, and DNS-based egress (<code>toFQDNs</code>) for external services.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--red);">
+          <h3>Deny Rules</h3>
+          <p><code>ingressDeny</code> / <code>egressDeny</code> take precedence over allow rules. Explicitly block specific traffic patterns.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Example Prompts -->
+  <section>
+    <div class="container">
+      <h2>Example <span>Prompts</span></h2>
+
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">Allow only the frontend pods to talk to the backend on port 8080 in the default namespace.</span>
+      </div>
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">Create an egress policy that lets the worker pods reach api.stripe.com on port 443 only.</span>
+      </div>
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">Block all ingress to pods labeled app=db except from pods labeled app=api on port 5432.</span>
+      </div>
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">Create an L7 HTTP policy that only allows GET requests to /api/v1/* on the api service.</span>
+      </div>
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">Create a cluster-wide host firewall policy that allows SSH only to bastion nodes from the world.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Important Notes -->
+  <section>
+    <div class="container">
+      <h2>Important <span>Notes</span></h2>
+
+      <div class="features" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+        <div class="feature" style="border-left: 3px solid var(--accent-light);">
+          <h3>Empty Selectors</h3>
+          <p>An empty <code>endpointSelector: {}</code> matches all pods in the namespace. Empty rule sections cause default deny.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--red);">
+          <h3>Deny Precedence</h3>
+          <p>Deny rules always override allow rules. Use <code>ingressDeny</code> / <code>egressDeny</code> carefully.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--yellow);">
+          <h3>L7 Requirements</h3>
+          <p>L7 rules need <code>--enable-l7-proxy=true</code>. Traffic is proxied through Envoy. Violations return app-level errors, not drops.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--green);">
+          <h3>Host Policies</h3>
+          <p>Node-level policies require <code>hostFirewall.enabled=true</code>. Use <code>nodeSelector</code> instead of <code>endpointSelector</code>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Cilium CRD Agent &mdash; Part of the <a href="index.html">kagent Demo Platform</a></p>
+  </footer>
+
+</body>
+</html>

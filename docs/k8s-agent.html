@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>k8s-agent — Documentation</title>
+  <link rel="stylesheet" href="paper-theme.css">
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-title"><span>kagent</span> Demo Platform</div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="architecture.html">Architecture</a>
+      <a href="k8s-agent.html" class="active">k8s-agent</a>
+      <a href="f5-bigip-agent.html">F5 BIG-IP</a>
+      <a href="fortigate-agent.html">FortiGate</a>
+      <a href="vault-agent.html">Vault</a>
+      <a href="cilium-crd-agent.html">Cilium</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-badge">Claude Sonnet 4.6 &middot; Human-in-the-Loop</div>
+    <h1><span>k8s</span>-agent</h1>
+    <p>An advanced Kubernetes expert agent for cluster operations, troubleshooting, and maintenance &mdash; with human approval required for all destructive operations.</p>
+  </div>
+
+  <!-- Overview -->
+  <section>
+    <div class="container">
+      <h2>Agent <span>Overview</span></h2>
+
+      <div class="ps-grid">
+        <div class="ps-card" style="border-left: 3px solid var(--accent-light);">
+          <h3>Identity</h3>
+          <table class="flow-table" style="margin: 0;">
+            <tbody>
+              <tr><td><strong>Name</strong></td><td><code>k8s-agent</code></td></tr>
+              <tr><td><strong>Namespace</strong></td><td><code>kagent</code></td></tr>
+              <tr><td><strong>Model</strong></td><td>Claude Sonnet 4.6 (<code>claude-model-config</code>)</td></tr>
+              <tr><td><strong>Type</strong></td><td>Declarative</td></tr>
+              <tr><td><strong>Tool Server</strong></td><td><code>kagent-tool-server</code> (18 tools)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="ps-card" style="border-left: 3px solid var(--green);">
+          <h3>A2A Skills</h3>
+          <ul>
+            <li><strong>Cluster Diagnostics</strong> &mdash; analyze and diagnose cluster issues</li>
+            <li><strong>Resource Management</strong> &mdash; manage and optimize Kubernetes resources</li>
+            <li><strong>Security Audit</strong> &mdash; audit and enhance Kubernetes security</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Capabilities -->
+  <section>
+    <div class="container">
+      <h2>Core <span>Capabilities</span></h2>
+
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon" style="background: rgba(99, 102, 241, 0.12); color: var(--accent-light);">&#x1f50d;</div>
+          <h3>Expert Diagnostics</h3>
+          <p>Deep understanding of Kubernetes architecture, components, and orchestration principles. Systematic approach to problem diagnosis using logs, metrics, and cluster state.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon" style="background: rgba(16, 185, 129, 0.12); color: var(--green);">&#x1f512;</div>
+          <h3>Security-First</h3>
+          <p>Prioritizes security awareness including RBAC, Pod Security, and secure practices. Follows the principle of least privilege.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon" style="background: rgba(245, 158, 11, 0.12); color: var(--yellow);">&#x1f6e1;</div>
+          <h3>Safety-Oriented</h3>
+          <p>Read-only operations first, progressive escalation only when necessary. Always verifies before acting and maintains rollback plans.</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon" style="background: rgba(239, 68, 68, 0.12); color: var(--red);">&#x1f91d;</div>
+          <h3>Human-in-the-Loop</h3>
+          <p>All modification tools require explicit user approval before execution. Describes the action, shows the YAML, and waits for confirmation.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools -->
+  <section>
+    <div class="container">
+      <h2>Available <span>Tools</span></h2>
+      <p>18 tools from <code>kagent-tool-server</code>, split between read-only and modification categories.</p>
+
+      <h3 style="margin-top: 24px; color: var(--green);">Read-Only Tools (no approval needed)</h3>
+      <table class="flow-table" style="margin-top: 12px;">
+        <thead>
+          <tr><th>Tool</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>k8s_get_resources</code></td><td>Retrieve information about Kubernetes resources (wide output)</td></tr>
+          <tr><td><code>k8s_describe_resource</code></td><td>Get detailed information about a specific resource</td></tr>
+          <tr><td><code>k8s_get_events</code></td><td>View cluster events to identify recent issues</td></tr>
+          <tr><td><code>k8s_get_pod_logs</code></td><td>Retrieve logs from specific pods</td></tr>
+          <tr><td><code>k8s_get_resource_yaml</code></td><td>Get YAML representation of a resource</td></tr>
+          <tr><td><code>k8s_get_available_api_resources</code></td><td>View supported API resources in the cluster</td></tr>
+          <tr><td><code>k8s_get_cluster_configuration</code></td><td>Retrieve cluster configuration</td></tr>
+          <tr><td><code>k8s_check_service_connectivity</code></td><td>Verify connectivity to a service</td></tr>
+          <tr><td><code>k8s_execute_command</code></td><td>Run a command inside a pod (read-only use)</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="margin-top: 32px; color: var(--red);">Modification Tools (approval required)</h3>
+      <table class="flow-table" style="margin-top: 12px;">
+        <thead>
+          <tr><th>Tool</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>k8s_apply_manifest</code></td><td>Apply a YAML resource file to the cluster</td></tr>
+          <tr><td><code>k8s_create_resource</code></td><td>Create a new resource from a local file</td></tr>
+          <tr><td><code>k8s_create_resource_from_url</code></td><td>Create a resource from a URL</td></tr>
+          <tr><td><code>k8s_patch_resource</code></td><td>Make partial updates to a resource</td></tr>
+          <tr><td><code>k8s_delete_resource</code></td><td>Remove a resource from the cluster</td></tr>
+          <tr><td><code>k8s_label_resource</code></td><td>Add labels to resources</td></tr>
+          <tr><td><code>k8s_remove_label</code></td><td>Remove labels from resources</td></tr>
+          <tr><td><code>k8s_annotate_resource</code></td><td>Add annotations to resources</td></tr>
+          <tr><td><code>k8s_remove_annotation</code></td><td>Remove annotations from resources</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Troubleshooting Framework -->
+  <section>
+    <div class="container">
+      <h2>Troubleshooting <span>Framework</span></h2>
+      <p>The agent follows a structured investigation protocol for every issue.</p>
+
+      <div class="features" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+        <div class="feature" style="border-left: 3px solid var(--accent-light);">
+          <h3>1. Initial Assessment</h3>
+          <p>Gather cluster info, verify version, check node status and capacity, review recent changes.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--cyan);">
+          <h3>2. Classification</h3>
+          <p>Application issues, infrastructure problems, performance concerns, security incidents, or config errors.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--yellow);">
+          <h3>3. Resource Analysis</h3>
+          <p>Pod status, container logs, resource metrics, network connectivity, storage status.</p>
+        </div>
+        <div class="feature" style="border-left: 3px solid var(--green);">
+          <h3>4. Solution</h3>
+          <p>Propose multiple solutions, assess risks, present implementation plan, include rollback procedures.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Example Prompts -->
+  <section>
+    <div class="container">
+      <h2>Example <span>Prompts</span></h2>
+
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">Check all pods across the cluster and tell me which ones are in a bad state. Show me the root cause for each.</span>
+      </div>
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">Scale the risk-api deployment in risk-management to 5 replicas and verify all pods are ready.</span>
+      </div>
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">Migrate the fruit-app and all its resources from namespace apples to namespace oranges.</span>
+      </div>
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">Which workloads across all namespaces are stateless and would be safe to migrate first?</span>
+      </div>
+      <div class="code-block" style="margin-bottom: 12px;">
+        <span class="prompt">&gt;</span> <span class="cmd">Check for RBAC misconfigurations in the finance-payments namespace.</span>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>k8s-agent &mdash; Part of the <a href="index.html">kagent Demo Platform</a></p>
+  </footer>
+
+</body>
+</html>
