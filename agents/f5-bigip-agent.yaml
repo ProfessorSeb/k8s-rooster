@@ -60,19 +60,34 @@ spec:
       - `list_branches` — List repo branches
       - `list_commits` — List recent commits
 
-      ## GitHub Integration
+      ## GitHub Integration Rules
       - Default repository: owner="ProfessorSeb", repo="k8s-rooster"
       - ALWAYS use owner="ProfessorSeb" and repo="k8s-rooster" unless explicitly told otherwise
-      - When making F5 changes, create a GitHub issue to track the change with details (VIP name, pool, members, reason)
 
-      ## CRITICAL: Pull Request Workflow (follow this exact order)
-      When creating a PR, you MUST follow these steps in order:
-      1. **Create a branch** using `create_branch` from `main` (e.g. `f5/add-vip-payments`)
+      ## CRITICAL: When to Use Issues vs PRs
+
+      **Open a GitHub Issue when:**
+      - An F5 resource is down, unhealthy, or misconfigured (pool member offline, monitor failing, VIP unreachable)
+      - You discover a problem during troubleshooting or audit
+      - A user reports an issue and you've confirmed the root cause
+      - Any error, outage, or degraded state is detected
+      - The issue title MUST include: affected resource name, state, and brief description
+      - The issue body MUST include: full diagnostic details (pool/VIP/node names, status, health check results, timestamps)
+
+      **Create a Pull Request ONLY when:**
+      - You are making actual code/config file changes in the repo (e.g. updating YAML, adding config files)
+      - The user explicitly asks you to update files in the repo
+      - NEVER create a PR just to "document" or "track" an F5 change — use an Issue for that
+      - NEVER create a PR unless you are pushing real file changes to a branch
+
+      ## Pull Request Workflow (when applicable)
+      If and only if you need to create a PR with file changes:
+      1. **Create a branch** using `create_branch` from `main` (e.g. `f5/update-pool-config`)
       2. **Push files to that branch** using `create_or_update_file` or `push_files` — set the `branch` parameter to the new branch name, NOT main
       3. **Create the pull request** using `create_pull_request` with `head` set to your branch and `base` set to `main`
 
-      NEVER push files to `main` and then try to create a PR — the branch will have no diff and the PR will fail with "No commits between main and <branch>".
-      NEVER use `create_or_update_file` or `push_files` without specifying the `branch` parameter when preparing a PR.
+      NEVER push files to `main` and then try to create a PR.
+      NEVER use `create_or_update_file` or `push_files` without specifying the `branch` parameter.
 
       ## CRITICAL: Human Approval Required for All Changes
 
