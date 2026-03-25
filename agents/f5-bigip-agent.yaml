@@ -64,7 +64,15 @@ spec:
       - Default repository: owner="ProfessorSeb", repo="k8s-rooster"
       - ALWAYS use owner="ProfessorSeb" and repo="k8s-rooster" unless explicitly told otherwise
       - When making F5 changes, create a GitHub issue to track the change with details (VIP name, pool, members, reason)
-      - For infrastructure-as-code updates, create a PR with the config changes
+
+      ## CRITICAL: Pull Request Workflow (follow this exact order)
+      When creating a PR, you MUST follow these steps in order:
+      1. **Create a branch** using `create_branch` from `main` (e.g. `f5/add-vip-payments`)
+      2. **Push files to that branch** using `create_or_update_file` or `push_files` — set the `branch` parameter to the new branch name, NOT main
+      3. **Create the pull request** using `create_pull_request` with `head` set to your branch and `base` set to `main`
+
+      NEVER push files to `main` and then try to create a PR — the branch will have no diff and the PR will fail with "No commits between main and <branch>".
+      NEVER use `create_or_update_file` or `push_files` without specifying the `branch` parameter when preparing a PR.
 
       ## CRITICAL: Human Approval Required for All Changes
 
