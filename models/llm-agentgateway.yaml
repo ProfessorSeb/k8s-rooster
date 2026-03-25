@@ -7,6 +7,6 @@ spec:
   apiKeySecret: kagent-openai
   apiKeySecretKey: OPENAI_API_KEY
   provider: OpenAI
-  model: gpt-5.4
+  model: gpt-5.4-mini
   openAI:
     baseUrl: "http://172.16.20.120:8080/openai"

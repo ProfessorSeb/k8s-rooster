@@ -11,17 +11,17 @@ spec:
   ai:
     groups:
     - providers:
-      - name: openai-gpt-52-codex
+      - name: openai-gpt-54-mini
         openai:
-          model: gpt-5.2-codex
+          model: gpt-5.4-mini
         policies:
           auth:
             secretRef:
               name: openai-secret
     - providers:
-      - name: openai-gpt-52-pro
+      - name: openai-gpt-54-nano
         openai:
-          model: gpt-5.2
+          model: gpt-5.4-nano
         policies:
           auth:
             secretRef:
