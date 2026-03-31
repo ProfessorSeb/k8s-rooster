@@ -128,6 +128,7 @@ k8s-rooster/
 ├── issues/                       # Known issues and bug tracking
 ├── upgrades/                     # Upgrade notes and procedures
 ├── .github/workflows/            # GitHub Actions (Ansible deploy, chaos, F5 Terraform)
+├── clean-configs.py              # Strips runtime metadata and sensitive data from captured YAML configs
 └── README.md
 ```
 
