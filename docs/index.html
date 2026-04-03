@@ -28,6 +28,7 @@
       <a href="kgateway-agent.html">kgateway</a>
       <a href="github-pr-agent.html">GitHub PR</a>
       <a href="github-issues-agent.html">GitHub Issues</a>
+      <a href="#uc-sandbox" style="color: var(--green);">Moat Sandbox</a>
     </div>
   </nav>
 
@@ -35,12 +36,13 @@
   <div class="hero">
     <div class="hero-badge">CNCF Sandbox Project</div>
     <h1><span>kagent</span> Demo Platform</h1>
-    <p>AI-powered Kubernetes operations. Crash diagnosis, migration planning, Istio ambient mesh troubleshooting, capacity forecasting, and Ansible infrastructure management — driven by an orchestrator agent with specialist sub-agents.</p>
+    <p>AI-powered Kubernetes operations. Crash diagnosis, migration planning, Istio ambient mesh troubleshooting, capacity forecasting, Ansible infrastructure management, and <strong>isolated sandbox code execution</strong> across a distributed fleet &mdash; driven by an orchestrator agent with specialist sub-agents.</p>
     <div class="hero-buttons">
       <a href="#uc-k8s" class="hero-btn primary">Kubernetes &darr;</a>
       <a href="#uc-networking" class="hero-btn">Networking &darr;</a>
       <a href="#uc-security" class="hero-btn">Security &darr;</a>
       <a href="#uc-cloud" class="hero-btn">Cloud &darr;</a>
+      <a href="#uc-sandbox" class="hero-btn" style="border-color: var(--green); color: var(--green);">Sandbox &darr;</a>
     </div>
   </div>
 
@@ -278,6 +280,201 @@
         </div>
       </div>
 
+      <!-- Sandbox / Moat -->
+      <div id="uc-sandbox" style="margin-top: 48px;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+          <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(16, 185, 129, 0.12); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">&#x1f3d7;</div>
+          <div>
+            <h3 style="margin: 0; font-size: 1.2rem;">Sandbox &amp; Code Execution</h3>
+            <p style="margin: 0; font-size: 0.8rem; color: var(--text-muted);">Isolated Linux sandboxes, container images, fleet orchestration, port forwarding, and snapshot time-travel</p>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+          <span class="tag tag-green">moat-sandbox-coder</span>
+          <span class="tag" style="background: rgba(16,185,129,0.12); color: #10b981;">moat-mcp-server</span>
+          <span class="tag" style="background: rgba(16,185,129,0.12); color: #10b981;">moat-fleet</span>
+        </div>
+        <div class="features" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+
+          <div class="feature" style="border-left: 3px solid var(--green);">
+            <h3>Fleet-Wide Sandbox Orchestration</h3>
+            <p>AI agents create sandboxes on-demand. The <strong>fleet controller</strong> (Go + xDS) automatically schedules to the least-loaded host, routes traffic via AgentGateway header matching, and fences dead hosts via lease-based health. Add a Proxmox host &mdash; it registers and the fleet uses it instantly.</p>
+            <div style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
+              <strong>Flow:</strong> Agent &rarr; Fleet Controller &rarr; xDS route &rarr; Host &rarr; Sandbox
+            </div>
+            <div class="code-block" style="margin-top: 10px;">
+              <span class="prompt">&gt;</span> <span class="cmd">Create a sandbox and write a Python script that scrapes stock prices, then run it.</span>
+            </div>
+          </div>
+
+          <div class="feature" style="border-left: 3px solid var(--green);">
+            <h3>Container-Native Sandboxes</h3>
+            <p>Request any OCI container image &mdash; <code>python:3.12</code>, <code>node:22</code>, <code>rust:1.86</code>, <code>golang:1.24</code> &mdash; as the sandbox root filesystem. Layers are pulled via skopeo, flattened with whiteout handling, and served as overlayfs (bubblewrap) or erofs (Firecracker). Content-addressed caching makes repeated images instant.</p>
+            <div style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
+              <strong>Flow:</strong> create_sandbox(image) &rarr; skopeo pull &rarr; OCI cache &rarr; overlayfs/erofs mount
+            </div>
+            <div class="code-block" style="margin-top: 10px;">
+              <span class="prompt">&gt;</span> <span class="cmd">Create a Rust sandbox and build a WebAssembly module that computes Fibonacci numbers.</span>
+            </div>
+          </div>
+
+          <div class="feature" style="border-left: 3px solid var(--green);">
+            <h3>Ephemeral Port Forwarding</h3>
+            <p>TCP tunnels to sandbox ports, <code>kubectl port-forward</code> style. No nftables rules, no DNS, no persistent state. Open a tunnel, access a Flask dashboard or PostgreSQL from your browser, close the terminal &mdash; everything cleans up automatically. Multiple independent tunnels per sandbox.</p>
+            <div style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
+              <strong>Flow:</strong> moatctl port-forward &rarr; gRPC stream &rarr; sandbox veth &rarr; TCP connect
+            </div>
+            <div class="code-block" style="margin-top: 10px;">
+              <span class="prompt">$</span> <span class="cmd">moatctl port-forward abc-123 8080:8080</span><br>
+              <span class="muted"># Open http://localhost:8080 &mdash; tunneled to sandbox</span>
+            </div>
+          </div>
+
+          <div class="feature" style="border-left: 3px solid var(--green);">
+            <h3>MCP-Native AI Integration</h3>
+            <p><strong>moat-mcp-server</strong> exposes 15 tools via Streamable HTTP MCP. Every tool call passes through AgentGateway's policy layer &mdash; JWT auth, RBAC, PII detection, prompt injection guard &mdash; and is traced end-to-end via OpenTelemetry into Langfuse. Natural language to running code in seconds.</p>
+            <div style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
+              <strong>Tools:</strong> create_sandbox, shell, run_code, read_file, write_file, list_files, take_snapshot, restore_snapshot, list_snapshots, get_pool_status, list_sandboxes, get_sandbox, delete_sandbox, list_sessions, delete_session
+            </div>
+          </div>
+
+          <div class="feature" style="border-left: 3px solid var(--green);">
+            <h3>Snapshot Time Travel</h3>
+            <p>Content-addressable snapshots with SHA-256 Merkle tree integrity. Baseline (full) + incremental (delta) snapshots. Restore to any point instantly. Diff any two snapshots to see exactly what changed. Cross-conversation <strong>sessions</strong> let agents resume work days later with full state preserved.</p>
+            <div style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
+              <strong>Flow:</strong> take_snapshot &rarr; nono CAS &rarr; Merkle tree &rarr; restore_snapshot (verified)
+            </div>
+            <div class="code-block" style="margin-top: 10px;">
+              <span class="prompt">&gt;</span> <span class="cmd">Save a snapshot before refactoring, then restore if the tests break.</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Moat Architecture Flow Diagram -->
+        <div style="margin-top: 36px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px;">
+          <h3 style="margin-bottom: 16px; font-size: 1rem; color: var(--green);">Moat Sandbox Architecture</h3>
+          <div class="arch-diagram">
+            <div class="arch-label">kagent Agent / Claude Desktop / moatctl</div>
+            <div class="arch-row">
+              <div class="arch-box green">moat-mcp-server<br><span style="font-size:0.7rem;opacity:0.7;">Streamable HTTP &middot; 15 tools</span></div>
+            </div>
+            <div class="arch-arrow">&darr;</div>
+            <div class="arch-label">Fleet Control Plane</div>
+            <div class="arch-row">
+              <div class="arch-box accent">Fleet Controller (Go)<br><span style="font-size:0.7rem;opacity:0.7;">gRPC + xDS &middot; PostgreSQL &middot; Leader Election</span></div>
+              <div class="arch-box accent">AgentGateway<br><span style="font-size:0.7rem;opacity:0.7;">xDS routes &middot; x-sandbox-id header</span></div>
+            </div>
+            <div class="arch-arrow">&darr;</div>
+            <div class="arch-label">Proxmox Hosts &middot; Fleet Agent on each host</div>
+            <div class="arch-row">
+              <div class="arch-box green" style="font-size: 0.78rem;">Host A (bubblewrap)<br><span style="opacity:0.5;">~50ms startup &middot; ~10 MiB/sandbox</span></div>
+              <div class="arch-box green" style="font-size: 0.78rem;">Host B (firecracker)<br><span style="opacity:0.5;">~4ms clone &middot; ~256 MiB/VM</span></div>
+              <div class="arch-box green" style="font-size: 0.78rem;">Host N (bubblewrap)<br><span style="opacity:0.5;">auto-registered &middot; lease-fenced</span></div>
+            </div>
+            <div class="arch-arrow">&darr;</div>
+            <div class="arch-label">Per-Sandbox Isolation</div>
+            <div class="arch-row">
+              <div class="arch-box" style="font-size: 0.78rem; border-color: var(--green);">Network NS<br><span style="opacity:0.5;">veth + nftables DNAT</span></div>
+              <div class="arch-box" style="font-size: 0.78rem; border-color: var(--green);">OCI Rootfs<br><span style="opacity:0.5;">overlayfs CoW / erofs</span></div>
+              <div class="arch-box" style="font-size: 0.78rem; border-color: var(--green);">Cgroup v2<br><span style="opacity:0.5;">CPU + memory + disk quota</span></div>
+              <div class="arch-box" style="font-size: 0.78rem; border-color: var(--green);">Worker gRPC<br><span style="opacity:0.5;">Unix socket &middot; exec/files</span></div>
+              <div class="arch-box" style="font-size: 0.78rem; border-color: var(--green);">Cred Proxy<br><span style="opacity:0.5;">secrets never in guest</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sandbox Scenarios -->
+        <div style="margin-top: 36px;">
+          <h3 style="margin-bottom: 16px; font-size: 1rem;">Sandbox <span style="color: var(--green);">Scenarios</span></h3>
+          <div class="scenarios">
+
+            <div class="scenario">
+              <div class="scenario-num" style="background: rgba(16,185,129,0.15); color: var(--green);">S1</div>
+              <div class="scenario-body">
+                <h3>Build &amp; Test in Any Language</h3>
+                <p>The agent creates a sandbox with a container image matching the language needed (Rust, Go, Python, Node, etc.), writes code, runs tests, and returns results. The container image cache means the second sandbox with the same image is instant.</p>
+                <div class="code-block">
+                  <span class="prompt">&gt;</span> <span class="cmd">Create a Go sandbox. Write a REST API with chi router that manages a todo list. Add table-driven tests. Run them and show me the results.</span>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 10px; font-size: 0.8rem;">
+                  <span class="tag tag-green">container images</span>
+                  <span class="tag tag-cyan">any language</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="scenario">
+              <div class="scenario-num" style="background: rgba(16,185,129,0.15); color: var(--green);">S2</div>
+              <div class="scenario-body">
+                <h3>Safe Refactoring with Snapshot Rollback</h3>
+                <p>Snapshot before a risky refactor. If tests break, restore instantly and try a different approach. The agent can bisect through snapshots to find exactly which change caused a regression.</p>
+                <div class="code-block">
+                  <span class="prompt">&gt;</span> <span class="cmd">Snapshot the current working state, then refactor the database layer to use async/await. If any tests fail, roll back and tell me what went wrong.</span>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 10px; font-size: 0.8rem;">
+                  <span class="tag tag-green">snapshots</span>
+                  <span class="tag tag-yellow">Merkle tree</span>
+                  <span class="tag tag-cyan">time travel</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="scenario">
+              <div class="scenario-num" style="background: rgba(16,185,129,0.15); color: var(--green);">S3</div>
+              <div class="scenario-body">
+                <h3>Port-Forward to a Running Dashboard</h3>
+                <p>The agent builds a web app in a sandbox, starts the server, and tells you the port-forward command. Open your browser and see the live app running inside an isolated sandbox &mdash; zero DNS, zero ingress, zero cleanup.</p>
+                <div class="code-block">
+                  <span class="prompt">&gt;</span> <span class="cmd">Build a Plotly dashboard that visualizes CPU usage data. Start the server so I can view it in my browser.</span>
+                </div>
+                <div class="code-block" style="margin-top: 8px;">
+                  <span class="prompt">$</span> <span class="cmd">moatctl port-forward &lt;sandbox-id&gt; 5000:5000</span><br>
+                  <span class="muted"># Open http://localhost:5000</span>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 10px; font-size: 0.8rem;">
+                  <span class="tag tag-green">port forwarding</span>
+                  <span class="tag tag-cyan">ephemeral</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="scenario">
+              <div class="scenario-num" style="background: rgba(16,185,129,0.15); color: var(--green);">S4</div>
+              <div class="scenario-body">
+                <h3>Fleet Auto-Scheduling Across Proxmox Hosts</h3>
+                <p>Multiple agents create sandboxes simultaneously. The fleet controller picks the least-loaded host for each, atomically reserves capacity in PostgreSQL, and pushes xDS routes so AgentGateway delivers traffic to the right host by <code>x-sandbox-id</code> header. Dead hosts are fenced automatically.</p>
+                <div class="code-block">
+                  <span class="prompt">&gt;</span> <span class="cmd">Check pool status &mdash; how many sandboxes are running and on which hosts?</span>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 10px; font-size: 0.8rem;">
+                  <span class="tag tag-green">fleet</span>
+                  <span class="tag" style="background: rgba(167,139,250,0.12); color: #a78bfa;">multi-host</span>
+                  <span class="tag tag-yellow">xDS routing</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="scenario">
+              <div class="scenario-num" style="background: rgba(16,185,129,0.15); color: var(--green);">S5</div>
+              <div class="scenario-body">
+                <h3>Cross-Conversation Persistent Sessions</h3>
+                <p>Start a development session, take snapshots, close the conversation. Days later, resume from exactly where you left off. Sessions persist across conversations with full workspace state, snapshots, and history.</p>
+                <div class="code-block">
+                  <span class="prompt">&gt;</span> <span class="cmd">List my sessions. Restore the "api-refactor" session from Tuesday and pick up where I left off.</span>
+                </div>
+                <div style="display: flex; gap: 8px; margin-top: 10px; font-size: 0.8rem;">
+                  <span class="tag tag-green">sessions</span>
+                  <span class="tag tag-cyan">persistent</span>
+                  <span class="tag tag-yellow">cross-conversation</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -310,6 +507,7 @@
           <div class="arch-box accent" style="border-color: #a78bfa;">ansible-infra-agent<br><span style="font-size:0.7rem;opacity:0.7;">Claude Sonnet 4.6 &middot; GitOps</span></div>
           <div class="arch-box accent" style="border-color: var(--green);">cilium-crd-agent<br><span style="font-size:0.7rem;opacity:0.7;">Claude Sonnet 4.6 &middot; HITL</span></div>
           <div class="arch-box accent" style="border-color: var(--cyan);">kgateway-agent<br><span style="font-size:0.7rem;opacity:0.7;">default-model &middot; Gateway API</span></div>
+          <div class="arch-box accent" style="border-color: var(--green);">moat-sandbox-coder<br><span style="font-size:0.7rem;opacity:0.7;">Claude Sonnet 4.6 &middot; 15 tools</span></div>
         </div>
         <div class="arch-label" style="margin-top: 12px;">MCP Tool Servers</div>
         <div class="arch-row">
@@ -320,6 +518,7 @@
           <div class="arch-box green" style="border-color: var(--cyan);">vault-mcp<br><span style="font-size:0.7rem;opacity:0.5;">Vault HTTP API</span></div>
           <div class="arch-box green" style="border-color: #a78bfa;">proxmox-mcp<br><span style="font-size:0.7rem;opacity:0.5;">Proxmox VE API</span></div>
           <div class="arch-box green" style="border-color: #a78bfa;">ansible-mcp<br><span style="font-size:0.7rem;opacity:0.5;">Semaphore API</span></div>
+          <div class="arch-box green" style="border-color: var(--green);">moat-mcp<br><span style="font-size:0.7rem;opacity:0.5;">Sandbox gRPC &middot; Fleet</span></div>
         </div>
         <div class="arch-arrow">&darr;</div>
         <div class="arch-label">Kubernetes Cluster &middot; Istio Ambient Mesh &middot; Network Infrastructure</div>
@@ -350,7 +549,7 @@
   <section>
     <div class="container">
       <h2>Demo <span>Scenarios</span></h2>
-      <p>Ten scenarios that show kagent solving real platform engineering problems. Chaos is injected on demand — everything starts healthy.</p>
+      <p>Twelve scenarios that show kagent solving real platform engineering problems. Chaos is injected on demand — everything starts healthy. Plus five sandbox-specific scenarios above.</p>
 
       <div class="scenarios">
 
@@ -777,7 +976,7 @@
   <section>
     <div class="container">
       <h2>Deployed <span>Agents</span></h2>
-      <p>Twelve AI agents in the kagent namespace, each with specialized tools and A2A skills. Three LLM backends: Claude Sonnet 4.6, xAI Grok, and OpenAI via AgentGateway. Agents manage both Kubernetes workloads and Proxmox LXC infrastructure.</p>
+      <p>Thirteen AI agents in the kagent namespace, each with specialized tools and A2A skills. Three LLM backends: Claude Sonnet 4.6, xAI Grok, and OpenAI via AgentGateway. Agents manage Kubernetes workloads, Proxmox LXC infrastructure, and isolated sandbox code execution across a distributed fleet.</p>
 
       <div class="features" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
 
@@ -931,6 +1130,20 @@
           </div>
         </div>
 
+        <div class="feature" style="border-left: 3px solid var(--green);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 style="margin: 0;">moat-sandbox-coder</h3>
+            <span class="tag tag-cyan">Claude Sonnet 4.6</span>
+          </div>
+          <p>Isolated sandbox code execution across a distributed fleet. Creates sandboxes with any OCI container image, executes code, manages files, port-forwards to services, and takes content-addressable snapshots with Merkle tree integrity.</p>
+          <div style="margin-top: 10px; font-size: 0.78rem; color: var(--text-muted);">
+            <strong style="color: var(--text);">Tools:</strong> moat-mcp-server (15 tools)<br>
+            <strong style="color: var(--text);">Skills:</strong> sandbox-code-execution<br>
+            <strong style="color: var(--text);">Backends:</strong> bubblewrap (~50ms) &middot; Firecracker microVM (~4ms clone)<br>
+            <strong style="color: var(--text);">Fleet:</strong> Auto-scheduled across Proxmox hosts via xDS
+          </div>
+        </div>
+
       </div>
 
       <!-- MCP Tool Servers -->
@@ -999,6 +1212,12 @@
             <td>ansible-infra-agent</td>
             <td>Ansible via Semaphore &mdash; run playbooks, lint, job history, logs</td>
           </tr>
+          <tr>
+            <td><code>moat-mcp-server</code></td>
+            <td>Remote (Streamable HTTP)</td>
+            <td>moat-sandbox-coder</td>
+            <td>Moat sandbox pool &mdash; create/delete sandboxes, exec, files, snapshots, sessions, fleet status (15 tools)</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -1036,8 +1255,8 @@
           </tr>
           <tr>
             <td><code>kagent</code></td>
-            <td>bank-platform-agent, k8s-agent, compliance-incident-agent, github-issues-agent, github-pr-agent, f5-bigip-agent, fortigate-agent, vault-agent, ansible-infra-agent, khook, khook-auth-proxy, f5-wrapper, fortigate-mcp-server, vault-mcp-server, proxmox-mcp-server, ansible-mcp-server</td>
-            <td>AI agents + MCP tool servers + event watcher + auth proxy</td>
+            <td>bank-platform-agent, k8s-agent, compliance-incident-agent, github-issues-agent, github-pr-agent, f5-bigip-agent, fortigate-agent, vault-agent, ansible-infra-agent, moat-sandbox-coder, khook, khook-auth-proxy, f5-wrapper, fortigate-mcp-server, vault-mcp-server, proxmox-mcp-server, ansible-mcp-server, moat-mcp-server</td>
+            <td>AI agents + MCP tool servers + sandbox fleet + event watcher + auth proxy</td>
           </tr>
           <tr>
             <td><code>Proxmox LXC</code></td>
@@ -1053,6 +1272,16 @@
             <td><code>monitoring</code></td>
             <td>Prometheus + kube-state-metrics (optional)</td>
             <td>Capacity forecasting data source</td>
+          </tr>
+          <tr>
+            <td><code>Proxmox Hosts</code></td>
+            <td>moat serve (fleet agent), moat-worker (per sandbox), moat-mcp (MCP server)</td>
+            <td>Distributed sandbox fleet &mdash; bubblewrap/Firecracker isolation, OCI images, snapshots, port forwarding</td>
+          </tr>
+          <tr>
+            <td><code>kagent (fleet)</code></td>
+            <td>moat-fleet (Go fleet controller), AgentGateway (xDS proxy)</td>
+            <td>Fleet control plane &mdash; scheduling, health, lease fencing, xDS routing to sandbox hosts</td>
           </tr>
         </tbody>
       </table>
