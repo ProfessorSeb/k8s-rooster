@@ -12,6 +12,7 @@ k8s-rooster/
 ├── manifests/                    # ArgoCD app-of-apps (top-level Applications)
 │   ├── agentgateway/             # AgentGateway ArgoCD applications
 │   ├── kagent/                   # kagent ArgoCD applications (agents, tool servers, slack bot)
+│   │   └── moat-fleet-application.yaml  # Moat fleet controller + AgentGateway Helm application
 │   └── vault/                    # Vault + external-secrets ArgoCD applications
 ├── gateways/                     # LLM gateway resources
 │   ├── shared/                   # Shared gateway, tracing params, otel-collector, Langfuse fan-out collector
@@ -124,6 +125,11 @@ k8s-rooster/
 │   ├── khook-auth-proxy.html     # khook auth proxy documentation page
 │   ├── architecture.html         # Architecture overview
 │   ├── DEPLOYMENT_GUIDE.md       # Deployment guide
+│   ├── usecase-container-sandbox.md      # Running OCI container sandboxes via Moat
+│   ├── usecase-fleet-orchestration.md    # Moat fleet-wide agent orchestration across hosts
+│   ├── usecase-mcp-ai-integration.md     # Integrating Moat MCP with AI agents (kagent/Claude)
+│   ├── usecase-port-forwarding.md        # Ephemeral TCP port forwarding from sandboxes
+│   ├── usecase-snapshot-time-travel.md   # Sandbox snapshot and time-travel restore
 │   └── *.html                    # Per-agent documentation pages
 ├── issues/                       # Known issues and bug tracking
 ├── upgrades/                     # Upgrade notes and procedures
@@ -185,6 +191,7 @@ This allows kagent agents to use MCP tools that are fronted by AgentGateway, get
 | `agentgateway-policies` | `policies/` | agentgateway-system | Security policies (PII, prompt injection, JWT auth, RBAC, etc.) |
 | `vault-apps` | `vault/` | argocd | HashiCorp Vault + External Secrets Operator |
 | `vault-external-secrets` | `external-secrets/` | various | ExternalSecret CRs (cluster store + per-namespace secrets) |
+| `moat-fleet` | `manifests/kagent/moat-fleet-application.yaml` | kagent | Moat fleet controller + AgentGateway — distributed sandbox host management |
 
 All applications use **auto-sync**, **selfHeal**, **prune**, and **ServerSideApply**.
 
@@ -286,7 +293,7 @@ terraform init && terraform apply
 - **ArgoCD with ServerSideApply** — required for CRDs that preserve unknown fields
 - **Separated concerns** — Agent CRs in `agents/`, tool server CRs in `tool-servers/`, slack bot in `slack-bot/`
 - **Vault-backed secrets** — External Secrets Operator pulls secrets from Vault into Kubernetes, replacing manual Secret management
-- **Moat sandbox coder** — Isolated Linux sandbox agent for code execution via Moat MCP server
+- **Moat sandbox coder** — Isolated Linux sandbox agent for code execution via Moat MCP server; supports fleet orchestration with automatic host scheduling, OCI container images (python:3.12, node:22, etc.), and ephemeral TCP port forwarding (`port_forward` tool)
 
 ---
 
