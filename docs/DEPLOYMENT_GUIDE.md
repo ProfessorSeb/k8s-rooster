@@ -185,6 +185,63 @@ kubectl get virtualservices -A
 kubectl describe application enterprise-agentgateway-helm -n argocd
 ```
 
+### Phase 4: kagent Enterprise Deployment
+
+1. **Create License Secret**:
+   ```bash
+   kubectl create namespace kagent
+   kubectl create secret generic kagent-enterprise-license \
+     -n kagent \
+     --from-literal=license-key="$KAGENT_LICENSE_KEY"
+   ```
+
+2. **Deploy via ArgoCD** (app-of-apps pattern):
+   ```bash
+   kubectl apply -f manifests/kagent/kagent-apps-application.yaml
+   ```
+   This deploys all kagent components: CRDs (0.3.14), controller (0.3.14), management + ClickHouse + telemetry (0.3.14), AgentGateway (v2.3.0-beta.8), khook, and agentregistry.
+
+3. **Verify**:
+   ```bash
+   kubectl get applications -n argocd | grep -E 'kagent|agentgateway|agentregistry'
+   kubectl get agents -n kagent
+   ```
+
+### Phase 5: AgentRegistry Enterprise Deployment
+
+AgentRegistry Enterprise is deployed as part of the `kagent-apps` app-of-apps via `kagent/agentregistry-application.yaml`.
+
+**Current version**: 0.0.12
+
+**Components deployed**:
+- AgentRegistry server (`us-docker.pkg.dev/agentregistry/enterprise/server:v0.0.12`)
+- Bundled PostgreSQL (dev/eval)
+- ClickHouse (telemetry storage)
+- OTel Collector (trace/log pipeline)
+
+**Known issues (v0.0.12)**:
+- Chart has broken httpGet probes (GET / returns 404). Patched via `ignoreDifferences` in ArgoCD to use tcpSocket probes instead.
+- Kagent provider registration (`arctl provider add kagent`) requires server v0.0.13+ (PR #317 merged to main but not yet released).
+
+**Verification**:
+```bash
+kubectl get pods -n agentregistry
+kubectl port-forward -n agentregistry svc/agentregistry-agentregistry-enterprise 8080:8080
+arctl version  # CLI connects via ARCTL_API_BASE_URL=http://localhost:8080/v0
+```
+
+## Current Component Versions
+
+| Component | Version | Chart Registry |
+|---|---|---|
+| AgentGateway Enterprise | v2.3.0-beta.8 | `us-docker.pkg.dev/solo-public/enterprise-agentgateway/charts` |
+| AgentGateway CRDs | v2.3.0-beta.8 | `us-docker.pkg.dev/solo-public/enterprise-agentgateway/charts` |
+| kagent Enterprise | 0.3.14 | `us-docker.pkg.dev/solo-public/kagent-enterprise-helm/charts` |
+| kagent CRDs | 0.3.14 | `us-docker.pkg.dev/solo-public/kagent-enterprise-helm/charts` |
+| kagent Management | 0.3.14 | `us-docker.pkg.dev/solo-public/solo-enterprise-helm/charts` |
+| AgentRegistry Enterprise | 0.0.12 | `us-docker.pkg.dev/agentregistry/enterprise/helm` |
+| Moat Fleet | 0.1.0 | `ghcr.io/solo-io/moat-fleet/charts` |
+
 ## Rollback Procedures
 
 ### Longhorn Rollback

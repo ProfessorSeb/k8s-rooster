@@ -80,6 +80,7 @@ k8s-rooster/
 │   ├── kagent-application.yaml
 │   ├── enterprise-agentgateway-application.yaml
 │   ├── enterprise-agentgateway-crds-application.yaml
+│   ├── agentregistry-application.yaml
 │   ├── khook-application.yaml
 │   ├── khook-crds-application.yaml
 │   └── kustomization.yaml
@@ -146,13 +147,15 @@ k8s-rooster/
 |---|---|
 | `agentgateway-system` | AgentGateway control plane, proxies, MCP servers, LLM gateways |
 | `kagent` | kagent Enterprise (agents, tools, management UI, slack bot, telemetry) |
+| `agentregistry` | AgentRegistry Enterprise (agent/MCP registry, deployment orchestration) |
 | `argocd` | ArgoCD GitOps controller |
 | `longhorn-system` | Longhorn distributed storage |
 
 ### Component Stack
 
-- **AgentGateway** (Solo Enterprise) — AI gateway for LLM traffic, MCP tool proxying, A2A, security policies
-- **kagent Enterprise** (Solo/CNCF) — Kubernetes-native AI agent platform with MCP tool integration
+- **AgentGateway** (Solo Enterprise) v2.3.0-beta.8 — AI gateway for LLM traffic, MCP tool proxying, A2A, security policies
+- **kagent Enterprise** (Solo/CNCF) v0.3.14 — Kubernetes-native AI agent platform with MCP tool integration
+- **AgentRegistry Enterprise** v0.0.12 — Agent and MCP server registry with multi-platform deployment orchestration (AWS, GCP, kagent)
 - **Consolidated Management UI** — Single `solo-enterprise-ui` in kagent namespace serves both kagent and AgentGateway products
 - **Telemetry** — Dual-export trace pipeline: AgentGateway → Langfuse OTel Collector (fan-out) → Langfuse + ClickHouse (Solo UI)
 - **HashiCorp Vault** — Secrets management with External Secrets Operator integration
@@ -192,6 +195,7 @@ This allows kagent agents to use MCP tools that are fronted by AgentGateway, get
 | `vault-apps` | `vault/` | argocd | HashiCorp Vault + External Secrets Operator |
 | `vault-external-secrets` | `external-secrets/` | various | ExternalSecret CRs (cluster store + per-namespace secrets) |
 | `moat-fleet` | `manifests/kagent/moat-fleet-application.yaml` | kagent | Moat fleet controller + AgentGateway — distributed sandbox host management |
+| `agentregistry` | `kagent/agentregistry-application.yaml` (Helm) | agentregistry | AgentRegistry Enterprise — agent/MCP registry + deployment orchestration |
 
 All applications use **auto-sync**, **selfHeal**, **prune**, and **ServerSideApply**.
 
@@ -297,7 +301,7 @@ terraform init && terraform apply
 
 ---
 
-**Last Updated**: March 27, 2026
+**Last Updated**: April 8, 2026
 **Cluster**: maniak-rooster (Talos)
 **Cluster Name (mgmt)**: rooster.maniak.io
 **Maintainer**: Seb (@ProfessorSeb)
