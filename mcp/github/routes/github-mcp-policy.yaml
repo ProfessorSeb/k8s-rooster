@@ -10,5 +10,5 @@ spec:
     name: mcp-github
   backend:
     mcp:
-      toolAuth:
-        defaultAction: Allow
+      authorization:
+        action: Allow
