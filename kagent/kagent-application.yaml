@@ -40,6 +40,9 @@ spec:
               enabled: true
             querydoc:
               enabled: true
+        postgres:
+          bundled:
+            storage: 5Gi
         agents:
           k8s-agent:
             enabled: false
@@ -64,6 +67,11 @@ spec:
     jsonPointers:
     - /spec/model
     - /spec/openAI
+  - group: ""
+    kind: PersistentVolumeClaim
+    name: kagent-postgresql
+    jsonPointers:
+    - /spec
   syncPolicy:
     automated:
       prune: true
@@ -71,3 +79,5 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+      - PruneLast=true
+      - RespectIgnoreDifferences=true
